@@ -1,0 +1,3 @@
+#!/Users/andrewc/citcom/causcumber/causcumber_venv/bin/python
+from numba.pycc import main
+main()
