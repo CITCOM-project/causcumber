@@ -5,10 +5,10 @@ Can we use cucumber specifications to systematically produce causal graphs that 
 The scenarios directory contains different example scenarios implemented in the Covasim model. For each scenario in the directory, a separate sub-directory should be created that contains the simulation and a cucumber specification.
 
 ## Steps to create a virtual environment:
-1. In `./covasim/causcumber`, run `python3 -m venv causcumber`
-2. To activate the virtual environment, run `source causcumber/bin/activate`
-3. To install the necessary requirements, in the root directory (`./covasim`), run `pip install -r requirements.txt`
-4. To install the necessary testing requirements, in the tests directory (`./covasim/tests`), run `pip install -r requirements_test.txt`
+1. In `./covasim/causcumber`, run `python3 -m venv causcumber_venv`
+2. To activate the virtual environment, run `source causcumber_venv/bin/activate`
+3. To install the necessary requirements, in the root directory (`./causcumber`), run `pip install -r requirements.txt`
+
 
 ## Proposed Causcumber workflow
 1. Create a `.feature` file specifying desired causal properties as scenarios in Gherkin language
