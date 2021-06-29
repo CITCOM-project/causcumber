@@ -1,7 +1,6 @@
 Feature: Intervention
 
-  We implement two different interventions in Covasim: Testing and Contact Tracing. The following scenarios
-  describe expected effect of the interventions on the cumulative number of infections.
+  We implement two different interventions in Covasim: Testing and Contact Tracing. The following scenarios describe expected effect of the interventions on the cumulative number of infections.
 
   Background:
     # Does every `Given` have to be followed by "the"? I'd rather it was "Given that..."
@@ -21,7 +20,7 @@ Feature: Intervention
     # This should result in the worst case scenario in terms of cumulative infections.
     Given no interventions are implemented
     When the simulation is complete
-    Then the cumulative number of infections should >= 70% of the population
+    Then the cumulative number of infections should be >= 70% of the population
 
   Scenario Outline: Testing
     # Under realistic parameter configurations, testing should always be better than
@@ -57,7 +56,7 @@ Feature: Intervention
       | 1.0    | 0.5    | 0.5    | 0.3    | <<<          | testing_only   |
       | 0.0    | 0.0    | 0.0    | 0.0    | =            | testing_only   |
 
-  Scenario: Contact Tracing But No Testing
+  Scenario: Contact Tracing Without Testing
     # Contact tracing requires testing to be implemented.
     # Otherwise, contact tracing has no effect on the cumulative number of infections.
     Given Testing is not implemented

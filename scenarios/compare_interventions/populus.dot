@@ -1,0 +1,27 @@
+digraph populus {
+  rankdir=LR;
+
+  initial_infections -> cum_cases;
+  pop_size -> cum_cases;
+
+  /* Not sure whether these will actually make a difference */
+  /* It'd be good to try and show they don't, if that's the case */
+  /* Or to try and show they do, especially if they don't actually */
+  /* I think they should do because folks go out more in the summer
+  and huddle more in winter, so it should spread faster in winter because
+  of people's social habits. */
+  start_date -> cum_cases;
+  end_date -> cum_cases;
+
+  start_date -> cum_deaths;
+  end_date -> cum_deaths;
+
+  cum_cases -> cum_deaths;
+
+  location -> cum_deaths;
+  location -> cum_cases;
+
+  pop_type -> cum_deaths;
+  pop_type -> cum_cases;
+
+}
