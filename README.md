@@ -11,7 +11,6 @@ The scenarios directory contains different example scenarios implemented in the 
 
 
 ## Proposed Causcumber workflow
-Starting from a *causal question* about a particular unit of a computational model:
 1. Create a `.feature` file specifying desired causal properties as scenarios in Gherkin language
 2. Transform each scenario into a causal question
 3. Infer a causal DAG baseline from each scenario - the user may need to correct this
