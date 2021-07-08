@@ -1,0 +1,18 @@
+digraph CausalGraph {
+    rankdir=LR;
+    volume -> depth_t1;
+    volume -> depth_t2;
+    volume -> depth_t3;
+
+    rain_t1 -> depth_t1;
+    temp_t1 -> depth_t1;
+
+    rain_t2 -> depth_t2;
+    temp_t2 -> depth_t2;
+
+    rain_t3 -> depth_t3;
+    temp_t3 -> depth_t3;
+
+    depth_t1 -> depth_t2;
+    depth_t2 -> depth_t3;
+}
