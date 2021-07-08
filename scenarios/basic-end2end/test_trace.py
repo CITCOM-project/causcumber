@@ -9,8 +9,9 @@ import covasim as cv
 from dowhy import CausalModel
 import os
 
-
-print("THIS IS TEST_TRACE")
+# Mute the "RuntimeWarning: divide by zero encountered in double_scalars" messages
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 def dict_plus(dic1, dic2):
     for field in dic2:
@@ -19,10 +20,7 @@ def dict_plus(dic1, dic2):
         dic1[field].append(dic2[field])
 
 
-def run_covasim(label, params, interventions, intervention_no, n_runs=100):
-    print("RUNNING COVASIM")
-    print("params:", params)
-    print("interventions:", interventions)
+def run_covasim(label, params, interventions, n_runs=100, run=False):
     params['interventions'] = []
     for intervention in interventions:
         if intervention == "testing":
@@ -36,13 +34,24 @@ def run_covasim(label, params, interventions, intervention_no, n_runs=100):
             params['interventions'].append(cv.contact_tracing(trace_probs=eval(params['trace_probs'])))
         else:
             raise Exception("Invalid intervention "+intervention)
-    
+
     params = {k: v for k, v in params.items() if k in base_params or k == "interventions"}
+   
+    print("Running covasim with params")
+    print("\n".join([f"  {k}: {v}" for k, v in params.items() if k != "interventions"]))
+    if params["interventions"] == []:
+        print("  internvetions: []")
+    else:
+        print("  interventions: [\n"+"\n".join([f"    {i}" for i in params["interventions"]]) + "\n  ]")
+    
+    if not run:
+        return None
+
     intervention_sim = cv.MultiSim(cv.Sim(pars=params, label=label, verbose=0))
     intervention_sim.run(n_runs=n_runs)
     fields = {'intervention': []}
     for sim in intervention_sim.sims:
-        fields['intervention'].append(intervention_no)
+        fields['intervention'].append(label)
         dict_plus(fields, {k: v for k, v in sim.compute_summary(output=True, full=False).items() if not (k.startswith("new_") or k.startswith("n_"))})
         dict_plus(fields, base_params)
     data = pd.DataFrame.from_dict(fields)
@@ -53,14 +62,16 @@ def run_covasim(label, params, interventions, intervention_no, n_runs=100):
         data.to_csv(path_or_buf="results/data.csv")
 
 
-def run_dowhy(datapath, graph, treatment_var, outcome_var, control_val, treatment_val):
-    print("RUNNING doWhy with params")
-    args = locals()
-    for k in args:
-        print(f"  {k} = {args[k]}")
-
+def run_dowhy(datapath, graph, treatment_var, outcome_var, control_val, treatment_val, relation, run=True):
+    print("Running doWhy with params")
+    print("\n".join([f"  {k}: {v}" for k, v in locals().items()]))
+    
+    if not run:
+        return None
+    
     # 1. Read in the data
     data = pd.read_csv(datapath)
+    data['intervention'] = [scenario_treatments[i] for i in data['intervention']]
     
     data['intervention'] = data['intervention'].astype('category')
     data['pop_type'] = data['pop_type'].astype('category')
@@ -81,8 +92,14 @@ def run_dowhy(datapath, graph, treatment_var, outcome_var, control_val, treatmen
     
     # 4. Estimate the target estimand using a statistical method.
     estimate = model.estimate_effect(identified_estimand, method_name="backdoor.linear_regression", control_value=control_val, treatment_value=treatment_val)
-    print("ESTIMATE:", estimate.value)
-    return estimate.value
+    causal_estimate = estimate.value
+    print("ESTIMATE:", causal_estimate)
+    if relation == "equal to" and causal_estimate < 0.1 and causal_estimate > -0.1:
+        print("result: PASS")
+    elif relation == "less than" and causal_estimate < 0:
+        print("result: PASS")
+    else:
+        print("result: FAIL")
     
 
 param_re = re.compile("(\w+)=(.*)")
@@ -101,19 +118,23 @@ background = feature['children'][0]['background']
 scenarios = [s['scenario'] for s in feature['children'][1:]]
 
 # get the base parameters and run covasim
+print(background['name'])
 base_params = {}
 for step in background['steps']:
     param = param_re.search(step['text'])
     if param:
         base_params[param.group(1)] = param.group(2)
-run_covasim(background['name'], base_params, [], 0)
+run_covasim(background['name'], base_params.copy(), [])
 
 scenario_treatments = {'Baseline': 0}
+
+tests = []
 
 # Start the enumeration at 1 because baseline acts as zero
 for i, scenario in enumerate(scenarios, 1):
     print("")
     print(scenario['name'])
+    
     scenario_treatments[scenario['name']] = i
     params = base_params.copy()
     interventions = []
@@ -129,24 +150,35 @@ for i, scenario in enumerate(scenarios, 1):
             interventions.append(intervention.group(1))
             # scenario_treatments[scenario['name']] = len(interventions)
         elif step['text'] == "the simulation is complete":
-            run_covasim(scenario['name'], params, interventions, i)
+            run_covasim(scenario['name'], params, interventions)
+        # load the causal question into the buffer
         elif causal_q:
-            causal_estimate = run_dowhy(
-                datapath = "results/data.csv",
-                graph = "testing.dot",
-                treatment_var = "intervention",
+            tests.append(dict(
+                label = scenario['name'],
                 outcome_var = causal_q.group(1),
-                control_val = scenario_treatments[causal_q.group(3)],
-                treatment_val = i # scenario_treatments[scenario['name']]
+                control_val = causal_q.group(3),
+                treatment_val = scenario['name'],
+                relation = causal_q.group(2),
+                run=True
+                )
             )
-            relation = causal_q.group(2)
         else:
             raise Exception("Invalid step")
-    
-    if relation == "equal to" and causal_estimate < 0.1 and causal_estimate > -0.1:
-        print("result: PASS")
-    elif relation == "less than" and causal_estimate < 0:
-        print("result: PASS")
-    else:
-        print("result: FAIL")
 
+print()
+
+print("RUNNING TESTS")
+for test in tests:
+    print(test['label'])
+    print("control_val:", test['control_val'])
+    print("treatment_val:", test['treatment_val'])
+    run_dowhy(
+        datapath = "results/data.csv",
+        graph = "testing.dot",
+        treatment_var = "intervention",
+        outcome_var = test['outcome_var'],
+        control_val = scenario_treatments[test['control_val']],
+        treatment_val = scenario_treatments[test['treatment_val']],
+        relation = test['relation']
+    )
+    print()
