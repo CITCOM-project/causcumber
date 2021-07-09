@@ -27,13 +27,16 @@ class BucketEvaporationModel:
     WATER_VAPOUR_PRESSURE_mmHG_AT_TEMPERATURE_F = {40: 6.309, 50: 9.205, 60: 13.239, 70: 18.773, 80: 26.168}
 
     def __init__(self, height, diameter):
+        self.height = height
+        self.diameter = diameter
         self.day = 0
         self.wind_speed = 0
         self.temperature = 0
         self.surface_area = self._calculate_surface_area(diameter)
         self.bucket_volume = self._calculate_bucket_volume(height)
-        self.volume = self.bucket_volume  # bucket starts full
-        self.log = pd.DataFrame({"Execution ID": [], "Day": [], "Wind Speed": [], "Temperature": [], "Volume": []})
+        self.water_volume = self.bucket_volume  # bucket starts full
+        self.log = pd.DataFrame({"id": [], "day": [], "wind_speed": [], "temperature": [], "bucket_volume": [],
+                                 "water_volume": [], "height": [], "diameter": [], "surface_area": []})
 
     def simulate(self, days_to_simulate, n_repeats):
         # On the first day, select a random wind and temperature and record
@@ -54,24 +57,30 @@ class BucketEvaporationModel:
             self.day = 0
             self.wind_speed = 0
             self.temperature = 0
-            self.volume = self.bucket_volume
+            self.water_volume = self.bucket_volume
 
     def plot_results(self):
         fig, ax = plt.subplots()
-        for execution in range(int(max(self.log["Execution ID"])) + 1):
-            xs = self.log[self.log["Execution ID"] == execution]["Day"].to_list()
-            ys = self.log[self.log["Execution ID"] == execution]["Volume"].to_list()
+        for execution in range(int(max(self.log["id"])) + 1):
+            xs = self.log[self.log["id"] == execution]["day"].to_list()
+            ys = self.log[self.log["id"] == execution]["water_volume"].to_list()
             ax.plot(xs, ys)
         ax.set_xlabel("Days")
-        ax.set_ylabel("Volume (Cubic Feet)")
+        ax.set_ylabel("Water Volume (Cubic Feet)")
+        ax.set_title("Water Evaporation from Bucket")
         plt.show()
+
+    def save_results(self, file_path):
+        self.log.to_csv(file_path + ".csv")
 
     def _next_day(self):
         self.day += 1
 
     def _log_results(self, execution_id):
-        daily_readings = pd.Series({"Execution ID": execution_id, "Day": self.day, "Wind Speed": self.wind_speed,
-                                    "Temperature": self.temperature, "Volume": self.volume})
+        daily_readings = pd.Series({"id": execution_id, "day": self.day, "wind_speed": self.wind_speed,
+                                    "temperature": self.temperature, "bucket_volume": self.bucket_volume,
+                                    "water_volume": self.water_volume, "height": self.height,
+                                    "diameter": self.diameter, "surface_area": self.surface_area})
         self.log = self.log.append(daily_readings, ignore_index=True)
 
     def _random_wind_speed(self):
@@ -91,11 +100,11 @@ class BucketEvaporationModel:
         evaporation_rate_litres_per_day = 4.54609 * ((7.4 * water_vapour_pressure_at_temp * self.surface_area *
                                                       math.pow((0.447 * self.wind_speed),
                                                                0.78)) / (self.temperature + 459.67))
-        self.volume -= evaporation_rate_litres_per_day
+        self.water_volume -= evaporation_rate_litres_per_day
 
         # Volume can't be less than zero
-        if self.volume < 0:
-            self.volume = 0
+        if self.water_volume < 0:
+            self.water_volume = 0
 
     def _calculate_bucket_volume(self, height):
         return height * self.surface_area
@@ -106,8 +115,9 @@ class BucketEvaporationModel:
 
 
 if __name__ == "__main__":
-    bucket_evaporation_model = BucketEvaporationModel(10, 2)
-    bucket_evaporation_model.simulate(31, 10)
+    bucket_evaporation_model = BucketEvaporationModel(2, 1)
+    bucket_evaporation_model.simulate(10, 100)
     bucket_evaporation_model.plot_results()
+    bucket_evaporation_model.save_results("./results/bucket_evaporation_2h_1d")
 
 
