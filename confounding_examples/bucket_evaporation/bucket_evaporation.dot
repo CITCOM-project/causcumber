@@ -1,0 +1,64 @@
+digraph CausalGraph {
+    rankdir=LR;
+    height -> bucket_volume;
+    diameter -> surface_area;
+    surface_area -> bucket_volume;
+
+
+    bucket_volume -> water_volume_t0;
+    surface_area -> water_volume_t0;
+    surface_area -> water_volume_t1;
+    surface_area -> water_volume_t2;
+    surface_area -> water_volume_t3;
+    surface_area -> water_volume_t4;
+    surface_area -> water_volume_t5;
+    surface_area -> water_volume_t6;
+    surface_area -> water_volume_t7;
+    surface_area -> water_volume_t8;
+    surface_area -> water_volume_t9;
+    surface_area -> water_volume_t10;
+
+    wind_speed_t0;
+    temperature_t0;
+
+    wind_speed_t1 -> water_volume_t1;
+    temperature_t1 -> water_volume_t1;
+
+    wind_speed_t2 -> water_volume_t2;
+    temperature_t2 -> water_volume_t2;
+
+    wind_speed_t3 -> water_volume_t3;
+    temperature_t3 -> water_volume_t3;
+
+    wind_speed_t4 -> water_volume_t4;
+    temperature_t4 -> water_volume_t4;
+
+    wind_speed_t5 -> water_volume_t5;
+    temperature_t5 -> water_volume_t5;
+
+    wind_speed_t6 -> water_volume_t6;
+    temperature_t6 -> water_volume_t6;
+
+    wind_speed_t7 -> water_volume_t7;
+    temperature_t7 -> water_volume_t7;
+
+    wind_speed_t8 -> water_volume_t8;
+    temperature_t8 -> water_volume_t8;
+
+    wind_speed_t9 -> water_volume_t9;
+    temperature_t9 -> water_volume_t9;
+
+    wind_speed_t10 -> water_volume_t10;
+    temperature_t10 -> water_volume_t10;
+
+    water_volume_t0 -> water_volume_t1;
+    water_volume_t1 -> water_volume_t2;
+    water_volume_t2 -> water_volume_t3;
+    water_volume_t3 -> water_volume_t4;
+    water_volume_t4 -> water_volume_t5;
+    water_volume_t5 -> water_volume_t6;
+    water_volume_t6 -> water_volume_t7;
+    water_volume_t7 -> water_volume_t8;
+    water_volume_t8 -> water_volume_t9;
+    water_volume_t9 -> water_volume_t10;
+}
