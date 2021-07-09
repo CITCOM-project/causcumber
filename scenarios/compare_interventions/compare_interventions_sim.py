@@ -1,47 +1,93 @@
 import covasim as cv
+import pandas as pd
+
+def msims(default, investigate):
+    sims = [cv.MultiSim(cv.Sim(pars=base_pars, label="Baseline"))]
+    for d, l in investigate:
+        pars = {**default, **d}
+        sims.append(cv.MultiSim(cv.Sim(pars=pars, label=l)))
+    return sims
 
 
-def msim_to_csv(simulation: cv.MultiSim, output_file_name: str):
-    """ Takes a MultiSim simulation, converts to a CSV file, and saves to ./results/ with the
-        given file name. """
-    simulation_df = simulation.base_sim.to_df()
-    simulation_df.to_csv("./results/{}.csv".format(str.lower(output_file_name)), index=False)
+def dict_plus(dic1, dic2):
+    for field in dic2:
+        if field not in dic1:
+            dic1[field] = []
+        dic1[field].append(dic2[field])
 
+
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
 
 """ Which intervention is more effective at reducing the cumulative number of infections? """
 base_pars = dict(
     pop_type='hybrid',
     pop_size=50e3,
     pop_infected=100,
-    start_day='2021-06-01',
-    end_day='2021-09-01',
+    start_day='2020-03-01',
+    end_day='2020-05-31',
     location='UK'
 )
 
 # Define interventions
 testing_intervention = cv.test_prob(symp_prob=0.2, asymp_prob=0.001, symp_quar_prob=1.0, asymp_quar_prob=1.0)
-contact_tracing_intervention = cv.contact_tracing(trace_probs=dict(h=1.0, s=0.5, w=0.5, c=0.3))
+zero_testing_intervention = cv.test_prob(symp_prob=0, asymp_prob=0, symp_quar_prob=0, asymp_quar_prob=0)
+contact_tracing_intervention = cv.contact_tracing(trace_probs=dict(h=1.0, s=0.5, w=0.5, c=0.3), quar_period=14)
+zero_contact_tracing_intervention = cv.contact_tracing(trace_probs=dict(h=0, s=0, w=0, c=0), quar_period=14)
 
-# Create simulations
-baseline_sim = cv.Sim(pars=base_pars, label="Baseline")
-testing_sim = cv.Sim(pars=base_pars, interventions=testing_intervention, label="Testing")
-contact_tracing_sim = cv.Sim(pars=base_pars, interventions=[testing_intervention, contact_tracing_intervention],
-                             label="Contact Tracing")
+intervention_sims = msims(base_pars, [
+    ({"interventions": zero_testing_intervention}, "Zero Testing"),
+    # ({"interventions": testing_intervention}, "Testing"),
+    # ({"interventions": zero_contact_tracing_intervention}, "Zero Contact Tracing"),
+    # ({"interventions": [testing_intervention, contact_tracing_intervention]}, "Contact Tracing"),
+    # ({"interventions": [contact_tracing_intervention]}, "Contact Tracing Without Testing"),
+    # ({"start_day": '2021-11-01', "end_day": '2022-02-01'}, "Winter"),
+    # ({"start_day": '2021-03-01', "end_day": '2021-06-01'}, "Spring"),
+    ])
 
-# Create multi-simulations
-baseline_sims = cv.MultiSim(baseline_sim)
-testing_sims = cv.MultiSim(testing_sim)
-contact_tracing_sims = cv.MultiSim(contact_tracing_sim)
-intervention_sims = [baseline_sims, testing_sims, contact_tracing_sims]
+to_keep = ['new_infections', 'new_infectious', 'new_symptomatic',
+       'new_severe', 'new_critical', 'new_recoveries', 'new_tests',
+       'new_diagnoses', 'n_exposed', 'n_dead', 'n_diagnosed',
+       'n_quarantined']
 
-# Combine multi-simulations into a single multi-simulation and run
-interventions_msims = []
-for intervention_sim in intervention_sims:
-    intervention_sim.run(n_runs=10)
-    intervention_sim.mean()
-    interventions_msims.append(intervention_sim)
-    msim_to_csv(intervention_sim, str.lower(intervention_sim.label))
+dfs = []
 
-# View plots
-merged_intervention_msims = cv.MultiSim.merge(interventions_msims, base=True)
-merged_intervention_msims.plot(color_by_sim=True)
+for intervention, intervention_sim in enumerate(intervention_sims):
+    intervention_sim.run(n_runs=10, verbose=0)
+    for sim in intervention_sim.sims:
+        df = sim.to_df()
+        quar_period = 14
+        for i in sim['interventions']:
+            if hasattr(i, "quar_period"):
+                quar_period = i.quar_period
+        df = df[to_keep]
+    
+        # aggregate by week
+        week_by_week = {k:[] for k in to_keep}
+        for c in chunks(df, 7):
+            for k in week_by_week:
+                if k.startswith('new_'):
+                    week_by_week[k].append(c[k].sum())
+                elif k.startswith('n_'):
+                    week_by_week[k].append(c[k].iloc[-1])
+                else:
+                    week_by_week[k].append(c[k].iloc[0])
+        
+        dfs.append((pd.DataFrame(week_by_week), quar_period, intervention))
+
+#%%
+temporal = []
+for df, quar_period, intervention in dfs:
+    dic = df.to_dict(orient='list')
+    lst = [item for k in to_keep for item in dic[k]]
+    keys = [f"{k}_w{w}" for k in to_keep for w in range(14)]
+    week_dic = {k:v for k, v in zip(keys, lst)}
+    week_dic['quar_period'] = quar_period
+    week_dic['intervention'] = intervention
+    for k, v in base_pars.items():
+        week_dic[k] = v
+    temporal.append(week_dic)
+
+pd.DataFrame(temporal).to_csv("results/week-by-week.csv")
