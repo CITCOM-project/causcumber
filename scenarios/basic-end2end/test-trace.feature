@@ -40,8 +40,8 @@ Feature: Test and Trace
     Given a testing intervention with parameters:
       * symp_prob=0.2
       * asymp_prob=0.001
-      * symp_quar_prob=1.0
-      * asymp_quar_prob=1.0
+      * symp_quar_prob=1
+      * asymp_quar_prob=1
     When the simulation is complete
     Then the "cum_deaths" should be "less than" Baseline
 
@@ -49,13 +49,10 @@ Feature: Test and Trace
     Given a testing intervention with parameters:
       * symp_prob=0.2
       * asymp_prob=0.001
-      * symp_quar_prob=1.0
-      * asymp_quar_prob=1.0
+      * symp_quar_prob=1
+      * asymp_quar_prob=1
     And a tracing intervention with parameters:
-      * trace_probs=dict(h=1.0
-    *  s=0.5
-    *  w=0.5
-    *  c=0.3)
+      * trace_probs=dict(h=1, s=0.5, w=0.5, c=0.3)
     When the simulation is complete
     Then the "cum_deaths" should be "less than" Standard testing
 
@@ -72,13 +69,10 @@ Feature: Test and Trace
     Given a testing intervention with parameters:
       * symp_prob=0.2
       * asymp_prob=0.001
-      * symp_quar_prob=1.0
-      * asymp_quar_prob=1.0
+      * symp_quar_prob=1
+      * asymp_quar_prob=1
     And a tracing intervention with parameters:
-      * trace_probs=dict(h=0
-    *  s=0
-    *  w=0
-    *  c=0)
+      * trace_probs=dict(h=0, s=0, w=0, c=0)
     When the simulation is complete
     Then the "cum_deaths" should be "equal to" Standard testing
 
@@ -89,10 +83,7 @@ Feature: Test and Trace
       * symp_quar_prob=0
       * asymp_quar_prob=0
     And a tracing intervention with parameters:
-      * trace_probs=dict(h=1.0
-    *  s=0.5
-    *  w=0.5
-    *  c=0.3)
+      * trace_probs=dict(h=1, s=0.5, w=0.5, c=0.3)
     When the simulation is complete
     Then the "cum_deaths" should be "equal to" Baseline
 
@@ -109,12 +100,9 @@ Feature: Test and Trace
     Given a testing intervention with parameters:
       * symp_prob=0.2
       * asymp_prob=0.001
-      * symp_quar_prob=1.0
-      * asymp_quar_prob=1.0
+      * symp_quar_prob=1
+      * asymp_quar_prob=1
     And a tracing intervention with parameters:
-      * trace_probs=dict(h=1.0
-    *  s=1
-    *  w=1
-    *  c=1)
+      * trace_probs=dict(h=1, s=1, w=1, c=1)
     When the simulation is complete
     Then the "cum_deaths" should be "less than" Standard tracing
