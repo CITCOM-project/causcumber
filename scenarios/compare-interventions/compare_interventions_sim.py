@@ -26,31 +26,35 @@ base_pars = dict(
     pop_type='hybrid',
     pop_size=50e3,
     pop_infected=100,
-    start_day='2020-03-01',
-    end_day='2020-05-31',
+    # start_day='2020-03-01',
+    # end_day='2020-05-31',
+    n_days=7*6,
     location='UK'
 )
 
 # Define interventions
 testing_intervention = cv.test_prob(symp_prob=0.2, asymp_prob=0.001, symp_quar_prob=1.0, asymp_quar_prob=1.0)
+optimal_testing_intervention = cv.test_prob(symp_prob=1, asymp_prob=1, symp_quar_prob=1, asymp_quar_prob=1)
 zero_testing_intervention = cv.test_prob(symp_prob=0, asymp_prob=0, symp_quar_prob=0, asymp_quar_prob=0)
 contact_tracing_intervention = cv.contact_tracing(trace_probs=dict(h=1.0, s=0.5, w=0.5, c=0.3), quar_period=14)
 zero_contact_tracing_intervention = cv.contact_tracing(trace_probs=dict(h=0, s=0, w=0, c=0), quar_period=14)
+optimal_contact_tracing_intervention = cv.contact_tracing(trace_probs=dict(h=1, s=1, w=1, c=1), quar_period=14)
 
 intervention_sims = msims(base_pars, [
+    ({"interventions": testing_intervention}, "Testing"),
+    ({"interventions": [testing_intervention, contact_tracing_intervention]}, "Contact Tracing"),
     ({"interventions": zero_testing_intervention}, "Zero Testing"),
-    # ({"interventions": testing_intervention}, "Testing"),
-    # ({"interventions": zero_contact_tracing_intervention}, "Zero Contact Tracing"),
-    # ({"interventions": [testing_intervention, contact_tracing_intervention]}, "Contact Tracing"),
-    # ({"interventions": [contact_tracing_intervention]}, "Contact Tracing Without Testing"),
+    ({"interventions": zero_contact_tracing_intervention}, "Zero Contact Tracing"),
+    ({"interventions": [contact_tracing_intervention]}, "Contact Tracing Without Testing"),
+    ({"interventions": optimal_testing_intervention}, "Testing"),
+    ({"interventions": [testing_intervention, optimal_contact_tracing_intervention]}, "Contact Tracing"),
     # ({"start_day": '2021-11-01', "end_day": '2022-02-01'}, "Winter"),
     # ({"start_day": '2021-03-01', "end_day": '2021-06-01'}, "Spring"),
     ])
 
-to_keep = ['new_infections', 'new_infectious', 'new_symptomatic',
-       'new_severe', 'new_critical', 'new_recoveries', 'new_tests',
-       'new_diagnoses', 'n_exposed', 'n_dead', 'n_diagnosed',
-       'n_quarantined']
+to_keep = ['cum_infections', 'cum_deaths', 'cum_symptomatic',
+       'cum_severe', 'cum_critical', 'cum_tests',
+       'n_exposed', 'n_quarantined']
 
 dfs = []
 
@@ -90,4 +94,8 @@ for df, quar_period, intervention in dfs:
         week_dic[k] = v
     temporal.append(week_dic)
 
-pd.DataFrame(temporal).to_csv("results/week-by-week.csv")
+data = pd.DataFrame(temporal)
+data.to_csv("results/week-by-week.csv")
+
+# for col in data.columns:
+#     print(col)
