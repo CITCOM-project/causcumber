@@ -7,6 +7,10 @@ Created on Tue Jul  6 11:51:00 2021
 """
 import dowhy
 import pandas as pd
+
+import os
+import pickle
+
 import warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
@@ -19,6 +23,7 @@ def run_dowhy(datapath, graph, treatment_var, outcome_var, control_val, treatmen
     print("\n".join([f"  {k}: {v}" for k, v in locals().items()]))
     
     # 1. Read in the data
+    print("\n  Reading the data..")
     data = pd.read_csv(datapath)
     
     data['intervention'] = [scenario_treatments.get(i, i) for i in data['intervention']]
@@ -27,10 +32,8 @@ def run_dowhy(datapath, graph, treatment_var, outcome_var, control_val, treatmen
     data['pop_type'] = data['pop_type'].astype('category')
     data['location'] = data['location'].astype('category')
     
-    # data['start_day'] = data['start_day'].astype('category')
-    # data['end_day'] = data['end_day'].astype('category')
-    
-    # 2. Create a causal model from the data and given graph.
+    # 2. Create a causal model from the data and given graph
+    print("  Creating a causal model...")
     model = dowhy.CausalModel(
         data=data,
         treatment=treatment_var,
@@ -39,12 +42,22 @@ def run_dowhy(datapath, graph, treatment_var, outcome_var, control_val, treatmen
     )
     
     # 3. Identify causal effect and return target estimands
-    identified_estimand = model.identify_effect(method_name="minimal-adjustment", estimand_type="nonparametric-nde")
-    
+    print("  Identifying...", f"results/{treatment_var}-{outcome_var}.id")
+    identified_estimand = None
+    if os.path.exists(f"results/{treatment_var}-{outcome_var}.id"):
+        print("    Reading")
+        with open(f"results/{treatment_var}-{outcome_var}.id", 'rb') as f:
+            identified_estimand = pickle.load(f)
+    else:
+        print("    Calculating")
+        identified_estimand = model.identify_effect(method_name="minimal-adjustment")
+        with open(f"results/{treatment_var}-{outcome_var}.id", 'wb') as f:
+            pickle.dump(identified_estimand, f)
+            
     # 4. Estimate the target estimand using a statistical method.
     # estimate = model.estimate_effect(identified_estimand, method_name="backdoor.linear_regression",
     #                                  control_value=control_val, treatment_value=treatment_val)
-    
+    print("Estimating...")
     estimate = model.estimate_effect(identified_estimand,
                                      method_name="mediation.two_stage_regression",
                                      confidence_intervals=False,

@@ -1,40 +1,24 @@
 Feature: Test and Trace
   Some properties of the testing and tracing interventions.
 
-  # Use this as the "default" control value?
+  # We're going to need a way to explicitly specify datatypes and hooks to deserialise values
+  # It's annoying, but otherwise covasim tries to parse n_days=84 as a date
+  # I suggest a format like "n_days:int = 84" or "n_days = 84:int"
   Background: Baseline
     Given a simulation run with the basic parameters:
       * pop_type=hybrid
       * pop_size=50000
       * pop_infected=100
-      * start_day=2020-03-01
-      * end_day=2020-06-30
+      * n_days=84
       * location=UK
     And final values for variables:
       * cum_infections
-      * cum_reinfections
-      * cum_infectious
       * cum_symptomatic
       * cum_severe
       * cum_critical
-      * cum_recoveries
       * cum_deaths
       * cum_tests
-      * cum_diagnoses
-      * cum_known_deaths
       * cum_quarantined
-      * cum_vaccinations
-      * cum_vaccinated
-      * prevalence
-      * incidence
-      * r_eff
-      * doubling_time
-      * test_yield
-      * rel_test_yield
-      * frac_vaccinated
-      * pop_nabs
-      * pop_protection
-      * pop_symp_protection
 
   Scenario: Standard testing
     Given a testing intervention with parameters:

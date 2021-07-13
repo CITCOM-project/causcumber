@@ -3,18 +3,21 @@ Feature: Populus
 
   Background: Baseline
     Given a simulation run with the basic parameters:
+      * quar_period=14
+      * n_days=84
       * pop_type=hybrid
       * pop_size=50000
       * pop_infected=100
-      * n_days=84
-    And final values for variables:
-      * cum_infections
-      * cum_symptomatic
-      * cum_severe
-      * cum_critical
-      * cum_deaths
-      * cum_diagnoses
-      * cum_quarantined
+      * location=UK
+    And, for each week {n}, the following variable values:
+      * cum_infections_w{n}
+      * cum_symptomatic_w{n}
+      * cum_severe_w{n}
+      * cum_critical_w{n}
+      * cum_tests_w{n}
+      * cum_deaths_w{n}
+      * n_exposed_w{n}
+      * n_quarantined_w{n}
 
   Scenario: Japan
     Given

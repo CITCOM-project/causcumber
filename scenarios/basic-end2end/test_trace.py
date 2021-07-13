@@ -9,9 +9,15 @@ import covasim as cv
 from dowhy import CausalModel
 import os
 
+import pygraphviz
+
+import pickle
+
 # Mute the "RuntimeWarning: divide by zero encountered in double_scalars" messages
 import warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
+
+causal_variables = {"inputs": set(), "outputs": set()}
 
 def dict_plus(dic1, dic2):
     for field in dic2:
@@ -20,8 +26,21 @@ def dict_plus(dic1, dic2):
         dic1[field].append(dic2[field])
 
 
+def draw_dag():
+    g = pygraphviz.AGraph(strict=False, directed=True, rankdir="LR", newrank=True)
+    for v2 in causal_variables['outputs']:
+        for v1 in causal_variables['inputs']:
+            g.add_edge(v1, v2)
+        for v1 in causal_variables['outputs']:
+            if v1 != v2:
+                g.add_edge(v1, v2)
+    g.write("causal_dag_connected.dot")
+
+
 def run_covasim(label, params, interventions, n_runs=100, run=False):
     params['interventions'] = []
+    if 'n_days' in params:
+        params['n_days'] = int(params['n_days'])
     for intervention in interventions:
         if intervention == "testing":
             params['interventions'].append(cv.test_prob(
@@ -36,6 +55,8 @@ def run_covasim(label, params, interventions, n_runs=100, run=False):
             raise Exception("Invalid intervention "+intervention)
 
     params = {k: v for k, v in params.items() if k in base_params or k == "interventions"}
+    
+    causal_variables['inputs'] = causal_variables['inputs'].union(params)
    
     print("Running covasim with params")
     print("\n".join([f"  {k}: {v}" for k, v in params.items() if k != "interventions"]))
@@ -48,11 +69,11 @@ def run_covasim(label, params, interventions, n_runs=100, run=False):
         return None
 
     intervention_sim = cv.MultiSim(cv.Sim(pars=params, label=label, verbose=0))
-    intervention_sim.run(n_runs=n_runs)
+    intervention_sim.run(n_runs=n_runs, verbose=0)
     fields = {'intervention': []}
     for sim in intervention_sim.sims:
         fields['intervention'].append(label)
-        dict_plus(fields, {k: v for k, v in sim.compute_summary(output=True, full=False).items() if not (k.startswith("new_") or k.startswith("n_"))})
+        dict_plus(fields, {k: v for k, v in sim.compute_summary(output=True, full=False).items() if k in causal_variables['outputs']})
         dict_plus(fields, base_params)
     data = pd.DataFrame.from_dict(fields)
     
@@ -77,9 +98,6 @@ def run_dowhy(datapath, graph, treatment_var, outcome_var, control_val, treatmen
     data['pop_type'] = data['pop_type'].astype('category')
     data['location'] = data['location'].astype('category')
     
-    data['start_day'] = data['start_day'].astype('category')
-    data['end_day'] = data['end_day'].astype('category')
-    
     # 2. Create a causal model from the data and given graph.
     model = CausalModel(
         data=data,
@@ -88,7 +106,14 @@ def run_dowhy(datapath, graph, treatment_var, outcome_var, control_val, treatmen
         graph=graph)
     
     # 3. Identify causal effect and return target estimands
-    identified_estimand = model.identify_effect(method_name="minimal-adjustment")
+    identified_estimand = None
+    if False and os.path.exists(f"results/{treatment_var}-{outcome_var}.id"):
+        with open(f"results/{treatment_var}-{outcome_var}.id", 'rb') as f:
+            identified_estimand = pickle.load(f)
+    else:
+        identified_estimand = model.identify_effect(method_name="minimal-adjustment")
+        with open(f"results/{treatment_var}-{outcome_var}.id", 'wb') as f:
+            pickle.dump(identified_estimand, f)
     
     # 4. Estimate the target estimand using a statistical method.
     estimate = model.estimate_effect(identified_estimand, method_name="backdoor.linear_regression", control_value=control_val, treatment_value=treatment_val)
@@ -124,6 +149,10 @@ for step in background['steps']:
     param = param_re.search(step['text'])
     if param:
         base_params[param.group(1)] = param.group(2)
+        causal_variables['inputs'].add(param.group(1))
+    elif step['keyword'].strip() == "*" and param is None:
+        causal_variables['outputs'].add(step['text'])
+
 run_covasim(background['name'], base_params.copy(), [])
 
 scenario_treatments = {'Baseline': 0}
@@ -165,8 +194,8 @@ for i, scenario in enumerate(scenarios, 1):
         else:
             raise Exception("Invalid step")
 
+draw_dag()
 print()
-
 print("RUNNING TESTS")
 for test in tests:
     print(test['label'])
@@ -174,7 +203,7 @@ for test in tests:
     print("treatment_val:", test['treatment_val'])
     run_dowhy(
         datapath = "results/data.csv",
-        graph = "testing.dot",
+        graph = "causal_dag.dot",
         treatment_var = "intervention",
         outcome_var = test['outcome_var'],
         control_val = scenario_treatments[test['control_val']],

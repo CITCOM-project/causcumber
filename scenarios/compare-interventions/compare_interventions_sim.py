@@ -5,7 +5,7 @@ def msims(default, investigate):
     sims = [cv.MultiSim(cv.Sim(pars=base_pars, label="Baseline"))]
     for d, l in investigate:
         pars = {**default, **d}
-        sims.append(cv.MultiSim(cv.Sim(pars=pars, label=l)))
+        sims.append(cv.MultiSim(cv.Sim(pars=pars, label=l, verbose=0)))
     return sims
 
 
@@ -59,7 +59,7 @@ to_keep = ['cum_infections', 'cum_deaths', 'cum_symptomatic',
 dfs = []
 
 for intervention, intervention_sim in enumerate(intervention_sims):
-    intervention_sim.run(n_runs=10, verbose=0)
+    intervention_sim.run(n_runs=10)
     for sim in intervention_sim.sims:
         df = sim.to_df()
         quar_period = 14
