@@ -1,5 +1,6 @@
 """ Utility files for CauseCumber. """
 import pydot
+import numpy as np
 from rpy2.robjects.packages import importr, isinstalled
 from rpy2.robjects.vectors import StrVector
 from rpy2.robjects.packages import STAP
@@ -23,7 +24,8 @@ def dagitty_identification(dot_file_path, treatment, outcome):
        """
     r_pkg = STAP(r_identification_fn, "r_pkg")
     min_adjustment_set = r_pkg.R_identification(dagitty_dag_str, treatment, outcome)
-    return min_adjustment_set
+    min_adjustment_list = np.array(min_adjustment_set).tolist()[0]
+    return min_adjustment_list
 
 
 def _install_r_packages(package_names):
