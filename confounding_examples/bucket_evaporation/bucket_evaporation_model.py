@@ -32,13 +32,15 @@ class BucketEvaporationModel:
         self.day = 0
         self.wind_speed = 0
         self.temperature = 0
-        self.surface_area = self._calculate_surface_area(diameter)
-        self.bucket_volume = self._calculate_bucket_volume(height)
+        self.surface_area = self._calculate_surface_area()
+        self.bucket_volume = self._calculate_bucket_volume()
         self.water_volume = self.bucket_volume  # bucket starts full
         self.log = pd.DataFrame({"id": [], "day": [], "wind_speed": [], "temperature": [], "bucket_volume": [],
                                  "water_volume": [], "height": [], "diameter": [], "surface_area": []})
 
     def simulate(self, days_to_simulate, n_repeats):
+        """ Run the model in daily time-steps, generating random wind speed and temperature, and
+        recording the results each day. """
         # On the first day, select a random wind and temperature and record
         for n in range(n_repeats):
             self._random_wind_speed()
@@ -60,6 +62,7 @@ class BucketEvaporationModel:
             self.water_volume = self.bucket_volume
 
     def plot_results(self):
+        """ Plot line graph of water evaporation over duration. """
         fig, ax = plt.subplots()
         for execution in range(int(max(self.log["id"])) + 1):
             xs = self.log[self.log["id"] == execution]["day"].to_list()
@@ -71,12 +74,15 @@ class BucketEvaporationModel:
         plt.show()
 
     def save_results(self, file_path):
+        """ Save log results to csv. """
         self.log.to_csv(file_path + ".csv")
 
     def _next_day(self):
+        """ Progress simulation to the next day. """
         self.day += 1
 
     def _log_results(self, execution_id):
+        """ Log results into dataframe. """
         daily_readings = pd.Series({"id": execution_id, "day": self.day, "wind_speed": self.wind_speed,
                                     "temperature": self.temperature, "bucket_volume": self.bucket_volume,
                                     "water_volume": self.water_volume, "height": self.height,
@@ -94,6 +100,8 @@ class BucketEvaporationModel:
     def _calculate_volume_evaporated(self):
         """ Calculate the volume of water evaporated using the equation from:
             https://dengarden.com/swimming-pools/Determine-Evaporation-Rate-for-Swimming-Pool
+
+            Subtract from previous volume.
         """
 
         water_vapour_pressure_at_temp = self.WATER_VAPOUR_PRESSURE_mmHG_AT_TEMPERATURE_F[self.temperature]
@@ -106,18 +114,19 @@ class BucketEvaporationModel:
         if self.water_volume < 0:
             self.water_volume = 0
 
-    def _calculate_bucket_volume(self, height):
-        return height * self.surface_area
+    def _calculate_bucket_volume(self):
+        """ Return the bucket volume in litres. """
+        return self.height * self.surface_area * 28.3168
 
-    @staticmethod
-    def _calculate_surface_area(diameter):
-        return math.pi * (diameter / 2) ** 2
+    def _calculate_surface_area(self):
+        """ Return surface area in ft^2. """
+        return math.pi * (self.diameter / 2) ** 2
 
 
 if __name__ == "__main__":
-    bucket_evaporation_model = BucketEvaporationModel(2, 1)
+    bucket_evaporation_model = BucketEvaporationModel(5, 9)
     bucket_evaporation_model.simulate(10, 100)
     bucket_evaporation_model.plot_results()
-    bucket_evaporation_model.save_results("./results/bucket_evaporation_2h_1d")
+    bucket_evaporation_model.save_results("./results/bucket_evaporation_5h_9d")
 
 

@@ -3,7 +3,7 @@ import pandas as pd
 import glob
 import os
 
-""" What is the causal effect of increasing bucket volume on day 9 from 0.5ft^3 to 2ft^3 on the remaining volume of
+""" What is the causal effect of increasing water volume on day 9 from 20 to 40L on the remaining volume of
     water after 10 days? """
 
 raw_bucket_model_df = pd.concat(map(pd.read_csv, glob.glob(os.path.join("results", "*.csv"))))
@@ -55,16 +55,16 @@ causal_model = CausalModel(bucket_model_df, treatment="water_volume_t9", outcome
                            graph="bucket_evaporation.dot")
 causal_estimand = causal_model.identify_effect(proceed_when_unidentifiable=True, method_name="minimal-adjustment")
 causal_estimate = causal_model.estimate_effect(causal_estimand, method_name="backdoor.linear_regression",
-                                               treatment_value=100, control_value=25)
+                                               treatment_value=40, control_value=20)
 
 # Obtain associational estimate (not adjusted for bucket volume)
 unadjusted_model = CausalModel(bucket_model_df, treatment="water_volume_t9", outcome="water_volume_t10",
                                common_causes=[])
 unadjusted_estimand = unadjusted_model.identify_effect(proceed_when_unidentifiable=True)
 unadjusted_estimate = unadjusted_model.estimate_effect(unadjusted_estimand, method_name="backdoor.linear_regression",
-                                                       treatment_value=100, control_value=25)
+                                                       treatment_value=40, control_value=20)
 
 # Compare
-print("Adjusting for {} yields a causal estimate of {}.".format(causal_estimand.get_backdoor_variables(),
-                                                                causal_estimate.value))
-print("Without adjustment yields an estimate of {}.".format(unadjusted_estimate.value))
+print("Adjusting for {} yields a causal estimate of {}L.".format(causal_estimand.get_backdoor_variables(),
+                                                                round(causal_estimate.value, 3)))
+print("Without adjustment yields an estimate of {}L.".format(round(unadjusted_estimate.value, 3)))
