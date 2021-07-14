@@ -39,15 +39,15 @@ def run_dowhy(datapath, graph, treatment_var, outcome_var, control_val, treatmen
     # 1. Read in the data
     print("\nReading the data...")
     data = pd.read_csv(datapath)
-    
+
     plot(data, treatment_var, outcome_var)
 
     data['intervention'] = [scenario_treatments.get(i, i) for i in data['intervention']]
-    
+
     data['intervention'] = data['intervention'].astype('category')
     data['pop_type'] = data['pop_type'].astype('category')
     data['location'] = data['location'].astype('category')
-    
+
     # 2. Create a causal model from the data and given graph
     print("Creating a causal model...")
     adjustment_set = dagitty_identification(graph, treatment_var, outcome_var)
@@ -69,13 +69,16 @@ def run_dowhy(datapath, graph, treatment_var, outcome_var, control_val, treatmen
     estimate = model.estimate_effect(
         identified_estimand,
         method_name="backdoor.linear_regression",
-        treatment_value=control_val,
-        control_value=treatment_val
+        treatment_value=treatment_val,
+        control_value=control_val,
+        confidence_intervals=True
         )
-    
-    print("ESTIMATE:", estimate.value)
+    ci_low, ci_high = estimate.get_confidence_intervals()[0]
+    print(data[["cum_severe_w5", "cum_deaths_w6"]])
+    print("Total Effect Estimate:", round(estimate.value, 2))
+    print("95% Confidence Intervals: [{}, {}]".format(round(ci_low, 2), round(ci_high, 2)))
     return estimate.value
 
-run_dowhy("results/week-by-week.csv", "zigzag-steps.dot", "cum_severe_w5", "cum_deaths_w6", 3000, 4000)
+run_dowhy("results/week-by-week_10.csv", "zigzag-steps.dot", "cum_severe_w5", "cum_deaths_w6", 3000, 4000)
 # run_dowhy("results/data.csv", "testing.dot", "intervention", "cum_deaths", 1, 2)
 # run_dowhy("results/data.csv", "testing.dot", "intervention", "cum_deaths", 2, 3)
