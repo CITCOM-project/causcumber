@@ -8,24 +8,40 @@ Created on Tue Jul  6 11:51:00 2021
 import dowhy
 import pandas as pd
 
-import os
-import pickle
-
 import warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
-import dowhy.causal_estimators.linear_regression_estimator
+import sys
+sys.path.append("../../")
 
-scenario_treatments = {'Baseline': 0, 'Standard testing': 1, 'Standard tracing': 2, 'No testing': 3, 'No tracing': 4, 'Trace without test': 5, 'Optimal testing': 6, 'Optimal tracing': 7}
+from causcumber_utils import dagitty_identification
+
+import matplotlib.pyplot as plt
+
+scenario_treatments = {'Baseline': 0, 'Standard testing': 1,
+                       'Standard tracing': 2, 'No testing': 3,
+                       'No tracing': 4, 'Trace without test': 5,
+                       'Optimal testing': 6, 'Optimal tracing': 7}
+
+
+def plot(data, x_col, y_col):
+    plt.scatter(data[x_col], data[y_col])
+    plt.xlabel(x_col)
+    plt.ylabel(y_col)
+    plt.show()
+
+
 
 def run_dowhy(datapath, graph, treatment_var, outcome_var, control_val, treatment_val):
     print("Running doWhy with params")
     print("\n".join([f"  {k}: {v}" for k, v in locals().items()]))
     
     # 1. Read in the data
-    print("\n  Reading the data..")
+    print("\nReading the data...")
     data = pd.read_csv(datapath)
     
+    plot(data, treatment_var, outcome_var)
+
     data['intervention'] = [scenario_treatments.get(i, i) for i in data['intervention']]
     
     data['intervention'] = data['intervention'].astype('category')
@@ -33,45 +49,33 @@ def run_dowhy(datapath, graph, treatment_var, outcome_var, control_val, treatmen
     data['location'] = data['location'].astype('category')
     
     # 2. Create a causal model from the data and given graph
-    print("  Creating a causal model...")
+    print("Creating a causal model...")
+    adjustment_set = dagitty_identification(graph, treatment_var, outcome_var)
+    print("  adjustment_set", adjustment_set)
     model = dowhy.CausalModel(
         data=data,
         treatment=treatment_var,
         outcome=outcome_var,
-        graph=graph
+        common_causes=adjustment_set
     )
     
-    # 3. Identify causal effect and return target estimands
-    print("  Identifying...", f"results/{treatment_var}-{outcome_var}.id")
-    identified_estimand = None
-    if os.path.exists(f"results/{treatment_var}-{outcome_var}.id"):
-        print("    Reading")
-        with open(f"results/{treatment_var}-{outcome_var}.id", 'rb') as f:
-            identified_estimand = pickle.load(f)
-    else:
-        print("    Calculating")
-        identified_estimand = model.identify_effect(method_name="minimal-adjustment")
-        with open(f"results/{treatment_var}-{outcome_var}.id", 'wb') as f:
-            pickle.dump(identified_estimand, f)
-            
+    # # 3. Identify causal effect and return target estimands
+    print("Identifying...")
+    identified_estimand = model.identify_effect(proceed_when_unidentifiable=True)
+    # print(identified_estimand)     
+       
     # 4. Estimate the target estimand using a statistical method.
-    # estimate = model.estimate_effect(identified_estimand, method_name="backdoor.linear_regression",
-    #                                  control_value=control_val, treatment_value=treatment_val)
     print("Estimating...")
-    estimate = model.estimate_effect(identified_estimand,
-                                     method_name="mediation.two_stage_regression",
-                                     confidence_intervals=False,
-                                     test_significance=False,
-                                     control_value=control_val, treatment_value=treatment_val,
-                                     method_params = {
-                                       'first_stage_model': dowhy.causal_estimators.linear_regression_estimator.LinearRegressionEstimator,
-                                       'second_stage_model': dowhy.causal_estimators.linear_regression_estimator.LinearRegressionEstimator
-                                     }
-                                    )
+    estimate = model.estimate_effect(
+        identified_estimand,
+        method_name="backdoor.linear_regression",
+        treatment_value=control_val,
+        control_value=treatment_val
+        )
     
     print("ESTIMATE:", estimate.value)
     return estimate.value
 
-run_dowhy("results/week-by-week.csv", "zigzag-steps.dot", "intervention", "cum_deaths_w6", 0, 3)
+run_dowhy("results/week-by-week.csv", "zigzag-steps.dot", "cum_severe_w5", "cum_deaths_w6", 3000, 4000)
 # run_dowhy("results/data.csv", "testing.dot", "intervention", "cum_deaths", 1, 2)
 # run_dowhy("results/data.csv", "testing.dot", "intervention", "cum_deaths", 2, 3)

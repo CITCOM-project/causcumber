@@ -39,6 +39,6 @@ def _install_r_packages(package_names):
 
 def _dot_to_dagitty_dag(dot_file_path):
     dot_graph = pydot.graph_from_dot_file(dot_file_path)
-    dot_string = dot_graph[0].to_string()
+    dot_string = "dag {" + "\n".join([e.to_string() for e in dot_graph[0].get_edges()]) + "}"
     dag_string = dot_string.replace("digraph", "dag")
     return dag_string

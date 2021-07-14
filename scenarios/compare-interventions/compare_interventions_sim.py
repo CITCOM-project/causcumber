@@ -1,6 +1,8 @@
 import covasim as cv
 import pandas as pd
 
+n_runs = 10
+
 def msims(default, investigate):
     sims = [cv.MultiSim(cv.Sim(pars=base_pars, label="Baseline"))]
     for d, l in investigate:
@@ -59,7 +61,7 @@ to_keep = ['cum_infections', 'cum_deaths', 'cum_symptomatic',
 dfs = []
 
 for intervention, intervention_sim in enumerate(intervention_sims):
-    intervention_sim.run(n_runs=10)
+    intervention_sim.run(n_runs=n_runs, verbose=0)
     for sim in intervention_sim.sims:
         df = sim.to_df()
         quar_period = 14
@@ -67,7 +69,7 @@ for intervention, intervention_sim in enumerate(intervention_sims):
             if hasattr(i, "quar_period"):
                 quar_period = i.quar_period
         df = df[to_keep]
-    
+        
         # aggregate by week
         week_by_week = {k:[] for k in to_keep}
         for c in chunks(df, 7):
@@ -87,7 +89,9 @@ for df, quar_period, intervention in dfs:
     dic = df.to_dict(orient='list')
     lst = [item for k in to_keep for item in dic[k]]
     keys = [f"{k}_w{w}" for k in to_keep for w in range(14)]
+    # BUG IS HERE!
     week_dic = {k:v for k, v in zip(keys, lst)}
+    print(week_dic)
     week_dic['quar_period'] = quar_period
     week_dic['intervention'] = intervention
     for k, v in base_pars.items():
@@ -95,7 +99,7 @@ for df, quar_period, intervention in dfs:
     temporal.append(week_dic)
 
 data = pd.DataFrame(temporal)
-data.to_csv("results/week-by-week.csv")
+data.to_csv(f"results/week-by-week_{n_runs}.csv")
 
-# for col in data.columns:
-#     print(col)
+for col in data.columns:
+    print(col)
