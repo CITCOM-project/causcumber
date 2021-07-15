@@ -49,8 +49,8 @@ intervention_sims = msims(base_pars, [
     ({"interventions": zero_testing_intervention}, "No testing"),
     ({"interventions": zero_contact_tracing_intervention}, "No tracing"),
     ({"interventions": [contact_tracing_intervention]}, "Trace without test"),
-    ({"interventions": optimal_testing_intervention}, "Optimal Testing"),
-    ({"interventions": [testing_intervention, optimal_contact_tracing_intervention]}, "Optimal Tracing"),
+    ({"interventions": optimal_testing_intervention}, "Optimal testing"),
+    ({"interventions": [testing_intervention, optimal_contact_tracing_intervention]}, "Optimal tracing"),
     # ({"start_day": '2021-11-01', "end_day": '2022-02-01'}, "Winter"),
     # ({"start_day": '2021-03-01', "end_day": '2021-06-01'}, "Spring"),
     ])
@@ -61,7 +61,7 @@ to_keep = ['cum_infections', 'cum_deaths', 'cum_symptomatic',
 
 dfs = []
 
-for intervention, intervention_sim in enumerate(intervention_sims):
+for intervention_sim in intervention_sims:
     intervention_sim.run(n_runs=n_runs, verbose=0)
     for sim in intervention_sim.sims:
         df = sim.to_df()
@@ -83,7 +83,7 @@ for intervention, intervention_sim in enumerate(intervention_sims):
                 else:
                     week_by_week[k].append(c[k].iloc[0])
         
-        dfs.append((pd.DataFrame(week_by_week), quar_period, intervention))
+        dfs.append((pd.DataFrame(week_by_week), quar_period, sim.label))
 
 #%%
 temporal = []

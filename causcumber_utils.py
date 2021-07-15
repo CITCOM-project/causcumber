@@ -59,7 +59,7 @@ def _dot_to_dagitty_dag(dot_file_path):
     return dag_string
 
 
-def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val):
+def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val, verbose=False):
     """
     Runs dowhy to calculate a causal estimate.
     
@@ -71,21 +71,24 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         Filepath of the DOT file representing the causal DAG. Nodes here MUST have a 1:1 correspondence with columns in the data.
     treatment_var : string
         The name of the treatment variable (must be a column in the data).
-    outcome_var : TYPE
+    outcome_var : string
         The name of the outcome variable (must be a column in the data).
-    control_val : TYPE
+    control_val
         The control value of the treatment variable (i.e. the value for individuals who did NOT receive treatment).
-    treatment_val : TYPE
+    treatment_val
         The treated value of the treatment variable (i.e. the value for individuals who DID receive treatment.)
+    verbose : boolean
+        Set to True to print additional information to the console (defaults to False).
 
     Returns
     -------
-    TYPE
-        DESCRIPTION.
+    float
+        The causal estimate calculated by doWhy.
 
     """
-    print("Running doWhy with params")
-    print("\n".join([f"  {k}: {v}" for k, v in locals().items() if k != "data"]))
+    if verbose:
+        print("Running doWhy with params")
+        print("\n".join([f"  {k}: {v}" for k, v in locals().items() if k != "data"]))
     
     if treatment_var not in data:
         raise ValueError(f"Treatment variable {treatment_var} must be a column in the data, i.e. one of {data.columns}")
@@ -93,9 +96,11 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         raise ValueError(f"Outcome variable {outcome_var} must be a column in the data, i.e. one of {data.columns}")
     
     # 2. Create a causal model from the data and given graph
-    print("Creating a causal model...")
+    if verbose:
+        print("Creating a causal model...")
     adjustment_set = dagitty_identification(graph, treatment_var, outcome_var)
-    print("  adjustment_set", adjustment_set)
+    if verbose:
+        print("  adjustment_set", adjustment_set)
     model = dowhy.CausalModel(
         data=data,
         treatment=treatment_var,
@@ -104,12 +109,14 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
     )
     
     # # 3. Identify causal effect and return target estimands
-    print("Identifying...")
+    if verbose:
+        print("Identifying...")
     identified_estimand = model.identify_effect(proceed_when_unidentifiable=True)
     # print(identified_estimand)     
        
     # 4. Estimate the target estimand using a statistical method.
-    print("Estimating...")
+    if verbose:
+        print("Estimating...")
     estimate = model.estimate_effect(
         identified_estimand,
         method_name="backdoor.linear_regression",
@@ -118,6 +125,7 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         confidence_intervals=True
         )
     ci_low, ci_high = estimate.get_confidence_intervals()[0]
-    print("Total Effect Estimate:", round(estimate.value, 2))
-    print("95% Confidence Intervals: [{}, {}]".format(round(ci_low, 2), round(ci_high, 2)))
+    if verbose:
+        print("Total Effect Estimate:", round(estimate.value, 2))
+        print("95% Confidence Intervals: [{}, {}]".format(round(ci_low, 2), round(ci_high, 2)))
     return estimate.value

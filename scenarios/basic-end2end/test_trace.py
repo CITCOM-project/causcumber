@@ -6,7 +6,6 @@ logging.getLogger('dowhy').setLevel(logging.CRITICAL)
 
 import pandas as pd
 import covasim as cv
-from dowhy import CausalModel
 import os
 
 import sys
@@ -15,13 +14,22 @@ from causcumber_utils import run_dowhy
 
 import pygraphviz
 
-import pickle
+import matplotlib.pyplot as plt
 
 # Mute the "RuntimeWarning: divide by zero encountered in double_scalars" messages
 import warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 causal_variables = {"inputs": set(), "outputs": set()}
+
+def plot(data, x_col, y_col):
+    grouped = data.groupby('intervention')
+    for i, g in grouped:
+        plt.scatter(g[x_col], g[y_col], label=i)
+    plt.xlabel(x_col)
+    plt.ylabel(y_col)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.show()
 
 def dict_plus(dic1, dic2):
     for field in dic2:
@@ -41,7 +49,7 @@ def draw_dag():
     g.write("causal_dag_connected.dot")
 
 
-def run_covasim(label, params, interventions, n_runs=100, run=False):
+def run_covasim(label, params, interventions, n_runs=10, run=False):
     params['interventions'] = []
     if 'n_days' in params:
         params['n_days'] = int(params['n_days'])
@@ -88,12 +96,17 @@ def run_covasim(label, params, interventions, n_runs=100, run=False):
 
 
 def test(data, graph, treatment_var, outcome_var, control_val, treatment_val, relation):
-    causal_estimate = run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val)
-    print("ESTIMATE:", causal_estimate)
     print("RELATION:", relation)
+    
+    grouped = {k:v for k, v in data.groupby(treatment_var)}
+    print("Association estimate:", grouped[treatment_val][outcome_var].mean() - grouped[control_val][outcome_var].mean())
+
+    causal_estimate = run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val)
+    print("Causal estimate:", causal_estimate)
+    
     if relation == "equal to":
         print("EXPECTED: ~0")
-        if causal_estimate < 0.1 and causal_estimate > -0.1:
+        if -1 < causal_estimate < 1:
             print("result: PASS")
         else:
             print("result: FAIL")
@@ -187,7 +200,8 @@ scenario_treatments = {'Baseline': 0, 'Standard testing': 1,
                        'Optimal testing': 6, 'Optimal tracing': 7}
 
 data = pd.read_csv("results/data.csv")
-data['intervention'] = [scenario_treatments.get(i, i) for i in data['intervention']]
+#plot(data, "intervention", "cum_deaths")
+data['intervention'] = [scenario_treatments[i] for i in data['intervention']]
 
 print()
 print("RUNNING TESTS")
@@ -195,13 +209,20 @@ for t in tests:
     print(t['label'])
     print("control_val:", t['control_val'])
     print("treatment_val:", t['treatment_val'])
+    control_val = scenario_treatments[t['control_val']]
+    treatment_val = scenario_treatments[t['treatment_val']]
     test(
-        data = data,
+        # TODO: This is a hack to get around the fact that doWhy draws a
+        # straight line through the endire data rather than through pairs of
+        # categorical values.
+        # This slices the data such that it only contains the two values we're
+        # interested in, effectively binarising the treatment
+        data = data.loc[data['intervention'].isin([control_val, treatment_val])],
         graph = "causal_dag.dot",
         treatment_var = "intervention",
         outcome_var = t['outcome_var'],
-        control_val = scenario_treatments[t['control_val']],
-        treatment_val = scenario_treatments[t['treatment_val']],
+        control_val = control_val,
+        treatment_val = treatment_val,
         relation = t['relation']
     )
     print()
