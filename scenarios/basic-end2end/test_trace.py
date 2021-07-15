@@ -90,12 +90,27 @@ def run_covasim(label, params, interventions, n_runs=100, run=False):
 def test(data, graph, treatment_var, outcome_var, control_val, treatment_val, relation):
     causal_estimate = run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val)
     print("ESTIMATE:", causal_estimate)
-    if relation == "equal to" and causal_estimate < 0.1 and causal_estimate > -0.1:
-        print("result: PASS")
-    elif relation == "less than" and causal_estimate < 0:
-        print("result: PASS")
+    print("RELATION:", relation)
+    if relation == "equal to":
+        print("EXPECTED: ~0")
+        if causal_estimate < 0.1 and causal_estimate > -0.1:
+            print("result: PASS")
+        else:
+            print("result: FAIL")
+    elif relation == "less than":
+        print("EXPECTED: estimate < 0")
+        if causal_estimate < 0:
+            print("result: PASS")
+        else:
+            print("result: FAIL")
+    elif relation == "greater than":
+        print("EXPECTED: estimate > 0")
+        if causal_estimate > 0:
+            print("result: PASS")
+        else:
+            print("result: FAIL")
     else:
-        print("result: FAIL")
+        raise ValueError(f"Unsupported relation '{relation}'")
     
 
 param_re = re.compile("(\w+)=(.*)")
