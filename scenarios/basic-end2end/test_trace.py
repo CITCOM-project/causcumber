@@ -101,7 +101,7 @@ def test(data, graph, treatment_var, outcome_var, control_val, treatment_val, re
     grouped = {k:v for k, v in data.groupby(treatment_var)}
     print("Association estimate:", grouped[treatment_val][outcome_var].mean() - grouped[control_val][outcome_var].mean())
 
-    causal_estimate, (ci_low, ci_high) = run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val, confidence_intervals=True)
+    causal_estimate, (ci_low, ci_high) = run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val)
     print("Causal estimate:", causal_estimate)
     assert(ci_low < ci_high)
     
@@ -204,6 +204,10 @@ data = pd.read_csv("results/data.csv")
 #plot(data, "intervention", "cum_deaths")
 data['intervention'] = [scenario_treatments[i] for i in data['intervention']]
 
+data['intervention'] = data['intervention'].astype('category')
+data['pop_type'] = data['pop_type'].astype('category')
+data['location'] = data['location'].astype('category')
+
 print()
 print("RUNNING TESTS")
 for t in tests:
@@ -213,12 +217,7 @@ for t in tests:
     control_val = scenario_treatments[t['control_val']]
     treatment_val = scenario_treatments[t['treatment_val']]
     test(
-        # TODO: This is a hack to get around the fact that doWhy draws a
-        # straight line through the endire data rather than through pairs of
-        # categorical values.
-        # This slices the data such that it only contains the two values we're
-        # interested in, effectively binarising the treatment
-        data = data.loc[data['intervention'].isin([control_val, treatment_val])],
+        data = data,
         graph = "causal_dag.dot",
         treatment_var = "intervention",
         outcome_var = t['outcome_var'],

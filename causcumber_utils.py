@@ -59,7 +59,7 @@ def _dot_to_dagitty_dag(dot_file_path):
     return dag_string
 
 
-def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val, verbose=False, confidence_intervals=False):
+def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val, verbose=False):
     """
     Runs dowhy to calculate a causal estimate.
     
@@ -79,12 +79,10 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         The treated value of the treatment variable (i.e. the value for individuals who DID receive treatment.)
     verbose : boolean
         Set to True to print additional information to the console (defaults to False).
-    confidence_intervals : boolean
-        Tell doWhy to compute the confidence intervals in the estimate
     Returns
     -------
-    float
-        The causal estimate calculated by doWhy.
+    float, (float, float)
+        The causal estimate calculated by doWhy and the confidence intervals (low, high).
 
     """
     if verbose:
@@ -96,12 +94,23 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
     if outcome_var not in data:
         raise ValueError(f"Outcome variable {outcome_var} must be a column in the data, i.e. one of {data.columns}")
     
+    
+    
     # 2. Create a causal model from the data and given graph
     if verbose:
         print("Creating a causal model...")
     adjustment_set = dagitty_identification(graph, treatment_var, outcome_var)
     if verbose:
         print("  adjustment_set", adjustment_set)
+    
+    # TODO: This is a hack to get around the fact that doWhy draws a
+    # straight line through the endire data rather than through pairs of
+    # categorical values.
+    # This slices the data such that it only contains the two values we're
+    # interested in, effectively binarising the treatment
+    if data.dtypes[treatment_var] == "category":
+        data = data.loc[data[treatment_var].isin([control_val, treatment_val])]
+
     model = dowhy.CausalModel(
         data=data,
         treatment=treatment_var,
@@ -118,15 +127,16 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
     # 4. Estimate the target estimand using a statistical method.
     if verbose:
         print("Estimating...")
+    
+    
+    
     estimate = model.estimate_effect(
         identified_estimand,
         method_name="backdoor.linear_regression",
         treatment_value=treatment_val,
         control_value=control_val,
-        confidence_intervals=confidence_intervals
+        confidence_intervals=True,
         )
-    if not confidence_intervals:
-        return estimate.value
     ci_low, ci_high = estimate.get_confidence_intervals()[0]
     if verbose:
         print("Total Effect Estimate:", round(estimate.value, 2))
