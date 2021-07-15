@@ -7,7 +7,7 @@ Created on Tue Jun  8 15:49:08 2021
 """
 import pygraphviz
 
-time = 7
+time = 11
 
 g = pygraphviz.AGraph(strict=False, directed=True, rankdir="LR", newrank=True)
 
@@ -104,7 +104,7 @@ def input_connections(t):
 
 input_connections(0)
 
-# Repeating unig
+# Repeating unit
 # Having a static repeating unit isn't a very good reflection on reality
 # because youcan't recover or die until you've been infected.
 # It's actually even more complicated than this because conditions are

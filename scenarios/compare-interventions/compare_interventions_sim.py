@@ -1,7 +1,8 @@
 import covasim as cv
 import pandas as pd
 
-n_runs = 10
+n_runs = 100
+n_weeks = 10
 
 def msims(default, investigate):
     sims = [cv.MultiSim(cv.Sim(pars=base_pars, label="Baseline"))]
@@ -30,7 +31,7 @@ base_pars = dict(
     pop_infected=100,
     # start_day='2020-03-01',
     # end_day='2020-05-31',
-    n_days=7*6,
+    n_days=(7*n_weeks)-1, # we need to take one away because it prints from day 0 to day n INCLUSIVE (i.e. n+1 days)
     location='UK'
 )
 
@@ -43,13 +44,13 @@ zero_contact_tracing_intervention = cv.contact_tracing(trace_probs=dict(h=0, s=0
 optimal_contact_tracing_intervention = cv.contact_tracing(trace_probs=dict(h=1, s=1, w=1, c=1), quar_period=14)
 
 intervention_sims = msims(base_pars, [
-    ({"interventions": testing_intervention}, "Testing"),
-    ({"interventions": [testing_intervention, contact_tracing_intervention]}, "Contact Tracing"),
-    ({"interventions": zero_testing_intervention}, "Zero Testing"),
-    ({"interventions": zero_contact_tracing_intervention}, "Zero Contact Tracing"),
-    ({"interventions": [contact_tracing_intervention]}, "Contact Tracing Without Testing"),
-    ({"interventions": optimal_testing_intervention}, "Testing"),
-    ({"interventions": [testing_intervention, optimal_contact_tracing_intervention]}, "Contact Tracing"),
+    ({"interventions": testing_intervention}, "Standard testing"),
+    ({"interventions": [testing_intervention, contact_tracing_intervention]}, "Standard tracing"),
+    ({"interventions": zero_testing_intervention}, "No testing"),
+    ({"interventions": zero_contact_tracing_intervention}, "No tracing"),
+    ({"interventions": [contact_tracing_intervention]}, "Trace without test"),
+    ({"interventions": optimal_testing_intervention}, "Optimal Testing"),
+    ({"interventions": [testing_intervention, optimal_contact_tracing_intervention]}, "Optimal Tracing"),
     # ({"start_day": '2021-11-01', "end_day": '2022-02-01'}, "Winter"),
     # ({"start_day": '2021-03-01', "end_day": '2021-06-01'}, "Spring"),
     ])
@@ -73,6 +74,7 @@ for intervention, intervention_sim in enumerate(intervention_sims):
         # aggregate by week
         week_by_week = {k:[] for k in to_keep}
         for c in chunks(df, 7):
+            assert(len(c) == 7)
             for k in week_by_week:
                 if k.startswith('new_'):
                     week_by_week[k].append(c[k].sum())
@@ -87,11 +89,7 @@ for intervention, intervention_sim in enumerate(intervention_sims):
 temporal = []
 for df, quar_period, intervention in dfs:
     dic = df.to_dict(orient='list')
-    lst = [item for k in to_keep for item in dic[k]]
-    keys = [f"{k}_w{w}" for k in to_keep for w in range(14)]
-    # BUG IS HERE!
-    week_dic = {k:v for k, v in zip(keys, lst)}
-    print(week_dic)
+    week_dic = {f"{k}_w{w+1}": item for k in to_keep for w, item in enumerate(dic[k])}
     week_dic['quar_period'] = quar_period
     week_dic['intervention'] = intervention
     for k, v in base_pars.items():
@@ -99,7 +97,8 @@ for df, quar_period, intervention in dfs:
     temporal.append(week_dic)
 
 data = pd.DataFrame(temporal)
+print(data)
 data.to_csv(f"results/week-by-week_{n_runs}.csv")
 
-for col in data.columns:
-    print(col)
+# for col in data.columns:
+#     print(col)

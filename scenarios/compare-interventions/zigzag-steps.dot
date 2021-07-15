@@ -2,91 +2,18 @@ digraph "" {
 	graph [newrank=True,
 		rankdir=LR
 	];
-	subgraph cluster_inputs {
-		graph [label=inputs];
-		quar_period;
-		intervention;
-		pop_type;
-		pop_size;
-		location;
-		pop_infected;
-		n_days;
-	}
-	subgraph cluster_0 {
-		graph [label=t0];
-		n_quarantined_w0;
-		n_exposed_w0;
-		cum_infections_w0;
-		cum_symptomatic_w0;
-		cum_severe_w0;
-		cum_critical_w0;
-		cum_deaths_w0;
-		cum_tests_w0;
-	}
-	subgraph cluster_1 {
-		graph [label=t1,
+	subgraph cluster_8 {
+		graph [label=t8,
 			rank=same
 		];
-		n_quarantined_w1;
-		n_exposed_w1;
-		cum_infections_w1;
-		cum_symptomatic_w1;
-		cum_severe_w1;
-		cum_critical_w1;
-		cum_deaths_w1;
-		cum_tests_w1;
-	}
-	subgraph cluster_2 {
-		graph [label=t2,
-			rank=same
-		];
-		n_quarantined_w2;
-		n_exposed_w2;
-		cum_infections_w2;
-		cum_symptomatic_w2;
-		cum_severe_w2;
-		cum_critical_w2;
-		cum_deaths_w2;
-		cum_tests_w2;
-	}
-	subgraph cluster_4 {
-		graph [label=t4,
-			rank=same
-		];
-		n_quarantined_w4;
-		n_exposed_w4;
-		cum_infections_w4;
-		cum_symptomatic_w4;
-		cum_severe_w4;
-		cum_critical_w4;
-		cum_deaths_w4;
-		cum_tests_w4;
-	}
-	subgraph cluster_3 {
-		graph [label=t3,
-			rank=same
-		];
-		n_quarantined_w3;
-		n_exposed_w3;
-		cum_infections_w3;
-		cum_symptomatic_w3;
-		cum_severe_w3;
-		cum_critical_w3;
-		cum_deaths_w3;
-		cum_tests_w3;
-	}
-	subgraph cluster_6 {
-		graph [label=t6,
-			rank=same
-		];
-		n_quarantined_w6;
-		n_exposed_w6;
-		cum_infections_w6;
-		cum_symptomatic_w6;
-		cum_severe_w6;
-		cum_critical_w6;
-		cum_deaths_w6;
-		cum_tests_w6;
+		n_quarantined_w8;
+		n_exposed_w8;
+		cum_infections_w8;
+		cum_symptomatic_w8;
+		cum_severe_w8;
+		cum_critical_w8;
+		cum_deaths_w8;
+		cum_tests_w8;
 	}
 	subgraph cluster_5 {
 		graph [label=t5,
@@ -101,12 +28,141 @@ digraph "" {
 		cum_deaths_w5;
 		cum_tests_w5;
 	}
+	subgraph cluster_6 {
+		graph [label=t6,
+			rank=same
+		];
+		n_quarantined_w6;
+		n_exposed_w6;
+		cum_infections_w6;
+		cum_symptomatic_w6;
+		cum_severe_w6;
+		cum_critical_w6;
+		cum_deaths_w6;
+		cum_tests_w6;
+	}
+	subgraph cluster_10 {
+		graph [label=t10,
+			rank=same
+		];
+		n_quarantined_w10;
+		n_exposed_w10;
+		cum_infections_w10;
+		cum_symptomatic_w10;
+		cum_severe_w10;
+		cum_critical_w10;
+		cum_deaths_w10;
+		cum_tests_w10;
+	}
+	subgraph cluster_4 {
+		graph [label=t4,
+			rank=same
+		];
+		n_quarantined_w4;
+		n_exposed_w4;
+		cum_infections_w4;
+		cum_symptomatic_w4;
+		cum_severe_w4;
+		cum_critical_w4;
+		cum_deaths_w4;
+		cum_tests_w4;
+	}
+	subgraph cluster_7 {
+		graph [label=t7,
+			rank=same
+		];
+		n_quarantined_w7;
+		n_exposed_w7;
+		cum_infections_w7;
+		cum_symptomatic_w7;
+		cum_severe_w7;
+		cum_critical_w7;
+		cum_deaths_w7;
+		cum_tests_w7;
+	}
+	subgraph cluster_9 {
+		graph [label=t9,
+			rank=same
+		];
+		n_quarantined_w9;
+		n_exposed_w9;
+		cum_infections_w9;
+		cum_symptomatic_w9;
+		cum_severe_w9;
+		cum_critical_w9;
+		cum_deaths_w9;
+		cum_tests_w9;
+	}
+	subgraph cluster_2 {
+		graph [label=t2,
+			rank=same
+		];
+		n_quarantined_w2;
+		n_exposed_w2;
+		cum_infections_w2;
+		cum_symptomatic_w2;
+		cum_severe_w2;
+		cum_critical_w2;
+		cum_deaths_w2;
+		cum_tests_w2;
+	}
+	subgraph cluster_3 {
+		graph [label=t3,
+			rank=same
+		];
+		n_quarantined_w3;
+		n_exposed_w3;
+		cum_infections_w3;
+		cum_symptomatic_w3;
+		cum_severe_w3;
+		cum_critical_w3;
+		cum_deaths_w3;
+		cum_tests_w3;
+	}
+	subgraph cluster_1 {
+		graph [label=t1,
+			rank=same
+		];
+		n_quarantined_w1;
+		n_exposed_w1;
+		cum_infections_w1;
+		cum_symptomatic_w1;
+		cum_severe_w1;
+		cum_critical_w1;
+		cum_deaths_w1;
+		cum_tests_w1;
+	}
+	subgraph cluster_0 {
+		graph [label=t0];
+		n_quarantined_w0;
+		n_exposed_w0;
+		cum_infections_w0;
+		cum_symptomatic_w0;
+		cum_severe_w0;
+		cum_critical_w0;
+		cum_deaths_w0;
+		cum_tests_w0;
+	}
+	subgraph cluster_inputs {
+		graph [label=inputs];
+		quar_period;
+		intervention;
+		pop_type;
+		pop_size;
+		location;
+		pop_infected;
+		n_days;
+	}
 	quar_period -> n_quarantined_w1;
 	quar_period -> n_quarantined_w2;
 	quar_period -> n_quarantined_w3;
 	quar_period -> n_quarantined_w4;
 	quar_period -> n_quarantined_w5;
 	quar_period -> n_quarantined_w6;
+	quar_period -> n_quarantined_w7;
+	quar_period -> n_quarantined_w8;
+	quar_period -> n_quarantined_w9;
+	quar_period -> n_quarantined_w10;
 	intervention -> n_quarantined_w0;
 	intervention -> n_exposed_w0;
 	intervention -> cum_tests_w0;
@@ -128,6 +184,18 @@ digraph "" {
 	intervention -> n_quarantined_w6;
 	intervention -> n_exposed_w6;
 	intervention -> cum_tests_w6;
+	intervention -> n_quarantined_w7;
+	intervention -> n_exposed_w7;
+	intervention -> cum_tests_w7;
+	intervention -> n_quarantined_w8;
+	intervention -> n_exposed_w8;
+	intervention -> cum_tests_w8;
+	intervention -> n_quarantined_w9;
+	intervention -> n_exposed_w9;
+	intervention -> cum_tests_w9;
+	intervention -> n_quarantined_w10;
+	intervention -> n_exposed_w10;
+	intervention -> cum_tests_w10;
 	pop_type -> n_quarantined_w0;
 	pop_type -> n_exposed_w0;
 	pop_type -> cum_symptomatic_w0;
@@ -169,6 +237,30 @@ digraph "" {
 	pop_type -> cum_symptomatic_w6;
 	pop_type -> cum_severe_w6;
 	pop_type -> cum_critical_w6;
+	pop_type -> n_quarantined_w7;
+	pop_type -> n_exposed_w7;
+	pop_type -> cum_infections_w7;
+	pop_type -> cum_symptomatic_w7;
+	pop_type -> cum_severe_w7;
+	pop_type -> cum_critical_w7;
+	pop_type -> n_quarantined_w8;
+	pop_type -> n_exposed_w8;
+	pop_type -> cum_infections_w8;
+	pop_type -> cum_symptomatic_w8;
+	pop_type -> cum_severe_w8;
+	pop_type -> cum_critical_w8;
+	pop_type -> n_quarantined_w9;
+	pop_type -> n_exposed_w9;
+	pop_type -> cum_infections_w9;
+	pop_type -> cum_symptomatic_w9;
+	pop_type -> cum_severe_w9;
+	pop_type -> cum_critical_w9;
+	pop_type -> n_quarantined_w10;
+	pop_type -> n_exposed_w10;
+	pop_type -> cum_infections_w10;
+	pop_type -> cum_symptomatic_w10;
+	pop_type -> cum_severe_w10;
+	pop_type -> cum_critical_w10;
 	pop_size -> n_quarantined_w0;
 	pop_size -> n_exposed_w0;
 	pop_size -> cum_symptomatic_w0;
@@ -210,6 +302,30 @@ digraph "" {
 	pop_size -> cum_symptomatic_w6;
 	pop_size -> cum_severe_w6;
 	pop_size -> cum_critical_w6;
+	pop_size -> n_quarantined_w7;
+	pop_size -> n_exposed_w7;
+	pop_size -> cum_infections_w7;
+	pop_size -> cum_symptomatic_w7;
+	pop_size -> cum_severe_w7;
+	pop_size -> cum_critical_w7;
+	pop_size -> n_quarantined_w8;
+	pop_size -> n_exposed_w8;
+	pop_size -> cum_infections_w8;
+	pop_size -> cum_symptomatic_w8;
+	pop_size -> cum_severe_w8;
+	pop_size -> cum_critical_w8;
+	pop_size -> n_quarantined_w9;
+	pop_size -> n_exposed_w9;
+	pop_size -> cum_infections_w9;
+	pop_size -> cum_symptomatic_w9;
+	pop_size -> cum_severe_w9;
+	pop_size -> cum_critical_w9;
+	pop_size -> n_quarantined_w10;
+	pop_size -> n_exposed_w10;
+	pop_size -> cum_infections_w10;
+	pop_size -> cum_symptomatic_w10;
+	pop_size -> cum_severe_w10;
+	pop_size -> cum_critical_w10;
 	location -> n_quarantined_w0;
 	location -> n_exposed_w0;
 	location -> cum_symptomatic_w0;
@@ -251,6 +367,30 @@ digraph "" {
 	location -> cum_symptomatic_w6;
 	location -> cum_severe_w6;
 	location -> cum_critical_w6;
+	location -> n_quarantined_w7;
+	location -> n_exposed_w7;
+	location -> cum_infections_w7;
+	location -> cum_symptomatic_w7;
+	location -> cum_severe_w7;
+	location -> cum_critical_w7;
+	location -> n_quarantined_w8;
+	location -> n_exposed_w8;
+	location -> cum_infections_w8;
+	location -> cum_symptomatic_w8;
+	location -> cum_severe_w8;
+	location -> cum_critical_w8;
+	location -> n_quarantined_w9;
+	location -> n_exposed_w9;
+	location -> cum_infections_w9;
+	location -> cum_symptomatic_w9;
+	location -> cum_severe_w9;
+	location -> cum_critical_w9;
+	location -> n_quarantined_w10;
+	location -> n_exposed_w10;
+	location -> cum_infections_w10;
+	location -> cum_symptomatic_w10;
+	location -> cum_severe_w10;
+	location -> cum_critical_w10;
 	pop_infected -> cum_infections_w0;
 	pop_infected -> cum_symptomatic_w0;
 	pop_infected -> cum_severe_w0;
@@ -279,6 +419,22 @@ digraph "" {
 	pop_infected -> cum_symptomatic_w6;
 	pop_infected -> cum_severe_w6;
 	pop_infected -> cum_critical_w6;
+	pop_infected -> cum_infections_w7;
+	pop_infected -> cum_symptomatic_w7;
+	pop_infected -> cum_severe_w7;
+	pop_infected -> cum_critical_w7;
+	pop_infected -> cum_infections_w8;
+	pop_infected -> cum_symptomatic_w8;
+	pop_infected -> cum_severe_w8;
+	pop_infected -> cum_critical_w8;
+	pop_infected -> cum_infections_w9;
+	pop_infected -> cum_symptomatic_w9;
+	pop_infected -> cum_severe_w9;
+	pop_infected -> cum_critical_w9;
+	pop_infected -> cum_infections_w10;
+	pop_infected -> cum_symptomatic_w10;
+	pop_infected -> cum_severe_w10;
+	pop_infected -> cum_critical_w10;
 	n_quarantined_w0 -> n_quarantined_w1;
 	n_quarantined_w0 -> n_exposed_w1;
 	n_exposed_w0 -> n_exposed_w1;
@@ -405,4 +561,88 @@ digraph "" {
 	cum_deaths_w5 -> cum_tests_w6;
 	cum_tests_w5 -> n_quarantined_w6;
 	cum_tests_w5 -> cum_tests_w6;
+	n_quarantined_w6 -> n_quarantined_w7;
+	n_quarantined_w6 -> n_exposed_w7;
+	n_exposed_w6 -> n_exposed_w7;
+	n_exposed_w6 -> cum_infections_w7;
+	cum_infections_w6 -> n_quarantined_w7;
+	cum_infections_w6 -> n_exposed_w7;
+	cum_infections_w6 -> cum_infections_w7;
+	cum_infections_w6 -> cum_symptomatic_w7;
+	cum_symptomatic_w6 -> n_quarantined_w7;
+	cum_symptomatic_w6 -> cum_infections_w7;
+	cum_symptomatic_w6 -> cum_symptomatic_w7;
+	cum_symptomatic_w6 -> cum_severe_w7;
+	cum_severe_w6 -> cum_severe_w7;
+	cum_severe_w6 -> cum_critical_w7;
+	cum_critical_w6 -> cum_critical_w7;
+	cum_critical_w6 -> cum_deaths_w7;
+	cum_deaths_w6 -> n_exposed_w7;
+	cum_deaths_w6 -> cum_deaths_w7;
+	cum_deaths_w6 -> cum_tests_w7;
+	cum_tests_w6 -> n_quarantined_w7;
+	cum_tests_w6 -> cum_tests_w7;
+	n_quarantined_w7 -> n_quarantined_w8;
+	n_quarantined_w7 -> n_exposed_w8;
+	n_exposed_w7 -> n_exposed_w8;
+	n_exposed_w7 -> cum_infections_w8;
+	cum_infections_w7 -> n_quarantined_w8;
+	cum_infections_w7 -> n_exposed_w8;
+	cum_infections_w7 -> cum_infections_w8;
+	cum_infections_w7 -> cum_symptomatic_w8;
+	cum_symptomatic_w7 -> n_quarantined_w8;
+	cum_symptomatic_w7 -> cum_infections_w8;
+	cum_symptomatic_w7 -> cum_symptomatic_w8;
+	cum_symptomatic_w7 -> cum_severe_w8;
+	cum_severe_w7 -> cum_severe_w8;
+	cum_severe_w7 -> cum_critical_w8;
+	cum_critical_w7 -> cum_critical_w8;
+	cum_critical_w7 -> cum_deaths_w8;
+	cum_deaths_w7 -> n_exposed_w8;
+	cum_deaths_w7 -> cum_deaths_w8;
+	cum_deaths_w7 -> cum_tests_w8;
+	cum_tests_w7 -> n_quarantined_w8;
+	cum_tests_w7 -> cum_tests_w8;
+	n_quarantined_w8 -> n_quarantined_w9;
+	n_quarantined_w8 -> n_exposed_w9;
+	n_exposed_w8 -> n_exposed_w9;
+	n_exposed_w8 -> cum_infections_w9;
+	cum_infections_w8 -> n_quarantined_w9;
+	cum_infections_w8 -> n_exposed_w9;
+	cum_infections_w8 -> cum_infections_w9;
+	cum_infections_w8 -> cum_symptomatic_w9;
+	cum_symptomatic_w8 -> n_quarantined_w9;
+	cum_symptomatic_w8 -> cum_infections_w9;
+	cum_symptomatic_w8 -> cum_symptomatic_w9;
+	cum_symptomatic_w8 -> cum_severe_w9;
+	cum_severe_w8 -> cum_severe_w9;
+	cum_severe_w8 -> cum_critical_w9;
+	cum_critical_w8 -> cum_critical_w9;
+	cum_critical_w8 -> cum_deaths_w9;
+	cum_deaths_w8 -> n_exposed_w9;
+	cum_deaths_w8 -> cum_deaths_w9;
+	cum_deaths_w8 -> cum_tests_w9;
+	cum_tests_w8 -> n_quarantined_w9;
+	cum_tests_w8 -> cum_tests_w9;
+	n_quarantined_w9 -> n_quarantined_w10;
+	n_quarantined_w9 -> n_exposed_w10;
+	n_exposed_w9 -> n_exposed_w10;
+	n_exposed_w9 -> cum_infections_w10;
+	cum_infections_w9 -> n_quarantined_w10;
+	cum_infections_w9 -> n_exposed_w10;
+	cum_infections_w9 -> cum_infections_w10;
+	cum_infections_w9 -> cum_symptomatic_w10;
+	cum_symptomatic_w9 -> n_quarantined_w10;
+	cum_symptomatic_w9 -> cum_infections_w10;
+	cum_symptomatic_w9 -> cum_symptomatic_w10;
+	cum_symptomatic_w9 -> cum_severe_w10;
+	cum_severe_w9 -> cum_severe_w10;
+	cum_severe_w9 -> cum_critical_w10;
+	cum_critical_w9 -> cum_critical_w10;
+	cum_critical_w9 -> cum_deaths_w10;
+	cum_deaths_w9 -> n_exposed_w10;
+	cum_deaths_w9 -> cum_deaths_w10;
+	cum_deaths_w9 -> cum_tests_w10;
+	cum_tests_w9 -> n_quarantined_w10;
+	cum_tests_w9 -> cum_tests_w10;
 }

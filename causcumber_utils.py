@@ -4,7 +4,8 @@ import numpy as np
 from rpy2.robjects.packages import importr, isinstalled
 from rpy2.robjects.vectors import StrVector
 from rpy2.robjects.packages import STAP
-
+import pandas as pd
+import dowhy
 
 def dagitty_identification(dot_file_path, treatment, outcome):
     """ Identify minimal adjustment set for the causal effect of treatment on outcome in the causal graph specified
@@ -56,3 +57,67 @@ def _dot_to_dagitty_dag(dot_file_path):
     dot_string = "dag {" + "\n".join([e.to_string() for e in dot_graph[0].get_edges()]) + "}"
     dag_string = dot_string.replace("digraph", "dag")
     return dag_string
+
+
+def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val):
+    """
+    Runs dowhy to calculate a causal estimate.
+    
+    Parameters
+    ----------
+    data : pandas dataframe
+        A dataframe representing the observational data.
+    graph : string
+        Filepath of the DOT file representing the causal DAG. Nodes here MUST have a 1:1 correspondence with columns in the data.
+    treatment_var : string
+        The name of the treatment variable (must be a column in the data).
+    outcome_var : TYPE
+        The name of the outcome variable (must be a column in the data).
+    control_val : TYPE
+        The control value of the treatment variable (i.e. the value for individuals who did NOT receive treatment).
+    treatment_val : TYPE
+        The treated value of the treatment variable (i.e. the value for individuals who DID receive treatment.)
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
+    print("Running doWhy with params")
+    print("\n".join([f"  {k}: {v}" for k, v in locals().items() if k != "data"]))
+    
+    if treatment_var not in data:
+        raise ValueError(f"Treatment variable {treatment_var} must be a column in the data, i.e. one of {data.columns}")
+    if outcome_var not in data:
+        raise ValueError(f"Outcome variable {outcome_var} must be a column in the data, i.e. one of {data.columns}")
+    
+    # 2. Create a causal model from the data and given graph
+    print("Creating a causal model...")
+    adjustment_set = dagitty_identification(graph, treatment_var, outcome_var)
+    print("  adjustment_set", adjustment_set)
+    model = dowhy.CausalModel(
+        data=data,
+        treatment=treatment_var,
+        outcome=outcome_var,
+        common_causes=adjustment_set
+    )
+    
+    # # 3. Identify causal effect and return target estimands
+    print("Identifying...")
+    identified_estimand = model.identify_effect(proceed_when_unidentifiable=True)
+    # print(identified_estimand)     
+       
+    # 4. Estimate the target estimand using a statistical method.
+    print("Estimating...")
+    estimate = model.estimate_effect(
+        identified_estimand,
+        method_name="backdoor.linear_regression",
+        treatment_value=treatment_val,
+        control_value=control_val,
+        confidence_intervals=True
+        )
+    ci_low, ci_high = estimate.get_confidence_intervals()[0]
+    print("Total Effect Estimate:", round(estimate.value, 2))
+    print("95% Confidence Intervals: [{}, {}]".format(round(ci_low, 2), round(ci_high, 2)))
+    return estimate.value

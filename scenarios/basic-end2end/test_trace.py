@@ -9,6 +9,10 @@ import covasim as cv
 from dowhy import CausalModel
 import os
 
+import sys
+sys.path.append("../../")
+from causcumber_utils import run_dowhy
+
 import pygraphviz
 
 import pickle
@@ -83,41 +87,8 @@ def run_covasim(label, params, interventions, n_runs=100, run=False):
         data.to_csv(path_or_buf="results/data.csv")
 
 
-def run_dowhy(datapath, graph, treatment_var, outcome_var, control_val, treatment_val, relation, run=True):
-    print("Running doWhy with params")
-    print("\n".join([f"  {k}: {v}" for k, v in locals().items()]))
-    
-    if not run:
-        return None
-    
-    # 1. Read in the data
-    data = pd.read_csv(datapath)
-    data['intervention'] = [scenario_treatments[i] for i in data['intervention']]
-    
-    data['intervention'] = data['intervention'].astype('category')
-    data['pop_type'] = data['pop_type'].astype('category')
-    data['location'] = data['location'].astype('category')
-    
-    # 2. Create a causal model from the data and given graph.
-    model = CausalModel(
-        data=data,
-        treatment=treatment_var,
-        outcome=outcome_var,
-        graph=graph)
-    
-    # 3. Identify causal effect and return target estimands
-    identified_estimand = None
-    if False and os.path.exists(f"results/{treatment_var}-{outcome_var}.id"):
-        with open(f"results/{treatment_var}-{outcome_var}.id", 'rb') as f:
-            identified_estimand = pickle.load(f)
-    else:
-        identified_estimand = model.identify_effect(method_name="minimal-adjustment")
-        with open(f"results/{treatment_var}-{outcome_var}.id", 'wb') as f:
-            pickle.dump(identified_estimand, f)
-    
-    # 4. Estimate the target estimand using a statistical method.
-    estimate = model.estimate_effect(identified_estimand, method_name="backdoor.linear_regression", control_value=control_val, treatment_value=treatment_val)
-    causal_estimate = estimate.value
+def test(data, graph, treatment_var, outcome_var, control_val, treatment_val, relation):
+    causal_estimate = run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val)
     print("ESTIMATE:", causal_estimate)
     if relation == "equal to" and causal_estimate < 0.1 and causal_estimate > -0.1:
         print("result: PASS")
@@ -187,27 +158,35 @@ for i, scenario in enumerate(scenarios, 1):
                 outcome_var = causal_q.group(1),
                 control_val = causal_q.group(3),
                 treatment_val = scenario['name'],
-                relation = causal_q.group(2),
-                run=True
+                relation = causal_q.group(2)
                 )
             )
         else:
             raise Exception("Invalid step")
 
 draw_dag()
+
+scenario_treatments = {'Baseline': 0, 'Standard testing': 1,
+                       'Standard tracing': 2, 'No testing': 3,
+                       'No tracing': 4, 'Trace without test': 5,
+                       'Optimal testing': 6, 'Optimal tracing': 7}
+
+data = pd.read_csv("results/data.csv")
+data['intervention'] = [scenario_treatments.get(i, i) for i in data['intervention']]
+
 print()
 print("RUNNING TESTS")
-for test in tests:
-    print(test['label'])
-    print("control_val:", test['control_val'])
-    print("treatment_val:", test['treatment_val'])
-    run_dowhy(
-        datapath = "results/data.csv",
+for t in tests:
+    print(t['label'])
+    print("control_val:", t['control_val'])
+    print("treatment_val:", t['treatment_val'])
+    test(
+        data = data,
         graph = "causal_dag.dot",
         treatment_var = "intervention",
-        outcome_var = test['outcome_var'],
-        control_val = scenario_treatments[test['control_val']],
-        treatment_val = scenario_treatments[test['treatment_val']],
-        relation = test['relation']
+        outcome_var = t['outcome_var'],
+        control_val = scenario_treatments[t['control_val']],
+        treatment_val = scenario_treatments[t['treatment_val']],
+        relation = t['relation']
     )
     print()
