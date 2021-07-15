@@ -101,22 +101,23 @@ def test(data, graph, treatment_var, outcome_var, control_val, treatment_val, re
     grouped = {k:v for k, v in data.groupby(treatment_var)}
     print("Association estimate:", grouped[treatment_val][outcome_var].mean() - grouped[control_val][outcome_var].mean())
 
-    causal_estimate = run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val)
+    causal_estimate, (ci_low, ci_high) = run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val, confidence_intervals=True)
     print("Causal estimate:", causal_estimate)
+    assert(ci_low < ci_high)
     
     if relation == "equal to":
         print("EXPECTED: ~0")
-        if -1 < causal_estimate < 1:
+        if -1 < causal_estimate < 1 and ci_low < 0 < ci_high:
             print("result: PASS")
         else:
             print("result: FAIL")
-    elif relation == "less than":
+    elif relation == "less than" and ci_high < 0:
         print("EXPECTED: estimate < 0")
         if causal_estimate < 0:
             print("result: PASS")
         else:
             print("result: FAIL")
-    elif relation == "greater than":
+    elif relation == "greater than" and ci_low > 0:
         print("EXPECTED: estimate > 0")
         if causal_estimate > 0:
             print("result: PASS")

@@ -59,7 +59,7 @@ def _dot_to_dagitty_dag(dot_file_path):
     return dag_string
 
 
-def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val, verbose=False):
+def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val, verbose=False, confidence_intervals=False):
     """
     Runs dowhy to calculate a causal estimate.
     
@@ -79,7 +79,8 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         The treated value of the treatment variable (i.e. the value for individuals who DID receive treatment.)
     verbose : boolean
         Set to True to print additional information to the console (defaults to False).
-
+    confidence_intervals : boolean
+        Tell doWhy to compute the confidence intervals in the estimate
     Returns
     -------
     float
@@ -122,10 +123,12 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         method_name="backdoor.linear_regression",
         treatment_value=treatment_val,
         control_value=control_val,
-        confidence_intervals=True
+        confidence_intervals=confidence_intervals
         )
+    if not confidence_intervals:
+        return estimate.value
     ci_low, ci_high = estimate.get_confidence_intervals()[0]
     if verbose:
         print("Total Effect Estimate:", round(estimate.value, 2))
         print("95% Confidence Intervals: [{}, {}]".format(round(ci_low, 2), round(ci_high, 2)))
-    return estimate.value
+    return estimate.value, estimate.get_confidence_intervals()[0]
