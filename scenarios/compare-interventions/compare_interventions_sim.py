@@ -36,21 +36,21 @@ base_pars = dict(
 )
 
 # Define interventions
-testing_intervention = cv.test_prob(symp_prob=0.2, asymp_prob=0.001, symp_quar_prob=1.0, asymp_quar_prob=1.0)
-optimal_testing_intervention = cv.test_prob(symp_prob=1, asymp_prob=1, symp_quar_prob=1, asymp_quar_prob=1)
-zero_testing_intervention = cv.test_prob(symp_prob=0, asymp_prob=0, symp_quar_prob=0, asymp_quar_prob=0)
+standard_testing_intervention = cv.test_prob(symp_prob=0.2, asymp_prob=0.001, symp_quar_prob=1.0, asymp_quar_prob=1.0)
+optimal_standard_testing_intervention = cv.test_prob(symp_prob=1, asymp_prob=1, symp_quar_prob=1, asymp_quar_prob=1)
+zero_standard_testing_intervention = cv.test_prob(symp_prob=0, asymp_prob=0, symp_quar_prob=0, asymp_quar_prob=0)
 contact_tracing_intervention = cv.contact_tracing(trace_probs=dict(h=1.0, s=0.5, w=0.5, c=0.3), quar_period=14)
 zero_contact_tracing_intervention = cv.contact_tracing(trace_probs=dict(h=0, s=0, w=0, c=0), quar_period=14)
 optimal_contact_tracing_intervention = cv.contact_tracing(trace_probs=dict(h=1, s=1, w=1, c=1), quar_period=14)
 
 intervention_sims = msims(base_pars, [
-    ({"interventions": testing_intervention}, "Standard testing"),
-    ({"interventions": [testing_intervention, contact_tracing_intervention]}, "Standard tracing"),
-    ({"interventions": zero_testing_intervention}, "No testing"),
-    ({"interventions": zero_contact_tracing_intervention}, "No tracing"),
+    ({"interventions": standard_testing_intervention}, "Standard testing"),
+    ({"interventions": [standard_testing_intervention, contact_tracing_intervention]}, "Standard tracing"),
+    ({"interventions": zero_standard_testing_intervention}, "No testing"),
+    ({"interventions": [standard_testing_intervention, zero_contact_tracing_intervention]}, "No tracing"),
     ({"interventions": [contact_tracing_intervention]}, "Trace without test"),
-    ({"interventions": optimal_testing_intervention}, "Optimal testing"),
-    ({"interventions": [testing_intervention, optimal_contact_tracing_intervention]}, "Optimal tracing"),
+    ({"interventions": optimal_standard_testing_intervention}, "Optimal testing"),
+    ({"interventions": [standard_testing_intervention, optimal_contact_tracing_intervention]}, "Optimal tracing"),
     # ({"start_day": '2021-11-01', "end_day": '2022-02-01'}, "Winter"),
     # ({"start_day": '2021-03-01', "end_day": '2021-06-01'}, "Spring"),
     ])

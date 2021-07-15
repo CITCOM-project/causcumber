@@ -108,7 +108,9 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
     # categorical values.
     # This slices the data such that it only contains the two values we're
     # interested in, effectively binarising the treatment
-    if data.dtypes[treatment_var] == "category":
+    if verbose:
+        print(f"Datatype of treatment '{treatment_var}':", data.dtypes[treatment_var])
+    if str(data.dtypes[treatment_var]) == "category":
         data = data.loc[data[treatment_var].isin([control_val, treatment_val])]
 
     model = dowhy.CausalModel(

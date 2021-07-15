@@ -34,17 +34,17 @@ def plot(data, x_col, y_col):
     plt.show()
 
 
-treatment_var = "intervention"
+treatment_var = "cum_infections_w7"
 outcome_var = "cum_deaths_w10"
-control_val = "Baseline"
-treatment_val = "No tracing"
+control_val = 10000
+treatment_val = 15000
 
 print("Reading the data...")
 data = pd.read_csv("results/week-by-week_100.csv")
 plot(data, treatment_var, outcome_var)
 
 grouped = {k:v for k, v in data.groupby(treatment_var)}
-print("Association estimate:", grouped[treatment_val][outcome_var].mean() - grouped[control_val][outcome_var].mean())
+# print("Association estimate:", grouped[treatment_val][outcome_var].mean() - grouped[control_val][outcome_var].mean())
 
 data['intervention'] = [scenario_treatments.get(i, i) for i in data['intervention']]
 data['intervention'] = data['intervention'].astype('category')
@@ -52,7 +52,7 @@ data['pop_type'] = data['pop_type'].astype('category')
 data['location'] = data['location'].astype('category')
 
 run_dowhy(data, "zigzag-steps.dot", treatment_var, outcome_var,
-          scenario_treatments[control_val], scenario_treatments[treatment_val],
+          control_val, treatment_val,
           verbose=True)
 
 # run_dowhy("results/data.csv", "testing.dot", "intervention", "cum_deaths", 1, 2)

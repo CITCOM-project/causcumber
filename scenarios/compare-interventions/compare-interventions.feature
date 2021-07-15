@@ -7,7 +7,7 @@ Feature: Compare interventions
       * pop_size=50000
       * pop_infected=100
       * location=UK
-    And, for each week {n}, the following variable values:
+    And for each week "n" in "12" weeks, the following variable values:
   		* cum_infections_w{n}
   		* cum_symptomatic_w{n}
   		* cum_severe_w{n}
