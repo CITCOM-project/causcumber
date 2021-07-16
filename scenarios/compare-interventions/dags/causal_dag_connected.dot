@@ -1,0 +1,84 @@
+digraph "" {
+	graph [newrank=True,
+		rankdir=LR
+	];
+	subgraph cluster_tn {
+		graph [label=t_n];
+		cum_infections_wn;
+		cum_symptomatic_wn;
+		cum_severe_wn;
+		cum_critical_wn;
+		cum_tests_wn;
+		cum_deaths_wn;
+		n_exposed_wn;
+		n_quarantined_wn;
+	}
+	subgraph cluster_inputs {
+		graph [label=inputs];
+		quar_period;
+		intervention;
+		pop_type;
+		pop_size;
+		pop_infected;
+		n_days;
+		location;
+	}
+	subgraph cluster_tn1 {
+		graph [label="t_n+1"];
+		cum_infections_wn1;
+		cum_symptomatic_wn1;
+		cum_severe_wn1;
+		cum_critical_wn1;
+		cum_tests_wn1;
+		cum_deaths_wn1;
+		n_exposed_wn1;
+		n_quarantined_wn1;
+	}
+	quar_period -> n_quarantined_wn;
+	intervention -> cum_tests_wn;
+	intervention -> n_exposed_wn;
+	intervention -> n_quarantined_wn;
+	pop_type -> cum_infections_wn;
+	pop_type -> cum_symptomatic_wn;
+	pop_type -> cum_severe_wn;
+	pop_type -> cum_critical_wn;
+	pop_type -> n_exposed_wn;
+	pop_type -> n_quarantined_wn;
+	pop_size -> cum_infections_wn;
+	pop_size -> cum_symptomatic_wn;
+	pop_size -> cum_severe_wn;
+	pop_size -> cum_critical_wn;
+	pop_size -> n_exposed_wn;
+	pop_size -> n_quarantined_wn;
+	pop_infected -> cum_symptomatic_wn;
+	pop_infected -> cum_severe_wn;
+	pop_infected -> cum_critical_wn;
+	pop_infected -> cum_infections_w0;
+	location -> cum_infections_wn;
+	location -> cum_symptomatic_wn;
+	location -> cum_severe_wn;
+	location -> cum_critical_wn;
+	location -> n_exposed_wn;
+	location -> n_quarantined_wn;
+	cum_infections_wn -> cum_infections_wn1;
+	cum_infections_wn -> cum_symptomatic_wn1;
+	cum_infections_wn -> n_exposed_wn1;
+	cum_infections_wn -> n_quarantined_wn1;
+	cum_symptomatic_wn -> cum_infections_wn1;
+	cum_symptomatic_wn -> cum_symptomatic_wn1;
+	cum_symptomatic_wn -> cum_severe_wn1;
+	cum_symptomatic_wn -> n_quarantined_wn1;
+	cum_severe_wn -> cum_severe_wn1;
+	cum_severe_wn -> cum_critical_wn1;
+	cum_critical_wn -> cum_critical_wn1;
+	cum_critical_wn -> cum_deaths_wn1;
+	cum_tests_wn -> cum_tests_wn1;
+	cum_tests_wn -> n_quarantined_wn1;
+	cum_deaths_wn -> cum_tests_wn1;
+	cum_deaths_wn -> cum_deaths_wn1;
+	cum_deaths_wn -> n_exposed_wn1;
+	n_exposed_wn -> cum_infections_wn1;
+	n_exposed_wn -> n_exposed_wn1;
+	n_quarantined_wn -> n_exposed_wn1;
+	n_quarantined_wn -> n_quarantined_wn1;
+}

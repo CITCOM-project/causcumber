@@ -133,7 +133,7 @@ causal_q_re = re.compile('the "(\w+)" should be "([\w ]+)" ([\w ]+)')
 
 parser = Parser()
 
-with open("test-trace.feature") as f:
+with open("features/test-trace.feature") as f:
     feature = parser.parse("".join(f.readlines()))['feature']
 
 # get the background
