@@ -88,7 +88,7 @@ digraph "" {
   // initial only - pop_infected is cum_infections_t0 anyway...
   /* pop_infected -> n_quarantined_wn; */
   /* pop_infected -> n_exposed_wn; */
-  pop_infected -> cum_infections_w0;
+  pop_infected -> cum_infections_wn; // Only really effected at w0, but OK as is
 	pop_infected -> cum_symptomatic_wn;
 	pop_infected -> cum_severe_wn;
 	pop_infected -> cum_critical_wn;
