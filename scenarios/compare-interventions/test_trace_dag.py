@@ -61,9 +61,9 @@ for step in background['steps']:
 print(causal_variables)
 
 g = pygraphviz.AGraph(strict=False, directed=True, rankdir="LR", newrank=True)
-tn = g.add_subgraph(name="cluster_tn")
-tn1 = g.add_subgraph(name="cluster_tn1")
-ips = g.add_subgraph(name="cluster_inputs")
+tn = g.add_subgraph(name="cluster_tn", label="<Time<sub>n</sub>>")
+tn1 = g.add_subgraph(name="cluster_tn1", label="<Time<sub>n+1</sub>>")
+ips = g.add_subgraph(name="cluster_inputs", label="Model inputs")
 
 for i in causal_variables['inputs']:
     ips.add_node(i)
@@ -72,16 +72,15 @@ for o in causal_variables['outputs']:
     if is_temporal(o):
         tn.add_node(week(o, "n"))
         tn1.add_node(week(o, "n1"))
+    else:
+        g.add_node(o)
 
-for v2 in causal_variables['outputs']:
-    op = output_re.match(v2)
-    print(op, op.group(1))
-    
-    for v1 in causal_variables['inputs']:
-        g.add_edge(v1, v2)
-    for v1 in causal_variables['outputs']:
-        if v1 != v2:
-            g.add_edge(v1, v2)
+for n in tn:
+    for n1 in tn1:
+        g.add_edge(n, n1)
+    for i in ips:
+        g.add_edge(i, n)
+
 g.write("causal_dag_connected.dot")
 
 
