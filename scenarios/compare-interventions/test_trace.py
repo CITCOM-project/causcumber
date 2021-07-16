@@ -49,7 +49,7 @@ def draw_dag():
     g.write("causal_dag_connected.dot")
 
 
-def run_covasim(label, params, interventions, n_runs=10, run=True):
+def run_covasim(label, params, interventions, n_runs=10, run=False):
     params['interventions'] = []
     if 'n_days' in params:
         params['n_days'] = int(params['n_days'])
@@ -75,7 +75,7 @@ def run_covasim(label, params, interventions, n_runs=10, run=True):
     if params["interventions"] == []:
         print("  internvetions: []")
     else:
-        print("  interventions: [\n"+"\n".join([f"    {i}" for i in params["interventions"]]) + "\n  ]")
+        print("  interventions: [\n"+",\n".join([f"    {i}" for i in params["interventions"]]) + "\n  ]")
     
     if not run:
         return None
@@ -99,10 +99,12 @@ def test(data, graph, treatment_var, outcome_var, control_val, treatment_val, re
     print("RELATION:", relation)
     
     grouped = {k:v for k, v in data.groupby(treatment_var)}
-    print("Association estimate:", grouped[treatment_val][outcome_var].mean() - grouped[control_val][outcome_var].mean())
+    if treatment_val in grouped and control_val in grouped:
+        print("Association estimate:", grouped[treatment_val][outcome_var].mean() - grouped[control_val][outcome_var].mean())
 
     causal_estimate, (ci_low, ci_high) = run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val)
     print("Causal estimate:", causal_estimate)
+    print("Confidence intervals:", ci_low, ci_high)
     assert(ci_low < ci_high)
     
     if relation == "equal to":
@@ -117,9 +119,9 @@ def test(data, graph, treatment_var, outcome_var, control_val, treatment_val, re
             print("result: PASS")
         else:
             print("result: FAIL")
-    elif relation == "greater than" and ci_low > 0:
+    elif relation == "more than":
         print("EXPECTED: estimate > 0")
-        if causal_estimate > 0:
+        if causal_estimate > 0 and ci_low > 0:
             print("result: PASS")
         else:
             print("result: FAIL")
@@ -128,8 +130,6 @@ def test(data, graph, treatment_var, outcome_var, control_val, treatment_val, re
     
 
 param_re = re.compile("(\w+)=(.*)")
-intervention_re = re.compile("a (\w+) intervention.*")
-causal_q_re = re.compile('the "(\w+)" should be "([\w ]+)" ([\w ]+)')
 
 parser = Parser()
 
@@ -152,12 +152,17 @@ for step in background['steps']:
         causal_variables['inputs'].add(param.group(1))
     elif step['keyword'].strip() == "*" and param is None:
         causal_variables['outputs'].add(step['text'])
+    
 
 run_covasim(background['name'], base_params.copy(), [])
 
 scenario_treatments = {'Baseline': 0}
 
 tests = []
+
+intervention_re = re.compile("a (\w+) intervention.*")
+causal_q_re = re.compile('the "(\w+)" should be "([\w ]+)" ([\w ]+)')
+implicit_scenario_re = re.compile('a control scenario with (\w+)=(\w+)')
 
 # Start the enumeration at 1 because baseline acts as zero
 for i, scenario in enumerate(scenarios, 1):
@@ -169,38 +174,46 @@ for i, scenario in enumerate(scenarios, 1):
     interventions = []
     causal_estimate = None
     relation = None
+    causal_test = {'label': scenario['name']}
     for step in scenario['steps']:
         param = param_re.search(step['text'])
         intervention = intervention_re.search(step['text'])
         causal_q = causal_q_re.search(step['text'])
-        if param:
+        implicit_scenario = implicit_scenario_re.search(step['text'])
+        if param and step['keyword'].strip() == "*":
             params[param.group(1)] = param.group(2)
         elif intervention:
             interventions.append(intervention.group(1))
             # scenario_treatments[scenario['name']] = len(interventions)
         elif step['text'] == "the simulation is complete":
             run_covasim(scenario['name'], params, interventions)
+        elif implicit_scenario:
+            causal_test['treatment_var'] = implicit_scenario.group(1)
+            causal_test['control_val'] = implicit_scenario.group(2)
+        elif param and step['keyword'].strip() == "When":
+            if param.group(1) ==  causal_test['treatment_var']:
+                causal_test['treatment_val'] = param.group(2)
+            else:
+                raise ValueError(f"Treatment variable {param.group(1)} does not match treatment variable {causal_test['treatment_var']}")
         # load the causal question into the buffer
+        # TODO: clean this up a bit
         elif causal_q:
-            tests.append(dict(
-                label = scenario['name'],
-                outcome_var = causal_q.group(1),
-                control_val = causal_q.group(3),
-                treatment_val = scenario['name'],
-                relation = causal_q.group(2)
-                )
-            )
+            causal_test['outcome_var'] = causal_q.group(1)
+            causal_test['relation'] = causal_q.group(2)
+            if 'treatment_var' not in causal_test:
+                causal_test['treatment_var'] = "intervention"
+                causal_test['control_val'] = causal_q.group(3)
+                causal_test['treatment_val'] = scenario['name']
         else:
-            raise Exception("Invalid step")
+            raise Exception("Invalid step:", step)
+    tests.append(causal_test)
 
-draw_dag()
+# draw_dag()
 
-scenario_treatments = {'Baseline': 0, 'Standard testing': 1,
-                       'Standard tracing': 2, 'No testing': 3,
-                       'No tracing': 4, 'Trace without test': 5,
-                       'Optimal testing': 6, 'Optimal tracing': 7}
+print(scenario_treatments)
 
-data = pd.read_csv("results/data.csv")
+
+data = pd.read_csv("results/week-by-week_100.csv")
 #plot(data, "intervention", "cum_deaths")
 data['intervention'] = [scenario_treatments[i] for i in data['intervention']]
 
@@ -214,12 +227,18 @@ for t in tests:
     print(t['label'])
     print("control_val:", t['control_val'])
     print("treatment_val:", t['treatment_val'])
-    control_val = scenario_treatments[t['control_val']]
-    treatment_val = scenario_treatments[t['treatment_val']]
+    if t['control_val'] in scenario_treatments:
+        control_val = scenario_treatments.get(t['control_val'])
+    else:
+        control_val = int(t['control_val'])
+    if t['treatment_val'] in scenario_treatments:
+        treatment_val = scenario_treatments.get(t['treatment_val'])
+    else:
+        treatment_val = int(t['treatment_val'])
     test(
         data = data,
-        graph = "causal_dag.dot",
-        treatment_var = "intervention",
+        graph = "zigzag-steps.dot",
+        treatment_var = t['treatment_var'],
         outcome_var = t['outcome_var'],
         control_val = control_val,
         treatment_val = treatment_val,

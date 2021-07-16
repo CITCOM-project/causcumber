@@ -36,8 +36,8 @@ def plot(data, x_col, y_col):
 
 treatment_var = "cum_infections_w7"
 outcome_var = "cum_deaths_w10"
-control_val = 10000
-treatment_val = 15000
+control_val = 5000
+treatment_val = 10000
 
 print("Reading the data...")
 data = pd.read_csv("results/week-by-week_100.csv")
