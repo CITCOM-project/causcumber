@@ -11,7 +11,7 @@ Feature: Peaks
       * pop_size=50000
       * pop_infected=100
       * location=UK
-    And, for each week {n}, the following variable values:
+    And for each week {n}, the following variable values:
       * new_infections_w{n}
       * cum_infections_w{n}
       * cum_symptomatic_w{n}
