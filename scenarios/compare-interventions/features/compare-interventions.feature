@@ -1,5 +1,5 @@
 Feature: Compare interventions
-  Background: Baseline
+  Background:
     Given a simulation run with the basic parameters:
       * quar_period=14
       * n_days=84
@@ -17,7 +17,10 @@ Feature: Compare interventions
   		* n_exposed_w{n}
   		* n_quarantined_w{n}
 
-    Scenario Outline: Testing
+  Scenario: Baseline
+    Given a simulation run with only the background parameters
+
+  Scenario Outline: Testing
       Given a testing intervention <id> with parameters:
         * symp_prob=<symp_prob>
         * asymp_prob=<asymp_prob>
@@ -40,12 +43,14 @@ Feature: Compare interventions
       And a tracing intervention with parameters:
         * trace_probs=dict(h=<h_prob>, w=<w_prob>, s=<s_prob>, c=<c_prob>)
       Then the "cum_deaths" should be <relationship> <id1>
+
+      Examples:
         | id            | h_prob | w_prob | s_prob | c_prob | relationship | id1            |
         | standardTrace | 1      | 0.5    | 0.5    | 0.3    | <            | baseline       |
         | optimalTrace  | 1      | 1      | 1      | 1      | <            | standardTest   |
         | noTrace       | 0      | 0      | 0      | 0      | =            | standardTest   |
 
-    Scenario: Contact Tracing Without Testing
+  Scenario: Contact Tracing Without Testing
       Given a testing intervention with parameters:
         * symp_prob=0
         * asymp_prob=0

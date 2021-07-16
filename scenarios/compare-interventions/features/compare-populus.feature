@@ -1,7 +1,7 @@
 Feature: Populus
   We test different basic population features of covasim such as location and size.
 
-  Background: Baseline
+  Background:
     Given a simulation run with the basic parameters:
       * quar_period=14
       * n_days=84
@@ -9,7 +9,7 @@ Feature: Populus
       * pop_size=50000
       * pop_infected=100
       * location=UK
-    And, for each week {n}, the following variable values:
+    And for each week {n}, the following variable values:
       * cum_infections_w{n}
       * cum_symptomatic_w{n}
       * cum_severe_w{n}
@@ -18,6 +18,9 @@ Feature: Populus
       * cum_deaths_w{n}
       * n_exposed_w{n}
       * n_quarantined_w{n}
+
+  Scenario: Baseline
+    Given a simulation run with only the background parameters
 
   Scenario: Japan
     Given

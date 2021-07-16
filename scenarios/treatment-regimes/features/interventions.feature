@@ -3,7 +3,7 @@ Feature: Peaks
   In which we try to lay out some more complex temporal scenarios WRT the peak of infection where we might get some confounding.
 
   # Could we use the background as the control group?
-  Background: Baseline
+  Background:
     Given a simulation run with the basic parameters:
       * quar_period=14
       * n_days=84
@@ -22,6 +22,9 @@ Feature: Peaks
       * n_exposed_w{n}
       * n_quarantined_w{n}
 
+  Scenario: Baseline
+    Given a simulation run with only the background parameters
+
   Scenario: Constant testing
     Given a testing intervention with parameters:
       * symp_prob=0.2
@@ -36,7 +39,7 @@ Feature: Peaks
   # Formal causal question: What is the causal effect of implementing <intervention> at time step t with probabilities ... on the infection rate t' time steps after implementing it in comparison to no intervention?
   # Intervention: <intervention>
   # Outcome: Infection rate decreases
-  Scenario Outline: Delayed Testing
+  Scenario: Delayed Testing
     Given a testing intervention with parameters:
       * symp_prob=0.2
       * asymp_prob=0.001
@@ -70,7 +73,7 @@ Feature: Peaks
       * asymp_quar_prob=1
     And a tracing intervention with parameters:
       * trace_probs=dict(h=1, s=0.5, w=0.5, c=0.3)
-    And, when "new_infections" > 100, the parameters change to
+    And when "new_infections" > 100, the parameters change to
       * trace_probs=dict(h=1, s=0.05, w=0.05, c=0)
     When the simulation is complete
     Then the "cum_deaths" should be "more than" Standard tracing

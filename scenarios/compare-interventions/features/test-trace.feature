@@ -4,7 +4,7 @@ Feature: Test and Trace
   # We're going to need a way to explicitly specify datatypes and hooks to deserialise values
   # It's annoying, but otherwise covasim tries to parse n_days=84 as a date
   # I suggest a format like "n_days:int = 84" or "n_days = 84:int"
-  Background: Baseline
+  Background:
     Given a simulation run with the basic parameters:
       * pop_type=hybrid
       * pop_size=50000
@@ -20,6 +20,9 @@ Feature: Test and Trace
   		* cum_deaths_w{n}
   		* n_exposed_w{n}
   		* n_quarantined_w{n}
+
+  Scenario: Baseline
+    Given a simulation run with only the background parameters
 
   Scenario: Standard testing
     Given a testing intervention with parameters:
