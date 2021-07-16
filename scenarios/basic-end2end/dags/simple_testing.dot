@@ -1,0 +1,4 @@
+digraph CausalGraph {
+    intervention -> cum_infections;
+    cum_infections -> cum_deaths;
+}

@@ -12,7 +12,7 @@ from gherkin.parser import Parser
 
 parser = Parser()
 
-with open("test-trace.feature") as f:
+with open("features/test-trace.feature") as f:
     feature = parser.parse("".join(f.readlines()))['feature']
 
 # get the background
