@@ -23,6 +23,7 @@ Feature: Compare vaccines
   Scenario: Baseline
     Given a simulation run with no vaccine available
     When the simulation is finished
+    Then the weekly cumulative infections should be reported
 
   Scenario Outline: Single vaccine
     All vaccines should reduce the cumulative number of infections relative to the
