@@ -5,3 +5,4 @@ pandas==1.2.5
 covasim==3.0.6
 gherkin-official==20.0.0
 pygraphviz==1.7
+rpy2==3.4.5
