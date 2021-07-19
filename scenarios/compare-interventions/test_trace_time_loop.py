@@ -19,9 +19,9 @@ def add_edges_from(g, edges):
 
 unit = pydotplus.graph_from_dot_file("dags/repeating_unit.dot")
 
-ips =  unit.get_subgraph("cluster_inputs")[0]
-tn =  unit.get_subgraph("cluster_tn")[0]
-tn1 =  unit.get_subgraph("cluster_tn1")[0]
+ips = unit.get_subgraph("cluster_inputs")[0]
+tn = unit.get_subgraph("cluster_tn")[0]
+tn1 = unit.get_subgraph("cluster_tn1")[0]
 
 ips_nodes = [n.get_name() for n in ips.get_nodes()]
 tn_nodes = [n.get_name() for n in tn.get_nodes()]
@@ -45,20 +45,20 @@ for e in unit.get_edges():
         print("Bad edge: ", s1, s2)
         print(ips_nodes, s1)
 
-g = pydotplus.Graph(strict=False, directed=True, rankdir="LR", newrank=True)
+g = pydotplus.Graph(graph_name="causal_dag", strict=False, directed=True,
+                    rankdir="LR", newrank=True)
 
 
-cluster_inputs = add_subgraph(g, name="cluster_inputs", label="inputs")
+cluster_inputs = add_subgraph(g, graph_name="cluster_inputs", label="inputs")
 
 add_edges_from(g, [(s1, s2.replace("_wn", "_w0")) for s1, s2 in inputs])
 
 for n in ips.get_nodes():
-    g.add_node(n)
+    cluster_inputs.add_node(n)
 
 cluster_w0 = add_subgraph(g,
-                          name="cluster_w00",
-                          label="<t<sub>0</sub>>",
-                          id="00")
+                          graph_name="cluster_w0",
+                          label="<t<sub>0</sub>>")
 add_nodes_from(cluster_w0, [s1.replace("_wn", "_w0") for s1, _ in timesteps])
 
 for t in range(1, num_weeks):
@@ -68,26 +68,29 @@ for t in range(1, num_weeks):
     add_edges_from(g, [(s1, s2.replace("_wn", f"_w{t}")) for s1, s2 in inputs])
 
     c = add_subgraph(g,
-                     name=f"cluster_w{str(t).zfill(len(str(num_weeks)))}",
-                     label=f"<t<sub>{t}</sub>>",
-                     id=str(t).zfill(len(str(num_weeks))))
+                     graph_name=f"cluster_w{t}",
+                     label=f"<t<sub>{t}</sub>>")
     add_nodes_from(c, [s2 for _, s2 in edges])
 
-# for s1, _ in timesteps:
-#     nodes = [s1.replace("_wn", f"_w{t}") for t in range(num_weeks)]
-#     print(nodes)
-#     s = g.add_subgraph(rank="same")
-#     s.add_nodes_from(nodes)
-#     break
+dotstring = f"digraph {g.get_name()}" + " {\n"
+dotstring += "".join([f"  {k} = {v};\n" for k, v in g.obj_dict['attributes'].items()])
+dotstring += "\n"
 
-# for s in g.get_subgraphs():
-#     for n in s.get_nodes():
-#         n.attr['id'] = str(n)
-#     print(s.nodes())
+for s in g.get_subgraphs():
+    dotstring += f"  subgraph {s.get_name()}" +" {\n"
+    dotstring += "".join([f"    {k} = {v};\n" for k, v in g.obj_dict['attributes'].items()])
+    dotstring += "".join([f"    {n.to_string()}\n" for n in s.get_nodes()])
+    
+    dotstring += "  }\n\n"
 
+for e in g.get_edges():
+    dotstring += f"  {e.to_string()}\n"
+
+dotstring += "}"
 
 with open("dags/causal_dag.dot", 'w') as f:
-    print(g.to_string(), file=f)
+    print(dotstring, file=f)
+    
 
 # g.create("dags/causal_dag.dot.pdf")
 
