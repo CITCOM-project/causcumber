@@ -1,30 +1,17 @@
 import covasim as cv
 import pandas as pd
 
-n_runs = 100
+import sys
+sys.path.append("../../")
+
+from covasim_utils import *
+
+n_runs = 10
 n_weeks = 10
 
-def msims(default, investigate):
-    sims = [cv.MultiSim(cv.Sim(pars=base_pars, label="Baseline"))]
-    for d, l in investigate:
-        pars = {**default, **d}
-        sims.append(cv.MultiSim(cv.Sim(pars=pars, label=l, verbose=0)))
-    return sims
 
-
-def dict_plus(dic1, dic2):
-    for field in dic2:
-        if field not in dic1:
-            dic1[field] = []
-        dic1[field].append(dic2[field])
-
-
-def chunks(lst, n):
-    """Yield successive n-sized chunks from lst."""
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]
-
-""" Which intervention is more effective at reducing the cumulative number of infections? """
+""" Which intervention is more effective at reducing the cumulative number of
+infections? """
 base_pars = dict(
     pop_type='hybrid',
     pop_size=50e3,
@@ -55,11 +42,11 @@ intervention_sims = msims(base_pars, [
     # ({"start_day": '2021-03-01', "end_day": '2021-06-01'}, "Spring"),
     ])
 
-to_keep = ['cum_infections', 'cum_deaths', 'cum_symptomatic',
-       'cum_severe', 'cum_critical', 'cum_tests',
-       'n_exposed', 'n_quarantined']
+to_keep = ['cum_infections', 'cum_deaths', 'cum_symptomatic', 'cum_severe',
+           'cum_critical', 'cum_tests', 'n_exposed', 'n_quarantined']
 
 dfs = []
+temporal = []
 
 for intervention_sim in intervention_sims:
     intervention_sim.run(n_runs=n_runs, verbose=0)
@@ -70,28 +57,11 @@ for intervention_sim in intervention_sims:
             if hasattr(i, "quar_period"):
                 quar_period = i.quar_period
         df = df[to_keep]
-        
-        # aggregate by week
-        week_by_week = {k:[] for k in to_keep}
-        for c in chunks(df, 7):
-            assert(len(c) == 7)
-            for k in week_by_week:
-                if k.startswith('new_'):
-                    week_by_week[k].append(c[k].sum())
-                elif k.startswith('n_'):
-                    week_by_week[k].append(c[k].iloc[-1])
-                else:
-                    week_by_week[k].append(c[k].iloc[0])
-        
-        dfs.append((pd.DataFrame(week_by_week), quar_period, sim.label))
-
-#%%
-temporal = []
-for df, quar_period, intervention in dfs:
+        week_by_week = pd.DataFrame(aggregate_by_week(df, to_keep))
     dic = df.to_dict(orient='list')
     week_dic = {f"{k}_w{w+1}": item for k in to_keep for w, item in enumerate(dic[k])}
     week_dic['quar_period'] = quar_period
-    week_dic['intervention'] = intervention
+    week_dic['intervention'] = sim.label
     for k, v in base_pars.items():
         week_dic[k] = v
     temporal.append(week_dic)
