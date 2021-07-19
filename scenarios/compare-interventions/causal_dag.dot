@@ -15,18 +15,78 @@ digraph "" {
 		cum_deaths_w2	[id=cum_deaths_w2];
 		cum_tests_w2	[id=cum_tests_w2];
 	}
-	subgraph cluster_8 {
-		graph [label=t8,
+	subgraph cluster_5 {
+		graph [label=t5,
 			rank=same
 		];
-		cum_infections_w8	[id=cum_infections_w8];
-		cum_symptomatic_w8	[id=cum_symptomatic_w8];
-		n_exposed_w8	[id=n_exposed_w8];
-		n_quarantined_w8	[id=n_quarantined_w8];
-		cum_severe_w8	[id=cum_severe_w8];
-		cum_critical_w8	[id=cum_critical_w8];
-		cum_deaths_w8	[id=cum_deaths_w8];
-		cum_tests_w8	[id=cum_tests_w8];
+		cum_infections_w5	[id=cum_infections_w5];
+		cum_symptomatic_w5	[id=cum_symptomatic_w5];
+		n_exposed_w5	[id=n_exposed_w5];
+		n_quarantined_w5	[id=n_quarantined_w5];
+		cum_severe_w5	[id=cum_severe_w5];
+		cum_critical_w5	[id=cum_critical_w5];
+		cum_deaths_w5	[id=cum_deaths_w5];
+		cum_tests_w5	[id=cum_tests_w5];
+	}
+	subgraph cluster_3 {
+		graph [label=t3,
+			rank=same
+		];
+		cum_infections_w3	[id=cum_infections_w3];
+		cum_symptomatic_w3	[id=cum_symptomatic_w3];
+		n_exposed_w3	[id=n_exposed_w3];
+		n_quarantined_w3	[id=n_quarantined_w3];
+		cum_severe_w3	[id=cum_severe_w3];
+		cum_critical_w3	[id=cum_critical_w3];
+		cum_deaths_w3	[id=cum_deaths_w3];
+		cum_tests_w3	[id=cum_tests_w3];
+	}
+	subgraph cluster_7 {
+		graph [label=t7,
+			rank=same
+		];
+		cum_infections_w7	[id=cum_infections_w7];
+		cum_symptomatic_w7	[id=cum_symptomatic_w7];
+		n_exposed_w7	[id=n_exposed_w7];
+		n_quarantined_w7	[id=n_quarantined_w7];
+		cum_severe_w7	[id=cum_severe_w7];
+		cum_critical_w7	[id=cum_critical_w7];
+		cum_deaths_w7	[id=cum_deaths_w7];
+		cum_tests_w7	[id=cum_tests_w7];
+	}
+	subgraph cluster_inputs {
+		graph [label=inputs];
+		quar_period	[id=quar_period];
+		intervention	[id=intervention];
+		pop_type	[id=pop_type];
+		pop_size	[id=pop_size];
+		pop_infected	[id=pop_infected];
+		location	[id=location];
+		n_days	[id=n_days];
+	}
+	subgraph cluster_w0 {
+		graph [label=t0];
+		n_quarantined_w0	[id=n_quarantined_w0];
+		cum_tests_w0	[id=cum_tests_w0];
+		n_exposed_w0	[id=n_exposed_w0];
+		cum_infections_w0	[id=cum_infections_w0];
+		cum_symptomatic_w0	[id=cum_symptomatic_w0];
+		cum_severe_w0	[id=cum_severe_w0];
+		cum_critical_w0	[id=cum_critical_w0];
+		cum_deaths_w0	[id=cum_deaths_w0];
+	}
+	subgraph cluster_4 {
+		graph [label=t4,
+			rank=same
+		];
+		cum_infections_w4	[id=cum_infections_w4];
+		cum_symptomatic_w4	[id=cum_symptomatic_w4];
+		n_exposed_w4	[id=n_exposed_w4];
+		n_quarantined_w4	[id=n_quarantined_w4];
+		cum_severe_w4	[id=cum_severe_w4];
+		cum_critical_w4	[id=cum_critical_w4];
+		cum_deaths_w4	[id=cum_deaths_w4];
+		cum_tests_w4	[id=cum_tests_w4];
 	}
 	subgraph cluster_1 {
 		graph [label=t1,
@@ -54,78 +114,18 @@ digraph "" {
 		cum_deaths_w6	[id=cum_deaths_w6];
 		cum_tests_w6	[id=cum_tests_w6];
 	}
-	subgraph cluster_3 {
-		graph [label=t3,
+	subgraph cluster_8 {
+		graph [label=t8,
 			rank=same
 		];
-		cum_infections_w3	[id=cum_infections_w3];
-		cum_symptomatic_w3	[id=cum_symptomatic_w3];
-		n_exposed_w3	[id=n_exposed_w3];
-		n_quarantined_w3	[id=n_quarantined_w3];
-		cum_severe_w3	[id=cum_severe_w3];
-		cum_critical_w3	[id=cum_critical_w3];
-		cum_deaths_w3	[id=cum_deaths_w3];
-		cum_tests_w3	[id=cum_tests_w3];
-	}
-	subgraph cluster_inputs {
-		graph [label=inputs];
-		quar_period	[id=quar_period];
-		intervention	[id=intervention];
-		pop_type	[id=pop_type];
-		pop_size	[id=pop_size];
-		pop_infected	[id=pop_infected];
-		location	[id=location];
-		n_days	[id=n_days];
-	}
-	subgraph cluster_5 {
-		graph [label=t5,
-			rank=same
-		];
-		cum_infections_w5	[id=cum_infections_w5];
-		cum_symptomatic_w5	[id=cum_symptomatic_w5];
-		n_exposed_w5	[id=n_exposed_w5];
-		n_quarantined_w5	[id=n_quarantined_w5];
-		cum_severe_w5	[id=cum_severe_w5];
-		cum_critical_w5	[id=cum_critical_w5];
-		cum_deaths_w5	[id=cum_deaths_w5];
-		cum_tests_w5	[id=cum_tests_w5];
-	}
-	subgraph cluster_7 {
-		graph [label=t7,
-			rank=same
-		];
-		cum_infections_w7	[id=cum_infections_w7];
-		cum_symptomatic_w7	[id=cum_symptomatic_w7];
-		n_exposed_w7	[id=n_exposed_w7];
-		n_quarantined_w7	[id=n_quarantined_w7];
-		cum_severe_w7	[id=cum_severe_w7];
-		cum_critical_w7	[id=cum_critical_w7];
-		cum_deaths_w7	[id=cum_deaths_w7];
-		cum_tests_w7	[id=cum_tests_w7];
-	}
-	subgraph cluster_4 {
-		graph [label=t4,
-			rank=same
-		];
-		cum_infections_w4	[id=cum_infections_w4];
-		cum_symptomatic_w4	[id=cum_symptomatic_w4];
-		n_exposed_w4	[id=n_exposed_w4];
-		n_quarantined_w4	[id=n_quarantined_w4];
-		cum_severe_w4	[id=cum_severe_w4];
-		cum_critical_w4	[id=cum_critical_w4];
-		cum_deaths_w4	[id=cum_deaths_w4];
-		cum_tests_w4	[id=cum_tests_w4];
-	}
-	subgraph cluster_w0 {
-		graph [label=t0];
-		n_quarantined_w0	[id=n_quarantined_w0];
-		cum_tests_w0	[id=cum_tests_w0];
-		n_exposed_w0	[id=n_exposed_w0];
-		cum_infections_w0	[id=cum_infections_w0];
-		cum_symptomatic_w0	[id=cum_symptomatic_w0];
-		cum_severe_w0	[id=cum_severe_w0];
-		cum_critical_w0	[id=cum_critical_w0];
-		cum_deaths_w0	[id=cum_deaths_w0];
+		cum_infections_w8	[id=cum_infections_w8];
+		cum_symptomatic_w8	[id=cum_symptomatic_w8];
+		n_exposed_w8	[id=n_exposed_w8];
+		n_quarantined_w8	[id=n_quarantined_w8];
+		cum_severe_w8	[id=cum_severe_w8];
+		cum_critical_w8	[id=cum_critical_w8];
+		cum_deaths_w8	[id=cum_deaths_w8];
+		cum_tests_w8	[id=cum_tests_w8];
 	}
 	subgraph cluster_9 {
 		graph [label=t9,

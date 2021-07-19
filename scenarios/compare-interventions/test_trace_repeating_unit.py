@@ -1,13 +1,12 @@
 from gherkin.parser import Parser
+
 import re
+
+import pygraphviz
 
 import logging
 logging.getLogger('dowhy').setLevel(logging.CRITICAL)
 
-import sys
-sys.path.append("../../")
-
-import pygraphviz
 
 causal_variables = {"inputs": set(), "outputs": set()}
 
@@ -22,9 +21,10 @@ background = feature['children'][0]['background']
 # get the scenarios
 scenarios = [s['scenario'] for s in feature['children'][1:]]
 
-param_re = re.compile("(\w+)=(.+)")
-output_re = re.compile("\w+((_w\{\w+\})?)$") # Group 1 is the temporal bit
-n_weeks_re = re.compile('for each week "(\w+)" in "(\d+)" weeks')
+param_re = re.compile(r"(\w+)=(.+)")
+output_re = re.compile(r"\w+((_w\{\w+\})?)$")  # Group 1 is the temporal bit
+n_weeks_re = re.compile(r'for each week "(\w+)" in "(\d+)" weeks')
+
 
 def week(var, w):
     return var.replace(output_re.match(var).group(1), f"_w{w}")
@@ -32,6 +32,7 @@ def week(var, w):
 
 def is_temporal(var):
     return output_re.match(var).group(1) != ""
+
 
 num_weeks = None
 num_weeks_placeholder = None
@@ -43,7 +44,7 @@ for step in background['steps']:
     param = param_re.search(step['text'])
     n_weeks = n_weeks_re.search(step['text'])
     output = output_re.search(step['text'])
-    if step['keyword'].strip()  == "Given":
+    if step['keyword'].strip() == "Given":
         continue
     elif param:
         base_params[param.group(1)] = param.group(2)
@@ -51,12 +52,12 @@ for step in background['steps']:
     elif n_weeks:
         num_weeks = int(n_weeks.group(2))
         num_weeks_placeholder = n_weeks.group(1)
-        output_re = re.compile("\w+((_w\{"+num_weeks_placeholder+"\})?)$")
+        output_re = re.compile(r"\w+((_w\{"+num_weeks_placeholder+"\})?)$")
     elif output and num_weeks is not None:
         for n in range(num_weeks):
-            causal_variables['outputs'].add(step['text'])#.replace("{"+num_weeks_placeholder+"}", str(n)))
+            causal_variables['outputs'].add(step['text'])
     else:
-            raise Exception("Invalid step:", step)
+        raise Exception("Invalid step:", step)
 
 print(causal_variables)
 
@@ -81,6 +82,4 @@ for n in tn:
     for i in ips:
         g.add_edge(i, n)
 
-g.write("causal_dag_connected.dot")
-
-
+g.write("dags/repeating_unit_connected.dot")
