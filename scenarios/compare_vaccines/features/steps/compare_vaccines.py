@@ -21,8 +21,6 @@ def step_impl(context):
         context.params_dict[row["parameter"]] = cast_type(row["value"])
 
 
-
-
 @given("the following variables are recorded weekly")
 def step_impl(context):
     """
@@ -31,7 +29,6 @@ def step_impl(context):
     results_dict = table_to_dict(context.table)
     variables_dict = {variable: [] for variable in results_dict["variable"]}
     context.results_df = pd.DataFrame(variables_dict)
-
 
 
 @given("a simulation run with no vaccine available")
@@ -55,7 +52,6 @@ def step_impl(context):
         context.results_df[variable] = results[variable].values
 
 
-
 @then("the weekly cumulative infections should be reported")
 def step_impl(context):
     """ Record the weekly cumulative infections. """
@@ -65,3 +61,24 @@ def step_impl(context):
         os.mkdir(RESULTS_PATH)
     out_path = os.path.join(RESULTS_PATH, "results.csv")
     context.results_df.to_csv(out_path)
+
+
+@given("the (?P<vaccine_name>.+) vaccine is available")
+def step_impl(context, vaccine_name):
+    """
+    :type context: behave.runner.Context
+    :type vaccine_name: str
+    """
+    # Results df add vaccines available
+
+
+    raise NotImplementedError(u'STEP: Given the <vaccine_name> vaccine is available')
+
+
+@then("the cumulative number of infections should be less than the baseline")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    # do causal inference
+    raise NotImplementedError(u'STEP: Then the cumulative number of infections should be less than the baseline')
