@@ -1,0 +1,7 @@
+gherkin_official==20.0.0
+dowhy==0.6
+matplotlib==3.4.2
+pandas==1.2.5
+covasim==3.0.6
+gherkin-official==20.0.0
+pygraphviz==1.7
