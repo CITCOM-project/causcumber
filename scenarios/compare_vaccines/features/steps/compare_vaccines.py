@@ -45,3 +45,10 @@ def step_impl(context):
     m_sim.run(n_runs=10, verbose=0)
     m_sim.mean()
     m_sim.plot_result(key="cum_infections")
+
+
+@then("the weekly cumulative infections should be reported")
+def step_impl(context):
+    """ Record the weekly cumulative infections. """
+    # TODO: Should probably parameterise "cumulative infections" so that we can use this def. for any param
+    raise NotImplementedError(u'STEP: Then the weekly cumulative infections should be reported')
