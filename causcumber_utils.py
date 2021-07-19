@@ -4,8 +4,8 @@ import numpy as np
 from rpy2.robjects.packages import importr, isinstalled
 from rpy2.robjects.vectors import StrVector
 from rpy2.robjects.packages import STAP
-import pandas as pd
 import dowhy
+
 
 def dagitty_identification(dot_file_path, treatment, outcome):
     """ Identify minimal adjustment set for the causal effect of treatment on outcome in the causal graph specified
@@ -61,32 +61,22 @@ def _dot_to_dagitty_dag(dot_file_path):
 
 def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val, verbose=False):
     """
-    Runs dowhy to calculate a causal estimate.
-    
-    Parameters
-    ----------
-    data : pandas dataframe
-        A dataframe representing the observational data.
-    graph : string
-        Filepath of the DOT file representing the causal DAG. Nodes here MUST have a 1:1 correspondence with columns in the data.
-    treatment_var : string
-        The name of the treatment variable (must be a column in the data).
-    outcome_var : string
-        The name of the outcome variable (must be a column in the data).
-    control_val
-        The control value of the treatment variable (i.e. the value for individuals who did NOT receive treatment).
-    treatment_val
-        The treated value of the treatment variable (i.e. the value for individuals who DID receive treatment.)
-    verbose : boolean
-        Set to True to print additional information to the console (defaults to False).
-    Returns
-    -------
-    float, (float, float)
-        The causal estimate calculated by doWhy and the confidence intervals (low, high).
 
+    :param data: A dataframe representing the observational data.
+    :param graph: Filepath of the DOT file representing the causal DAG. Nodes here MUST have a 1:1 correspondence with
+                  columns in the data.
+    :param treatment_var: The name of the treatment variable (must be a column in the data).
+    :param outcome_var: The name of the outcome variable (must be a column in the data).
+    :param control_val: The control value of the treatment variable (i.e. the value for individuals who did NOT
+                        receive treatment).
+    :param treatment_val: The treated value of the treatment variable (i.e. the value for individuals who DID receive
+                          treatment.)
+    :param verbose: Set to True to print additional information to the console (defaults to False).
+    :return: The causal estimate calculated by doWhy and the 95% confidence intervals [low, high].
     """
+
     if verbose:
-        print("Running doWhy with params")
+        print("Running Do Why with params")
         print("\n".join([f"  {k}: {v}" for k, v in locals().items() if k != "data"]))
     
     if treatment_var not in data:
@@ -94,20 +84,17 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
     if outcome_var not in data:
         raise ValueError(f"Outcome variable {outcome_var} must be a column in the data, i.e. one of {data.columns}")
     
-    
-    
-    # 2. Create a causal model from the data and given graph
+    # Create a causal model from the data and given graph
     if verbose:
         print("Creating a causal model...")
     adjustment_set = dagitty_identification(graph, treatment_var, outcome_var)
     if verbose:
         print("  adjustment_set", adjustment_set)
     
-    # TODO: This is a hack to get around the fact that doWhy draws a
-    # straight line through the endire data rather than through pairs of
-    # categorical values.
-    # This slices the data such that it only contains the two values we're
-    # interested in, effectively binarising the treatment
+    """ TODO: This is a hack to get around the fact that doWhy draws a straight line through
+        the entire data rather than through pairs of categorical values. This slices the data such
+        that it only contains the two values we're interested in, effectively binarising the
+        treatment. """
     if verbose:
         print(f"Datatype of treatment '{treatment_var}':", data.dtypes[treatment_var])
     if str(data.dtypes[treatment_var]) == "category":
@@ -120,18 +107,16 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         common_causes=adjustment_set
     )
     
-    # # 3. Identify causal effect and return target estimands
+    # Identify causal effect and return target estimand
     if verbose:
         print("Identifying...")
     identified_estimand = model.identify_effect(proceed_when_unidentifiable=True)
-    # print(identified_estimand)     
        
-    # 4. Estimate the target estimand using a statistical method.
+    # Estimate the target estimand using linear regression.
     if verbose:
         print("Estimating...")
-    
-    
-    
+
+    # TODO: Should give user the ability to select different estimation methods
     estimate = model.estimate_effect(
         identified_estimand,
         method_name="backdoor.linear_regression",
