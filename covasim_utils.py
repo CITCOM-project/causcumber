@@ -1,4 +1,4 @@
-"""Utilities for running covasim"""
+""" Utilities for running Covasim. """
 import covasim as cv
 import pandas as pd
 import os
