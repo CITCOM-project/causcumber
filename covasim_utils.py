@@ -81,6 +81,7 @@ def msims(default, investigate, include_baseline=True):
 def save_results_df(results_df, out_path, file_name):
     """
     Given a data frame containing Covasim results, save the dataframe to a specified path.
+    If the out_path directory doesn't exist, this method will create it.
     :param results_df: (pandas data frame) containing Covasim results.
     :param out_path: (string) path to save location.
     :param file_name: (string) name of file excluding extension.
