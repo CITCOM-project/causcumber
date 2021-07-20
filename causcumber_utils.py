@@ -78,19 +78,19 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
     if verbose:
         print("Running Do Why with params")
         print("\n".join([f"  {k}: {v}" for k, v in locals().items() if k != "data"]))
-    
+
     if treatment_var not in data:
         raise ValueError(f"Treatment variable {treatment_var} must be a column in the data, i.e. one of {data.columns}")
     if outcome_var not in data:
         raise ValueError(f"Outcome variable {outcome_var} must be a column in the data, i.e. one of {data.columns}")
-    
+
     # Create a causal model from the data and given graph
     if verbose:
         print("Creating a causal model...")
     adjustment_set = dagitty_identification(graph, treatment_var, outcome_var)
     if verbose:
         print("  adjustment_set", adjustment_set)
-    
+
     """ TODO: This is a hack to get around the fact that doWhy draws a straight line through
         the entire data rather than through pairs of categorical values. This slices the data such
         that it only contains the two values we're interested in, effectively binarising the
@@ -106,12 +106,12 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         outcome=outcome_var,
         common_causes=adjustment_set
     )
-    
+
     # Identify causal effect and return target estimand
     if verbose:
         print("Identifying...")
     identified_estimand = model.identify_effect(proceed_when_unidentifiable=True)
-       
+
     # Estimate the target estimand using linear regression.
     if verbose:
         print("Estimating...")
@@ -124,8 +124,13 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         control_value=control_val,
         confidence_intervals=True,
         )
-    ci_low, ci_high = estimate.get_confidence_intervals()[0]
+
+    # TODO: there's a *potential* bug in doWhy such that ci_low and ci_high don't always correspond to the minimum and maximum respectively
+    # This is why we need to sort
+    ci_low, ci_high = sorted(estimate.get_confidence_intervals()[0])
+
+
     if verbose:
         print("Total Effect Estimate:", round(estimate.value, 2))
         print("95% Confidence Intervals: [{}, {}]".format(round(ci_low, 2), round(ci_high, 2)))
-    return estimate.value, estimate.get_confidence_intervals()[0]
+    return estimate.value, (ci_low, ci_high)
