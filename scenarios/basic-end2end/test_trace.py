@@ -125,106 +125,107 @@ def test(data, graph, treatment_var, outcome_var, control_val, treatment_val, re
             print("result: FAIL")
     else:
         raise ValueError(f"Unsupported relation '{relation}'")
-    
 
-param_re = re.compile("(\w+)=(.*)")
-intervention_re = re.compile("a (\w+) intervention.*")
-causal_q_re = re.compile('the "(\w+)" should be "([\w ]+)" ([\w ]+)')
 
-parser = Parser()
+if __name__ == "__main__":
+    param_re = re.compile("(\w+)=(.*)")
+    intervention_re = re.compile("a (\w+) intervention.*")
+    causal_q_re = re.compile('the "(\w+)" should be "([\w ]+)" ([\w ]+)')
 
-with open("features/test-trace.feature") as f:
-    feature = parser.parse("".join(f.readlines()))['feature']
+    parser = Parser()
 
-# get the background
-background = feature['children'][0]['background']
+    with open("features/test-trace.feature") as f:
+        feature = parser.parse("".join(f.readlines()))['feature']
 
-# get the scenarios
-scenarios = [s['scenario'] for s in feature['children'][1:]]
+    # get the background
+    background = feature['children'][0]['background']
 
-# get the base parameters and run covasim
-print(background['name'])
-base_params = {}
-for step in background['steps']:
-    param = param_re.search(step['text'])
-    if param:
-        base_params[param.group(1)] = param.group(2)
-        causal_variables['inputs'].add(param.group(1))
-    elif step['keyword'].strip() == "*" and param is None:
-        causal_variables['outputs'].add(step['text'])
+    # get the scenarios
+    scenarios = [s['scenario'] for s in feature['children'][1:]]
 
-run_covasim("Baseline", base_params.copy(), [])
-
-scenario_treatments = {'Baseline': 0}
-
-tests = []
-
-# Start the enumeration at 1 because baseline acts as zero
-for i, scenario in enumerate(scenarios, 1):
-    print("")
-    print(scenario['name'])
-    
-    scenario_treatments[scenario['name']] = i
-    params = base_params.copy()
-    interventions = []
-    causal_estimate = None
-    relation = None
-    for step in scenario['steps']:
+    # get the base parameters and run covasim
+    print(background['name'])
+    base_params = {}
+    for step in background['steps']:
         param = param_re.search(step['text'])
-        intervention = intervention_re.search(step['text'])
-        causal_q = causal_q_re.search(step['text'])
         if param:
-            params[param.group(1)] = param.group(2)
-        elif intervention:
-            interventions.append(intervention.group(1))
-            # scenario_treatments[scenario['name']] = len(interventions)
-        elif step['text'] == "the simulation is complete":
-            run_covasim(scenario['name'], params, interventions)
-        # load the causal question into the buffer
-        elif causal_q:
-            tests.append(dict(
-                label = scenario['name'],
-                outcome_var = causal_q.group(1),
-                control_val = causal_q.group(3),
-                treatment_val = scenario['name'],
-                relation = causal_q.group(2)
+            base_params[param.group(1)] = param.group(2)
+            causal_variables['inputs'].add(param.group(1))
+        elif step['keyword'].strip() == "*" and param is None:
+            causal_variables['outputs'].add(step['text'])
+
+    run_covasim("Baseline", base_params.copy(), [])
+
+    scenario_treatments = {'Baseline': 0}
+
+    tests = []
+
+    # Start the enumeration at 1 because baseline acts as zero
+    for i, scenario in enumerate(scenarios, 1):
+        print("")
+        print(scenario['name'])
+
+        scenario_treatments[scenario['name']] = i
+        params = base_params.copy()
+        interventions = []
+        causal_estimate = None
+        relation = None
+        for step in scenario['steps']:
+            param = param_re.search(step['text'])
+            intervention = intervention_re.search(step['text'])
+            causal_q = causal_q_re.search(step['text'])
+            if param:
+                params[param.group(1)] = param.group(2)
+            elif intervention:
+                interventions.append(intervention.group(1))
+                # scenario_treatments[scenario['name']] = len(interventions)
+            elif step['text'] == "the simulation is complete":
+                run_covasim(scenario['name'], params, interventions)
+            # load the causal question into the buffer
+            elif causal_q:
+                tests.append(dict(
+                    label = scenario['name'],
+                    outcome_var = causal_q.group(1),
+                    control_val = causal_q.group(3),
+                    treatment_val = scenario['name'],
+                    relation = causal_q.group(2)
+                    )
                 )
-            )
-        else:
-            raise Exception(f"Invalid step {step}")
+            else:
+                raise Exception(f"Invalid step {step}")
 
-draw_dag()
+    draw_dag()
 
-scenario_treatments = {'Baseline': 0, 'Standard testing': 1,
-                       'Standard tracing': 2, 'No testing': 3,
-                       'No tracing': 4, 'Trace without test': 5,
-                       'Optimal testing': 6, 'Optimal tracing': 7}
+    scenario_treatments = {'Baseline': 0, 'Standard testing': 1,
+                           'Standard tracing': 2, 'No testing': 3,
+                           'No tracing': 4, 'Trace without test': 5,
+                           'Optimal testing': 6, 'Optimal tracing': 7}
 
-data = pd.read_csv("results/data.csv")
-#plot(data, "intervention", "cum_deaths")
-for i in data['intervention']:
-    print(i)
-data['intervention'] = [scenario_treatments[i] for i in data['intervention']]
+    data = pd.read_csv("results/data.csv")
+    #plot(data, "intervention", "cum_deaths")
+    for i in data['intervention']:
+        print(i)
+    data['intervention'] = [scenario_treatments[i] for i in data['intervention']]
 
-data['intervention'] = data['intervention'].astype('category')
-data['pop_type'] = data['pop_type'].astype('category')
-data['location'] = data['location'].astype('category')
+    data['intervention'] = data['intervention'].astype('category')
+    data['pop_type'] = data['pop_type'].astype('category')
+    data['location'] = data['location'].astype('category')
 
-print()
-print("RUNNING TESTS")
-for t in tests:
-    print(t['label'])
-    print("control_val:", t['control_val'])
-    print("treatment_val:", t['treatment_val'])
-    control_val = scenario_treatments[t['control_val']]
-    treatment_val = scenario_treatments[t['treatment_val']]
-    test(
-        data = data,
-        graph = "dags/causal_dag.dot",
-        treatment_var = "intervention",
-        outcome_var = t['outcome_var'],
-        control_val = control_val,
-        treatment_val = treatment_val,
-        relation = t['relation']
-    )
     print()
+    print("RUNNING TESTS")
+    for t in tests:
+        print(t['label'])
+        print("control_val:", t['control_val'])
+        print("treatment_val:", t['treatment_val'])
+        control_val = scenario_treatments[t['control_val']]
+        treatment_val = scenario_treatments[t['treatment_val']]
+        test(
+            data = data,
+            graph = "dags/causal_dag.dot",
+            treatment_var = "intervention",
+            outcome_var = t['outcome_var'],
+            control_val = control_val,
+            treatment_val = treatment_val,
+            relation = t['relation']
+        )
+        print()
