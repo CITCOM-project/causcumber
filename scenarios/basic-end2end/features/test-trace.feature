@@ -20,8 +20,8 @@ Feature: Test and Trace
       * cum_tests
       * cum_quarantined
 
-  Scenario: Baseline
-    Given a simulation run with only the background parameters
+  # Scenario: Baseline
+  #   Given a simulation run with only the background parameters
 
   Scenario: Standard testing
     Given a testing intervention with parameters:
@@ -89,7 +89,7 @@ Feature: Test and Trace
       * asymp_prob=0.001
       * symp_quar_prob=1
       * asymp_quar_prob=1
-    And a tracingit pg intervention with parameters:
+    And a tracing intervention with parameters:
       * trace_probs=dict(h=1, s=1, w=1, c=1)
     When the simulation is complete
     Then the "cum_deaths" should be "less than" Standard tracing

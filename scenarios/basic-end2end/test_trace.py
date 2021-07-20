@@ -153,7 +153,7 @@ for step in background['steps']:
     elif step['keyword'].strip() == "*" and param is None:
         causal_variables['outputs'].add(step['text'])
 
-run_covasim(background['name'], base_params.copy(), [])
+run_covasim("Baseline", base_params.copy(), [])
 
 scenario_treatments = {'Baseline': 0}
 
@@ -191,7 +191,7 @@ for i, scenario in enumerate(scenarios, 1):
                 )
             )
         else:
-            raise Exception("Invalid step")
+            raise Exception(f"Invalid step {step}")
 
 draw_dag()
 
@@ -202,6 +202,8 @@ scenario_treatments = {'Baseline': 0, 'Standard testing': 1,
 
 data = pd.read_csv("results/data.csv")
 #plot(data, "intervention", "cum_deaths")
+for i in data['intervention']:
+    print(i)
 data['intervention'] = [scenario_treatments[i] for i in data['intervention']]
 
 data['intervention'] = data['intervention'].astype('category')
@@ -218,7 +220,7 @@ for t in tests:
     treatment_val = scenario_treatments[t['treatment_val']]
     test(
         data = data,
-        graph = "causal_dag.dot",
+        graph = "dags/causal_dag.dot",
         treatment_var = "intervention",
         outcome_var = t['outcome_var'],
         control_val = control_val,
