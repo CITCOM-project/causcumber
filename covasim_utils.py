@@ -1,6 +1,7 @@
 """Utilities for running covasim"""
 import covasim as cv
 import pandas as pd
+import os
 
 
 def dict_plus(dic1, dic2):
@@ -75,3 +76,17 @@ def msims(default, investigate, include_baseline=True):
     if include_baseline:
         sims += [cv.MultiSim(cv.Sim(pars=default, label="Baseline"))]
     return sims
+
+
+def save_results_df(results_df, out_path, file_name):
+    """
+    Given a data frame containing Covasim results, save the dataframe to a specified path.
+    If the out_path directory doesn't exist, this method will create it.
+    :param results_df: (pandas data frame) containing Covasim results.
+    :param out_path: (string) path to save location.
+    :param file_name: (string) name of file excluding extension.
+    """
+    if not os.path.exists(out_path):
+        os.mkdir(out_path)
+    out_path = os.path.join(out_path, f"{file_name}.csv")
+    results_df.to_csv(out_path)
