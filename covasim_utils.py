@@ -10,16 +10,47 @@ def dict_plus(dic1, dic2):
         dic1[field].append(dic2[field])
 
 
-def run_covasim(label, params, desired_outputs, n_runs=10, run=True):
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
+
+
+def aggregate_by_week(data, desired_outputs=None):
+    if desired_outputs is None:
+        desired_outputs = data.columns
+    week_by_week = {k: [] for k in desired_outputs}
+    for c in chunks(data, 7):
+        for k in week_by_week:
+            if k.startswith('new_'):
+                week_by_week[k].append(c[k].sum())
+            elif k.startswith('n_'):
+                week_by_week[k].append(c[k].iloc[-1])
+            else:
+                week_by_week[k].append(c[k].iloc[0])
+    return pd.DataFrame(week_by_week)
+
+
+def run_covasim_by_week(label, params, desired_outputs, n_runs=10):
     intervention_sim = cv.MultiSim(cv.Sim(pars=params, label=label, verbose=0))
     intervention_sim.run(n_runs=n_runs, verbose=0)
-    fields = {'intervention': []}
+    temporal = []
     for sim in intervention_sim.sims:
-        fields['intervention'].append(label)
-        dict_plus(fields, {k: v for k, v in sim.compute_summary(output=True, full=False).items() if k in desired_outputs})
-        dict_plus(fields, {k: v for k, v in params.items() if k != "intervention"})
-    data = pd.DataFrame.from_dict(fields)
-    return data
+        df = sim.to_df()
+        quar_period = 14
+        for i in sim['interventions']:
+            if hasattr(i, "quar_period"):
+                quar_period = i.quar_period
+        df = df[desired_outputs]
+        week_by_week = pd.DataFrame(aggregate_by_week(df, desired_outputs))
+        dic = week_by_week.to_dict(orient='list')
+        week_dic = {f"{k}_w{w+1}": item for k in desired_outputs for w, item in enumerate(dic[k])}
+        week_dic['quar_period'] = quar_period
+        week_dic['intervention'] = sim.label
+        for k, v in params.items():
+            week_dic[k] = v
+        temporal.append(week_dic)
+    return pd.DataFrame(temporal)
 
 
 def msims(default, investigate, include_baseline=True):
@@ -44,24 +75,3 @@ def msims(default, investigate, include_baseline=True):
     if include_baseline:
         sims += [cv.MultiSim(cv.Sim(pars=default, label="Baseline"))]
     return sims
-
-
-def chunks(lst, n):
-    """Yield successive n-sized chunks from lst."""
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]
-
-
-def aggregate_by_week(data, to_keep):
-    print(data)
-    data = data[to_keep]
-    week_by_week = {k: [] for k in to_keep}
-    for c in chunks(data, 7):
-        for k in week_by_week:
-            if k.startswith('new_'):
-                week_by_week[k].append(c[k].sum())
-            elif k.startswith('n_'):
-                week_by_week[k].append(c[k].iloc[-1])
-            else:
-                week_by_week[k].append(c[k].iloc[0])
-    return pd.DataFrame(week_by_week)
