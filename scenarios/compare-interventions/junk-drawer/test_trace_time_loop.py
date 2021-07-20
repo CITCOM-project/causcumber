@@ -29,7 +29,7 @@ tn1_nodes = [n.get_name() for n in tn1.get_nodes()]
 
 # TODO: validate that these clusters are actually there.
 
-num_weeks = 11
+num_weeks = 13
 
 timesteps = []
 inputs = []
@@ -80,7 +80,7 @@ for s in g.get_subgraphs():
     dotstring += f"  subgraph {s.get_name()}" +" {\n"
     dotstring += "".join([f"    {k} = {v};\n" for k, v in g.obj_dict['attributes'].items()])
     dotstring += "".join([f"    {n.to_string()}\n" for n in s.get_nodes()])
-    
+
     dotstring += "  }\n\n"
 
 for e in g.get_edges():
@@ -90,7 +90,7 @@ dotstring += "}"
 
 with open("dags/causal_dag.dot", 'w') as f:
     print(dotstring, file=f)
-    
+
 
 # g.create("dags/causal_dag.dot.pdf")
 

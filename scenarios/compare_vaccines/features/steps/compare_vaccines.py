@@ -4,13 +4,21 @@ import covasim as cv
 from collections import defaultdict
 from behave import *
 from pydoc import locate
+
+import sys
+sys.path.append("../../../../") # This one's for native running from within steps
+sys.path.append("../../../") # This one's for running `behave` in `features`
+sys.path.append("../../") # This one's for running `behave` in `compare_vaccines`
+
 from behave_utils import table_to_dict
 from covasim_utils import run_covasim_by_week, save_results_df
 
 
 use_step_matcher("re")
 
-RESULTS_PATH = "scenarios/compare_vaccines/results"
+# If we run behave inside compare_vaccines, then we need the results path to be in there
+# RESULTS_PATH = "scenarios/compare_vaccines/results"
+RESULTS_PATH = "results"
 
 
 @given("a simulation with parameters")

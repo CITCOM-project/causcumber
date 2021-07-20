@@ -2,7 +2,7 @@ import covasim as cv
 import pandas as pd
 
 import sys
-sys.path.append("../../")
+sys.path.append("../../../")
 
 from covasim_utils import *
 
@@ -12,7 +12,7 @@ n_weeks = 10
 
 """ Which intervention is more effective at reducing the cumulative number of
 infections? """
-base_pars = dict(
+params = dict(
     pop_type='hybrid',
     pop_size=50e3,
     pop_infected=100,
@@ -30,7 +30,7 @@ contact_tracing_intervention = cv.contact_tracing(trace_probs=dict(h=1.0, s=0.5,
 zero_contact_tracing_intervention = cv.contact_tracing(trace_probs=dict(h=0, s=0, w=0, c=0), quar_period=14)
 optimal_contact_tracing_intervention = cv.contact_tracing(trace_probs=dict(h=1, s=1, w=1, c=1), quar_period=14)
 
-intervention_sims = msims(base_pars, [
+intervention_sims = msims(params, [
     ({"interventions": standard_testing_intervention}, "Standard testing"),
     ({"interventions": [standard_testing_intervention, contact_tracing_intervention]}, "Standard tracing"),
     ({"interventions": zero_standard_testing_intervention}, "No testing"),
@@ -42,7 +42,7 @@ intervention_sims = msims(base_pars, [
     # ({"start_day": '2021-03-01', "end_day": '2021-06-01'}, "Spring"),
     ])
 
-to_keep = ['cum_infections', 'cum_deaths', 'cum_symptomatic', 'cum_severe',
+desired_outputs = ['cum_infections', 'cum_deaths', 'cum_symptomatic', 'cum_severe',
            'cum_critical', 'cum_tests', 'n_exposed', 'n_quarantined']
 
 dfs = []
@@ -56,15 +56,15 @@ for intervention_sim in intervention_sims:
         for i in sim['interventions']:
             if hasattr(i, "quar_period"):
                 quar_period = i.quar_period
-        df = df[to_keep]
-        week_by_week = pd.DataFrame(aggregate_by_week(df, to_keep))
-    dic = df.to_dict(orient='list')
-    week_dic = {f"{k}_w{w+1}": item for k in to_keep for w, item in enumerate(dic[k])}
-    week_dic['quar_period'] = quar_period
-    week_dic['intervention'] = sim.label
-    for k, v in base_pars.items():
-        week_dic[k] = v
-    temporal.append(week_dic)
+        df = df[desired_outputs]
+        week_by_week = pd.DataFrame(aggregate_by_week(df, desired_outputs))
+        dic = week_by_week.to_dict(orient='list')
+        week_dic = {f"{k}_w{w+1}": item for k in desired_outputs for w, item in enumerate(dic[k])}
+        week_dic['quar_period'] = quar_period
+        week_dic['intervention'] = sim.label
+        for k, v in params.items():
+            week_dic[k] = v
+        temporal.append(week_dic)
 
 data = pd.DataFrame(temporal)
 print(data)
