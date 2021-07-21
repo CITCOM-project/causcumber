@@ -80,10 +80,12 @@ def step_impl(context):
     causal_estimate, confidence_intervals = run_dowhy(combined_results, causal_graph, "intervention",
                                                       "cum_infections_5", 0, 1, verbose=False)
     test_outcome = causal_estimate < 0
-    results_dict = {"causal_estimate": causal_estimate, "confidence_intervals": confidence_intervals,
-                    "test_passed": test_outcome}
-    results_df = pd.DataFrame(results_dict)
-    save_results_df(results_df, RESULTS_PATH, "single_vaccine_causal_inference")
+    results_dict = {"vaccine": [treatment],
+                    "causal_estimate": [causal_estimate],
+                    "ci_low": [confidence_intervals[0]],
+                    "ci_high": [confidence_intervals[1]],
+                    "test_passed": [test_outcome]}
+    save_results_df(pd.DataFrame(results_dict), RESULTS_PATH, f"{treatment}_vaccine_causal_inference")
     assert test_outcome
 
 
