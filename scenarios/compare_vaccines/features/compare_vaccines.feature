@@ -22,7 +22,7 @@ Feature: Compare vaccines
 
   Scenario: Baseline
     Given a simulation run with no vaccine available
-    When the simulation is finished
+    When the model is run
     Then the weekly cumulative infections should be reported
 
   Scenario: Draw DAG
@@ -64,17 +64,18 @@ Feature: Compare vaccines
       | cum_vaccinated_n  | cum_deaths_n1      |
     Then we obtain the causal DAG for 5 weeks
 
-  Scenario: Single vaccine
+  Scenario Outline: Single vaccine
     All vaccines should reduce the cumulative number of infections relative to the
     baseline scenario where no vaccine is available.
 
-    Given a single one of the following vaccines is available in the model
-      | vaccine |
-      | pfizer  |
-      | moderna |
-      | az      |
-    When the simulation is finished for all vaccines
+    Given a baseline run of the model
+    When the model is run with vaccine <vaccine_name>
     Then the cumulative number of infections should be less than the baseline
+    Examples:
+      | vaccine_name |
+      | pfizer       |
+      | moderna      |
+      | az           |
 
 #  Scenario Outline: Multiple vaccines
 #    Any pair of vaccines should not be significantly worse than a single vaccine.
