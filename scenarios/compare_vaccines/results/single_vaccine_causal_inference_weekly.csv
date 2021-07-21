@@ -1,0 +1,5 @@
+,treatment,control,estimate,confidence_intervals,test_outcome
+0,pfizer,Baseline,-3017.8,"(-3497.5, -2538.1)",PASS
+1,moderna,Baseline,-3015.299999999999,"(-3495.01, -2535.59)",PASS
+2,az,Baseline,-2459.700000000001,"(-2945.37, -1974.03)",PASS
+3,Baseline,Baseline,0.0,"(0.0, 0.0)",PASS

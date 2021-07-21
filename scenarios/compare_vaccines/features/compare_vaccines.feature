@@ -6,8 +6,7 @@ Feature: Compare vaccines
   Background:
     Given a simulation with parameters
       | parameter    | value  | type |
-      | quar_period  | 14     | int  |
-      | n_days       | 84     | int  |
+      | n_days       | 35     | int  |
       | pop_type     | hybrid | str  |
       | pop_size     | 50000  | int  |
       | pop_infected | 100    | int  |
@@ -19,11 +18,51 @@ Feature: Compare vaccines
       | cum_severe        | int      |
       | cum_critical      | int      |
       | cum_deaths        | int      |
+      | cum_vaccinated    | int      |
 
   Scenario: Baseline
     Given a simulation run with no vaccine available
     When the simulation is finished
     Then the weekly cumulative infections should be reported
+
+  Scenario: Draw DAG
+    Given a connected repeating unit
+    When we prune the following edges
+      | s1                | s2                 |
+      | intervention      | cum_infections_n   |
+      | intervention      | cum_symptomatic_n  |
+      | intervention      | cum_severe_n       |
+      | intervention      | cum_critical_n     |
+      | intervention      | cum_deaths_n       |
+      | pop_type          | cum_deaths_n       |
+      | pop_size          | cum_deaths_n       |
+      | location          | cum_deaths_n       |
+      | pop_infected      | cum_deaths_n       |
+      | n_days            | cum_infections_n   |
+      | n_days            | cum_symptomatic_n  |
+      | n_days            | cum_severe_n       |
+      | n_days            | cum_critical_n     |
+      | n_days            | cum_deaths_n       |
+      | cum_infections_n  | cum_severe_n1      |
+      | cum_infections_n  | cum_critical_n1    |
+      | cum_infections_n  | cum_deaths_n1      |
+      | cum_symptomatic_n | cum_critical_n1    |
+      | cum_symptomatic_n | cum_deaths_n1      |
+      | cum_severe_n      | cum_infections_n1  |
+      | cum_severe_n      | cum_symptomatic_n1 |
+      | cum_severe_n      | cum_deaths_n1      |
+      | cum_critical_n    | cum_infections_n1  |
+      | cum_critical_n    | cum_symptomatic_n1 |
+      | cum_critical_n    | cum_severe_n1      |
+      | cum_deaths_n      | cum_infections_n1  |
+      | cum_deaths_n      | cum_symptomatic_n1 |
+      | cum_deaths_n      | cum_severe_n1      |
+      | cum_deaths_n      | cum_critical_n1    |
+      | cum_vaccinated_n  | cum_symptomatic_n1 |
+      | cum_vaccinated_n  | cum_severe_n1      |
+      | cum_vaccinated_n  | cum_critical_n1    |
+      | cum_vaccinated_n  | cum_deaths_n1      |
+    Then we obtain the causal DAG for 5 weeks
 
   Scenario: Single vaccine
     All vaccines should reduce the cumulative number of infections relative to the

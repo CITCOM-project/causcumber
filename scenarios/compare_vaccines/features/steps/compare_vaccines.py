@@ -10,7 +10,7 @@ from behave import *
 from pydoc import locate
 from behave_utils import table_to_dict
 from covasim_utils import run_covasim_by_week, save_results_df
-from causcumber_utils import run_dowhy
+from causcumber_utils import run_dowhy, draw_connected_repeating_unit, iterate_repeating_unit
 
 
 use_step_matcher("re")
@@ -72,7 +72,7 @@ def step_impl(context):
     # get baseline_results
     baseline_results = pd.read_csv("./results/no_vaccination_results.csv")
     combined_results = pd.concat([context.results_df, baseline_results])
-    causal_graph = "./dags/simple_vaccine_dag.dot"
+    causal_graph = "./dags/causal_dag.dot"
 
     # DoWhy requires categorical data to be numerical
     vaccine_conversion = {"Baseline": 0, "pfizer": 1, "moderna": 2, "az": 3}
@@ -83,7 +83,7 @@ def step_impl(context):
     for treatment in combined_results.intervention.unique():
         if treatment != "Baseline":
             causal_estimate, confidence_intervals = run_dowhy(combined_results, causal_graph, "intervention",
-                                                              "cum_infections_13", 0, treatment)
+                                                              "cum_infections_5", 0, treatment)
             results["treatment"].append(treatment)
             results["control"].append("Baseline")
             results["estimate"].append(causal_estimate)
@@ -108,7 +108,7 @@ def step_impl(context):
         test_outcomes.append(test_outcome)
         assert test_predicate
     result_df["test_outcome"] = test_outcomes
-    save_results_df(result_df, RESULTS_PATH, "single_vaccine_causal_inference")
+    save_results_df(result_df, RESULTS_PATH, "single_vaccine_causal_inference_weekly")
 
 
 
@@ -143,3 +143,24 @@ def step_impl(context):
         result_dfs.append(run_covasim_by_week(label, params, desired_outputs))
     context.results_df = pd.concat(result_dfs)
     save_results_df(context.results_df, RESULTS_PATH, "single_vaccination_results")
+
+
+@given("a connected repeating unit")
+def step_impl(context):
+    inputs = list(context.params_df)
+    inputs.append("intervention")
+    outputs = list(context.results_df)
+    print(inputs, outputs)
+    context.repeating_unit = draw_connected_repeating_unit(inputs, outputs)
+
+
+@when("we prune the following edges")
+def step_impl(context):
+    for row in context.table:
+        context.repeating_unit.delete_edge(row['s1'], row['s2'])
+
+
+@then("we obtain the causal DAG for 5 weeks")
+def step_impl(context):
+    dag = iterate_repeating_unit(context.repeating_unit, 5, start=1)
+    dag.write("./dags/causal_dag.dot")
