@@ -45,7 +45,7 @@ def run_covasim_by_week(label, params, desired_outputs, n_runs=10):
         df = df[desired_outputs]
         week_by_week = pd.DataFrame(aggregate_by_week(df, desired_outputs))
         dic = week_by_week.to_dict(orient='list')
-        week_dic = {f"{k}_w{w+1}": item for k in desired_outputs for w, item in enumerate(dic[k])}
+        week_dic = {f"{k}_{w+1}": item for k in desired_outputs for w, item in enumerate(dic[k])}
         week_dic['quar_period'] = quar_period
         week_dic['intervention'] = sim.label
         for k, v in params.items():

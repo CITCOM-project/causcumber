@@ -1,10 +1,78 @@
 """ Utility files for CauseCumber. """
-import pydot
+import pygraphviz
 import numpy as np
 from rpy2.robjects.packages import importr, isinstalled
 from rpy2.robjects.vectors import StrVector
 from rpy2.robjects.packages import STAP
 import dowhy
+import pydot
+
+
+def draw_connected_repeating_unit(inputs, time_steps=[],
+                                  suffix_n="_n", suffix_n1="_n1"):
+    g = pygraphviz.AGraph(strict=False, directed=True,
+                          rankdir="LR", newrank=True)
+    tn = g.add_subgraph(name="cluster_tn", label="<Time<sub>n</sub>>")
+    tn1 = g.add_subgraph(name="cluster_tn1", label="<Time<sub>n+1</sub>>")
+    ips = g.add_subgraph(name="cluster_inputs", label="Model inputs")
+
+    for i in inputs:
+        ips.add_node(i)
+
+    for o in time_steps:
+        tn.add_node(f"{o}_n")
+        tn1.add_node(f"{o}_n1")
+
+    for n in tn:
+        for n1 in tn1:
+            g.add_edge(n, n1)
+        for i in ips:
+            g.add_edge(i, n)
+
+    return g
+
+
+def iterate_repeating_unit(unit, num_steps, start=0,
+                           inputs_cluster="cluster_inputs",
+                           ips_cluster="cluster_inputs",
+                           tn_cluster="cluster_tn",
+                           tn1_cluster="cluster_tn1",
+                           suffix_n="_n", suffix_n1="_n1"):
+    timesteps = []
+    inputs = []
+    tn_nodes = unit.get_subgraph(tn_cluster)
+    tn1_nodes = unit.get_subgraph(tn1_cluster)
+    ips_nodes = unit.get_subgraph(ips_cluster)
+    for s1, s2 in unit.edges():
+        if s1 in tn_nodes and s2 in tn1_nodes:
+            timesteps.append((s1, s2))
+        elif s1 in ips_nodes and s2 in tn_nodes:
+            inputs.append((s1, s2))
+        else:
+            raise ValueError("Bad edge: ", s1, s2)
+
+    g = pygraphviz.AGraph(strict=False, directed=True,
+                          rankdir="LR", newrank=True)
+
+    g.add_edges_from([(s1, s2.replace(suffix_n, f"_{start}")) for s1, s2 in inputs])
+    g.add_subgraph(graph_name="cluster_inputs",
+                   label="inputs").add_nodes_from(ips_nodes)
+
+    cluster_start = g.add_subgraph(graph_name=f"cluster_{start}",
+                               label="<t<sub>0</sub>>")
+    cluster_start.add_nodes_from([s1.replace(suffix_n, f"_{start}") for s1, _ in timesteps])
+
+    for t in range(start+1, num_steps+1):
+        edges = [(s1.replace(suffix_n, f"_{t-1}"),
+                  s2.replace(suffix_n1, f"_{t}")) for s1, s2 in timesteps]
+        g.add_edges_from(edges)
+        g.add_edges_from([(s1, s2.replace(suffix_n, f"_{t}"))
+                          for s1, s2 in inputs])
+
+        c = g.add_subgraph(graph_name=f"cluster_{t}",
+                           label=f"<t<sub>{t}</sub>>")
+        c.add_nodes_from([s2 for _, s2 in edges])
+    return g
 
 
 def dagitty_identification(dot_file_path, treatment, outcome):
@@ -53,8 +121,10 @@ def _dot_to_dagitty_dag(dot_file_path):
     :param dot_file_path: path to causal graph dot file as a string.
     :return: string representation of dagitty-compatible dag.
     """
-    dot_graph = pydot.graph_from_dot_file(dot_file_path)
-    dot_string = "dag {" + "\n".join([e.to_string() for e in dot_graph[0].get_edges()]) + "}"
+    # dot_graph = pydot.graph_from_dot_data(dot_file_path)
+    # dot_string = "dag {" + "\n".join([e.to_string() for e in dot_graph[0].get_edges()]) + "}"
+    dot_graph = pygraphviz.AGraph(dot_file_path)
+    dot_string = "dag {" + "\n".join([f"{s1} -> {s2};" for s1, s2 in dot_graph.edges()]) + "}"
     dag_string = dot_string.replace("digraph", "dag")
     return dag_string
 

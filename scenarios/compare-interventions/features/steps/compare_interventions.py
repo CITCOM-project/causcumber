@@ -11,7 +11,7 @@ sys.path.append("../../") # This one's for running `behave` in `compare-inverven
 
 from behave_utils import table_to_dict
 from covasim_utils import run_covasim_by_week
-from causcumber_utils import run_dowhy
+from causcumber_utils import run_dowhy, draw_connected_repeating_unit, iterate_repeating_unit
 
 use_step_matcher("parse")
 
@@ -65,8 +65,26 @@ def step_impl(context):
     df = pd.read_csv("results/background.csv")
     for week in range(1, round(context.params_dict['n_days']/7)+1):
         for column in context.desired_outputs:
-            assert f"{column}_w{week}" in df.columns, f"{column}_w{week} not recorded"
+            assert f"{column}_{week}" in df.columns, f"{column}_{week} not recorded"
 
+
+@given(u'a connected repeating unit')
+def step_impl(context):
+    inputs = list(context.params_dict.keys())
+    inputs.append("intervention")
+    context.repeating_unit = draw_connected_repeating_unit(inputs, context.desired_outputs)
+
+
+@when(u'we prune the following edges')
+def step_impl(context):
+    for row in context.table:
+        context.repeating_unit.delete_edge(row['s1'], row['s2'])
+
+
+@then(u'we obtain the causal DAG for {n} weeks')
+def step_impl(context, n):
+    dag = iterate_repeating_unit(context.repeating_unit, int(n), start=1)
+    dag.write("dags/causal_dag.dot")
 
 @given(u'testing interventions <label> with parameters: <symp_prob>, <asymp_prob>, <symp_quar_prob>, <asymp_quar_prob>')
 def step_impl(context):
@@ -130,7 +148,7 @@ def step_impl(context):
                   data,
                   "dags/causal_dag.dot",
                   "intervention",
-                  f"cum_deaths_w{context.n_weeks}",
+                  f"cum_deaths_{context.n_weeks}",
                   treatments[row['id1']],
                   treatments[row['label']])
         test(estimate, row['relationship'], ci_low, ci_high)
@@ -176,7 +194,7 @@ def step_impl(context, outcome, relationship, control):
               data,
               "dags/causal_dag.dot",
               "intervention",
-              f"{outcome}_w{context.n_weeks}",
+              f"{outcome}_{context.n_weeks}",
               treatments[context.scenario.name],
-              treatments[control])
+              treatments[control], verbose=True)
     test(estimate, relationship, ci_low, ci_high)
