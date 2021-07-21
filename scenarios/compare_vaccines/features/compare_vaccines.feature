@@ -25,20 +25,18 @@ Feature: Compare vaccines
     When the simulation is finished
     Then the weekly cumulative infections should be reported
 
-  Scenario Outline: Single vaccine
+  Scenario: Single vaccine
     All vaccines should reduce the cumulative number of infections relative to the
     baseline scenario where no vaccine is available.
 
-    Given the <vaccine_name> vaccine is available
-    When the simulation is finished
+    Given a single one of the following vaccines is available in the model
+      | vaccine |
+      | pfizer  |
+      | moderna |
+      | az      |
+    When the simulation is finished for all vaccines
     Then the cumulative number of infections should be less than the baseline
-    # TODO: Make sure we run the model for each of these vaccines BEFORE the Then step is executed
-    Examples:
-      | vaccine_name |
-      | pfizer       |
-      | moderna      |
-      | az           |
-#
+
 #  Scenario Outline: Multiple vaccines
 #    Any pair of vaccines should not be significantly worse than a single vaccine.
 #
@@ -56,4 +54,4 @@ Feature: Compare vaccines
 #      | moderna            | az                  | az                  |
 #      | moderna            | az                  | moderna             |
 #      | moderna            | az                  | pfizer              |
-#
+

@@ -1,6 +1,7 @@
 import pandas as pd
+import numpy as np
 import covasim as cv
-import os
+from collections import defaultdict
 from behave import *
 from pydoc import locate
 
@@ -10,6 +11,7 @@ sys.path.append("../../../") # This one's for running `behave` in `features`
 sys.path.append("../../") # This one's for running `behave` in `compare_vaccines`
 
 from behave_utils import table_to_dict
+from covasim_utils import run_covasim_by_week, save_results_df
 
 
 use_step_matcher("re")
@@ -22,11 +24,13 @@ RESULTS_PATH = "results"
 @given("a simulation with parameters")
 def step_impl(context):
     """
-    Populate the params_dict with the specified simulation parameters.
+    Populate the params_df with the specified simulation parameters.
     """
+    params_dict = defaultdict(list)
     for row in context.table:
         cast_type = locate(row["type"])
-        context.params_dict[row["parameter"]] = cast_type(row["value"])
+        params_dict[row["parameter"]].append(cast_type(row["value"]))
+    context.params_df = pd.DataFrame(params_dict)
 
 
 @given("the following variables are recorded weekly")
@@ -50,43 +54,62 @@ def step_impl(context):
 @when("the simulation is finished")
 def step_impl(context):
     """ Run Covasim with params_dict. """
-    # TODO: How can we get the current scenario name and use it as label for sim?
-    m_sim = cv.MultiSim(cv.Sim(pars=context.params_dict, label=context.scenario.name))
-    # TODO: Set n_runs and verbose somewhere
-    m_sim.run(n_runs=10, verbose=0)
-    m_sim.mean()
-    results = m_sim.results
-    for variable in list(context.results_df):
-        context.results_df[variable] = results[variable].values
+    label = context.scenario.name
+    params = context.params_df.to_dict("records")[0]
+    desired_outputs = list(context.results_df)
+    context.results_df = run_covasim_by_week(label, params, desired_outputs)
 
 
 @then("the weekly cumulative infections should be reported")
 def step_impl(context):
     """ Record the weekly cumulative infections. """
-    # TODO: Should probably parameterise "cumulative infections" so that we can use this def. for any param
-    print(context.results_df)
-    if not os.path.exists(RESULTS_PATH):
-        os.mkdir(RESULTS_PATH)
-    out_path = os.path.join(RESULTS_PATH, "results.csv")
-    context.results_df.to_csv(out_path)
-
-
-@given("the (?P<vaccine_name>.+) vaccine is available")
-def step_impl(context, vaccine_name):
-    """
-    :type context: behave.runner.Context
-    :type vaccine_name: str
-    """
-    # Results df add vaccines available
-
-
-    raise NotImplementedError(u'STEP: Given the <vaccine_name> vaccine is available')
+    save_results_df(context.results_df, RESULTS_PATH, "no_vaccination_results")
 
 
 @then("the cumulative number of infections should be less than the baseline")
 def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    # do causal inference
-    raise NotImplementedError(u'STEP: Then the cumulative number of infections should be less than the baseline')
+    """ Use causal inference to estimate the causal effect of vaccination on cumulative
+        infections. """
+    save_results_df(context.results_df, RESULTS_PATH, "single_vaccination_results")
+    pass
+
+
+@given("a single one of the following vaccines is available in the model")
+def step_impl(context):
+    """ Instantiate the vaccine objects and make them available to the simulation. """
+    # Make an object for each specified vaccine (TODO: move this to covasim_utils)
+    vaccines = [row["vaccine"] for row in context.table.rows]
+    vaccinate_days = list(range(context.params_df["n_days"][0]))
+    vaccine_objects = [cv.vaccinate_prob(vaccine, vaccinate_days, label=str(vaccine)) for vaccine in vaccines]
+
+    # For each vaccine object, create a duplicate row in params df
+    context.params_df = pd.concat([context.params_df]*len(vaccine_objects))
+    print(context.params_df)
+
+    # Add vaccines to interventions column in params df
+    context.params_df["interventions"] = vaccine_objects
+
+    # Add interventions column to results df
+    context.results_df["interventions"] = vaccine_objects
+
+    # Add waning for vaccination to be used
+    context.params_df["use_waning"] = True
+    context.results_df["use_waning"] = True
+
+
+@when("the simulation is finished for all vaccines")
+def step_impl(context):
+    """  Run the model for each vaccine. """
+    model_runs = context.params_df.to_dict("records")
+    desired_outputs = list(context.results_df)
+
+    # Remove outputs that we have already recorded
+    desired_outputs.remove("interventions")
+    desired_outputs.remove("use_waning")
+
+    result_dfs = []
+    for run_params in model_runs:
+        label = run_params["interventions"].label
+        params = run_params
+        result_dfs.append(run_covasim_by_week(label, params, desired_outputs))
+    context.results_df = pd.concat(result_dfs)
