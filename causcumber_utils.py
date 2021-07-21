@@ -198,9 +198,9 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
     # TODO: there's a *potential* bug in doWhy such that ci_low and ci_high don't always correspond to the minimum and maximum respectively
     # This is why we need to sort
     ci_low, ci_high = sorted(estimate.get_confidence_intervals()[0])
-
-
+    ci_low, ci_high = round(ci_low, 2), round(ci_high, 2)
+    estimate_value = round(estimate.value, 2)
     if verbose:
-        print("Total Effect Estimate:", round(estimate.value, 2))
-        print("95% Confidence Intervals: [{}, {}]".format(round(ci_low, 2), round(ci_high, 2)))
+        print("Total Effect Estimate:", estimate.value)
+        print("95% Confidence Intervals: [{}, {}]".format(ci_low, ci_high))
     return estimate.value, (ci_low, ci_high)
