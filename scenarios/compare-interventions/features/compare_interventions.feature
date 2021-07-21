@@ -1,3 +1,5 @@
+# This file MUST be run from inside ../compare_interventions, otherwise it won't
+# be able to find the causal DAG. Run as `behave features/compare_interventions.feature`
 Feature: Compare interventions
   Background:
     Given a simulation with parameters
@@ -43,11 +45,8 @@ Feature: Compare interventions
     When all simulations are complete
     Then the "cum_deaths" should be <relationship> <id1>
 
-  # Scenario: Contact Tracing Without Testing
-  #     Given a testing intervention noTest with parameters: 0, 0, 0, 0
-  #     And a tracing intervention with parameters:
-  #       # These can be any probabilities here
-  #       # We should come up with a way to represent that
-  #       * trace_probs=dict(h=1, s=0.5, w=0.5, c=0.3)
-  #     When the simulation is complete
-  #     Then the "cum_deaths" should be "equal to" Baseline
+  Scenario: Contact Tracing Without Testing
+      Given a testing intervention noTest with parameters: 0, 0, 0, 0
+      And a tracing intervention with parameters: trace_probs=dict(h=1, s=0.5, w=0.5, c=0.3)
+      When the simulation is complete
+      Then the "cum_deaths" should be "equal to" Baseline

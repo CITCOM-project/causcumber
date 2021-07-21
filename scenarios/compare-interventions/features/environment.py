@@ -3,11 +3,6 @@ import pandas as pd
 from behave import fixture, use_fixture
 import os
 
-@fixture
-def set_results_df(context):
-    """ Add a results dataframe which stores simulation outputs to context. """
-    context.results_df = pd.DataFrame()
-
 
 @fixture
 def set_desired_outputs(context):
@@ -23,7 +18,6 @@ def set_parameters_dict(context):
 
 def before_feature(context, feature):
     print(f"Running Feature `{feature.name}`")
-    use_fixture(set_results_df, context)
     use_fixture(set_parameters_dict, context)
 
     if not os.path.exists("results"):

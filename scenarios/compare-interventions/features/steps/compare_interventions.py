@@ -35,31 +35,37 @@ def step_impl(context):
     Create a results df to record only the specified values.
     """
     results_dict = table_to_dict(context.table)
-    variables_dict = {f"{variable}_w{w}": [] for variable in results_dict["variable"] for w in range(context.n_weeks)}
-    context.results_df = pd.DataFrame(variables_dict)
     context.desired_outputs = results_dict['variable']
 
 
 @given(u'a simulation run with only the background parameters')
 def step_impl(context):
     context.run_params = context.params_dict.copy()
+    context.run_params['interventions'] = []
+
+def write_df(df, fname):
+    if not os.path.isfile(fname):
+        df.to_csv(fname, header='column_names')
+    else:
+        df.to_csv(fname, mode='a', header=False)
 
 
 @when(u'the simulation is complete')
 def step_impl(context):
     week_by_week = run_covasim_by_week(
         context.scenario.name,
-        context.run_params,
+        {k: v for k, v in context.run_params.items() if k != "label"},
         context.desired_outputs,
         n_runs=10)
-    pd.concat([context.results_df,week_by_week]).to_csv("results/background.csv")
+    write_df(week_by_week, "results/background.csv")
 
 
 @then(u'all weekly variables are recorded')
 def step_impl(context):
-    for week in range(round(context.params_dict['n_days']/7)):
+    df = pd.read_csv("results/background.csv")
+    for week in range(1, round(context.params_dict['n_days']/7)+1):
         for column in context.desired_outputs:
-            assert f"{column}_w{week}" in context.results_df, f"{column}_w{week} not in results_df"
+            assert f"{column}_w{week}" in df.columns, f"{column}_w{week} not recorded"
 
 
 @given(u'testing interventions <label> with parameters: <symp_prob>, <asymp_prob>, <symp_quar_prob>, <asymp_quar_prob>')
@@ -88,11 +94,28 @@ def step_impl(context):
             context.desired_outputs,
             n_runs=10)
         results.append(r)
-    df = pd.concat(results+[context.results_df])
-    if not os.path.isfile('results/sims.csv'):
-       df.to_csv('results/sims.csv', header='column_names')
-    else: # else it exists so append without writing the header
-       df.to_csv('results/sims.csv', mode='a', header=False)
+    df = pd.concat(results)
+    write_df(df, "results/sims.csv")
+
+
+def test(estimate, relationship, ci_low, ci_high):
+    if relationship == "<":
+        assert estimate < 0 and ci_high < 0, f"Expected estimate < 0, got {ci_low} < {estimate} < {ci_high}"
+    elif relationship == "=":
+        assert ci_low < 0 < ci_high, f"Expected estimate ~0, got {ci_low} < {estimate} < {ci_high}"
+    elif relationship == ">":
+        assert estimate > 0 and ci_low > 0, f"Expected estimate > 0, got {ci_low} < {estimate} < {ci_high}"
+
+
+def preprocess_data(data):
+    grouped = data.groupby("intervention")
+    treatments = {k: i for i, (k, _) in enumerate(grouped)}
+    data['intervention'] = [treatments[i] for i in data['intervention']]
+    data['intervention'] = data['intervention'].astype('category')
+    data['pop_type'] = data['pop_type'].astype('category')
+    data['location'] = data['location'].astype('category')
+    data = data.drop(["interventions"], axis=1)
+    return data, treatments
 
 
 @then(u'the "cum_deaths" should be <relationship> <id1>')
@@ -101,13 +124,7 @@ def step_impl(context):
         background = pd.read_csv("results/background.csv")
         sims = pd.read_csv("results/sims.csv")
         data = pd.concat([background, sims])
-        grouped = data.groupby("intervention")
-        treatments = {k: i for i, (k, _) in enumerate(grouped)}
-        data['intervention'] = [treatments[i] for i in data['intervention']]
-        data['intervention'] = data['intervention'].astype('category')
-        data['pop_type'] = data['pop_type'].astype('category')
-        data['location'] = data['location'].astype('category')
-        data = data.drop(["interventions"], axis=1)
+        data, treatments = preprocess_data(data)
         data.to_csv("results/data.csv")
         estimate, (ci_low, ci_high) = run_dowhy(
                   data,
@@ -116,17 +133,13 @@ def step_impl(context):
                   f"cum_deaths_w{context.n_weeks}",
                   treatments[row['id1']],
                   treatments[row['label']])
-        if row['relationship'] == "<":
-            assert estimate < 0 and ci_high < 0, f"Expected estimate < 0, got {ci_low} < {estimate} < {ci_high}"
-        elif row['relationship'] == "=":
-            assert ci_low < 0 < ci_high, f"Expected estimate ~0, got {ci_low} < {estimate} < {ci_high}"
-        elif row['relationship'] == ">":
-            assert estimate > 0 and ci_low > 0, f"Expected estimate > 0, got {ci_low} < {estimate} < {ci_high}"
+        test(estimate, row['relationship'], ci_low, ci_high)
 
-@given(u'a testing intervention standardTest with parameters: {symp_prob}, {asymp_prob}, {symp_quar_prob}, {asymp_quar_prob}')
-def step_impl(context, symp_prob, asymp_prob, symp_quar_prob, asymp_quar_prob):
+@given(u'a testing intervention {label} with parameters: {symp_prob}, {asymp_prob}, {symp_quar_prob}, {asymp_quar_prob}')
+def step_impl(context, label, symp_prob, asymp_prob, symp_quar_prob, asymp_quar_prob):
     context.scenario_table = context.table
     context.run_params = context.params_dict.copy()
+    context.run_params['label'] = label
     context.run_params['interventions'] = [cv.test_prob(
         symp_prob=symp_prob,
         asymp_prob=asymp_prob,
@@ -147,3 +160,23 @@ def step_impl(context):
         )
         run_params['label']=row['label']
         context.covasim_runs.append(run_params)
+
+
+@given(u'a tracing intervention with parameters: trace_probs=dict(h={h}, s={s}, w={w}, c={c})')
+def step_impl(context, h, s, w, c):
+    context.run_params['interventions'].append(cv.contact_tracing(
+        trace_probs=dict(h=float(h), s=float(s), w=float(w), c=float(c)), quar_period=14)
+    )
+
+@then(u'the "{outcome}" should be "{relationship}" {control}')
+def step_impl(context, outcome, relationship, control):
+    data, treatments = preprocess_data(pd.read_csv("results/background.csv"))
+    print(treatments)
+    estimate, (ci_low, ci_high) = run_dowhy(
+              data,
+              "dags/causal_dag.dot",
+              "intervention",
+              f"{outcome}_w{context.n_weeks}",
+              treatments[context.scenario.name],
+              treatments[control])
+    test(estimate, relationship, ci_low, ci_high)
