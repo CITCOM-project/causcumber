@@ -1,17 +1,16 @@
+import sys
+sys.path.append("../../../../")  # This one's for native running from within steps
+sys.path.append("../../../")  # This one's for running `behave` in `features`
+sys.path.append("../../")  # This one's for running `behave` in `compare_vaccines`
+
 import pandas as pd
-import numpy as np
 import covasim as cv
 from collections import defaultdict
 from behave import *
 from pydoc import locate
-
-import sys
-sys.path.append("../../../../") # This one's for native running from within steps
-sys.path.append("../../../") # This one's for running `behave` in `features`
-sys.path.append("../../") # This one's for running `behave` in `compare_vaccines`
-
 from behave_utils import table_to_dict
 from covasim_utils import run_covasim_by_week, save_results_df
+from causcumber_utils import run_dowhy
 
 
 use_step_matcher("re")
@@ -70,8 +69,48 @@ def step_impl(context):
 def step_impl(context):
     """ Use causal inference to estimate the causal effect of vaccination on cumulative
         infections. """
-    save_results_df(context.results_df, RESULTS_PATH, "single_vaccination_results")
-    pass
+    # get baseline_results
+    baseline_results = pd.read_csv("./results/no_vaccination_results.csv")
+    combined_results = pd.concat([context.results_df, baseline_results])
+    causal_graph = "./dags/simple_vaccine_dag.dot"
+
+    # DoWhy requires categorical data to be numerical
+    vaccine_conversion = {"Baseline": 0, "pfizer": 1, "moderna": 2, "az": 3}
+    combined_results["intervention"] = combined_results["intervention"].replace(vaccine_conversion)
+    combined_results["intervention"] = combined_results["intervention"].astype("category")
+
+    results = defaultdict(list)
+    for treatment in combined_results.intervention.unique():
+        if treatment != "Baseline":
+            causal_estimate, confidence_intervals = run_dowhy(combined_results, causal_graph, "intervention",
+                                                              "cum_infections_13", 0, treatment)
+            results["treatment"].append(treatment)
+            results["control"].append("Baseline")
+            results["estimate"].append(causal_estimate)
+            results["confidence_intervals"].append(confidence_intervals)
+
+    # Convert categories back to strings
+    reverse_vaccine_conversion = dict((v, k) for k, v in vaccine_conversion.items())
+    results["treatment"] = [reverse_vaccine_conversion[treatment] for treatment in results["treatment"]]
+
+    # Store test outcome in data frame
+    test_outcomes = []
+    result_df = pd.DataFrame(results)
+    for row in result_df.itertuples():
+        if row.treatment != "Baseline":
+            test_predicate = row.estimate < 0
+        else:
+            test_predicate = row.estimate == 0
+        if test_predicate:
+            test_outcome = "PASS"
+        else:
+            test_outcome = "FAIL"
+        test_outcomes.append(test_outcome)
+        assert test_predicate
+    result_df["test_outcome"] = test_outcomes
+    save_results_df(result_df, RESULTS_PATH, "single_vaccine_causal_inference")
+
+
 
 
 @given("a single one of the following vaccines is available in the model")
@@ -84,17 +123,12 @@ def step_impl(context):
 
     # For each vaccine object, create a duplicate row in params df
     context.params_df = pd.concat([context.params_df]*len(vaccine_objects))
-    print(context.params_df)
 
     # Add vaccines to interventions column in params df
     context.params_df["interventions"] = vaccine_objects
 
-    # Add interventions column to results df
-    context.results_df["interventions"] = vaccine_objects
-
     # Add waning for vaccination to be used
     context.params_df["use_waning"] = True
-    context.results_df["use_waning"] = True
 
 
 @when("the simulation is finished for all vaccines")
@@ -102,14 +136,10 @@ def step_impl(context):
     """  Run the model for each vaccine. """
     model_runs = context.params_df.to_dict("records")
     desired_outputs = list(context.results_df)
-
-    # Remove outputs that we have already recorded
-    desired_outputs.remove("interventions")
-    desired_outputs.remove("use_waning")
-
     result_dfs = []
     for run_params in model_runs:
         label = run_params["interventions"].label
         params = run_params
         result_dfs.append(run_covasim_by_week(label, params, desired_outputs))
     context.results_df = pd.concat(result_dfs)
+    save_results_df(context.results_df, RESULTS_PATH, "single_vaccination_results")
