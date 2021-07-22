@@ -22,9 +22,9 @@ def before_feature(context, feature):
 
     if not os.path.exists("results"):
         os.mkdir("results")
-    for f in os.listdir("results"):
-        if f.endswith(".csv"):
-            os.remove(os.path.join("results", f))
+    # for f in os.listdir("results"):
+    #     if f.endswith(".csv"):
+    #         os.remove(os.path.join("results", f))
 
 
 def after_feature(context, feature):

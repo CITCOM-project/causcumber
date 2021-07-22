@@ -17,6 +17,43 @@ use_step_matcher("parse")
 
 RESULTS_PATH = "scenarios/compare_interventions/results"
 
+# Instantiate named covasim interventions with parameters
+intervention = {
+    "standardTest": cv.test_prob(
+        symp_prob=0.2,
+        asymp_prob=0.001,
+        symp_quar_prob=1,
+        asymp_quar_prob=1
+    ),
+    "noTest": cv.test_prob(
+        symp_prob=0,
+        asymp_prob=0,
+        symp_quar_prob=0,
+        asymp_quar_prob=0
+    ),
+    "optimalTest": cv.test_prob(
+        symp_prob=1,
+        asymp_prob=1,
+        symp_quar_prob=1,
+        asymp_quar_prob=1
+    ),
+    "standardTrace": cv.contact_tracing(trace_probs={'h': 1, 'w': 0.5, 's': 0.5, 'c': 0.3}, quar_period=14),
+    "noTrace": cv.contact_tracing(trace_probs={'h': 0, 'w': 0, 's': 0, 'c': 0}, quar_period=14),
+    "optimalTrace": cv.contact_tracing(trace_probs={'h': 1, 'w': 1, 's': 1, 'c': 1}, quar_period=14)
+}
+
+# Provide a list of interventions with which to run covasim
+interventions = {
+    "baseline": [],
+    "standardTest": [intervention["standardTest"]],
+    "noTest": [intervention["noTest"]],
+    "optimalTest": [intervention["optimalTest"]],
+    "standardTrace": [intervention["standardTest"], intervention["standardTrace"]],
+    "noTrace": [intervention["standardTest"], intervention["noTrace"]],
+    "optimalTrace": [intervention["standardTest"], intervention["optimalTrace"]],
+    "traceNoTest": [intervention["standardTrace"]]
+}
+
 
 @given("a simulation with parameters")
 def step_impl(context):
@@ -38,11 +75,6 @@ def step_impl(context):
     context.desired_outputs = results_dict['variable']
 
 
-@given(u'a simulation run with only the background parameters')
-def step_impl(context):
-    context.run_params = context.params_dict.copy()
-    context.run_params['interventions'] = []
-
 def write_df(df, fname):
     if not os.path.isfile(fname):
         df.to_csv(fname, header='column_names')
@@ -50,19 +82,9 @@ def write_df(df, fname):
         df.to_csv(fname, mode='a', header=False)
 
 
-@when(u'the simulation is complete')
-def step_impl(context):
-    week_by_week = run_covasim_by_week(
-        context.scenario.name,
-        {k: v for k, v in context.run_params.items() if k != "label"},
-        context.desired_outputs,
-        n_runs=10)
-    write_df(week_by_week, "results/background.csv")
-
-
 @then(u'all weekly variables are recorded')
 def step_impl(context):
-    df = pd.read_csv("results/background.csv")
+    df = pd.read_csv("results/baseline.csv")
     for week in range(1, round(context.params_dict['n_days']/7)+1):
         for column in context.desired_outputs:
             assert f"{column}_{week}" in df.columns, f"{column}_{week} not recorded"
@@ -86,34 +108,33 @@ def step_impl(context, n):
     dag = iterate_repeating_unit(context.repeating_unit, int(n), start=1)
     dag.write("dags/causal_dag.dot")
 
-@given(u'testing interventions <label> with parameters: <symp_prob>, <asymp_prob>, <symp_quar_prob>, <asymp_quar_prob>')
-def step_impl(context):
-    context.covasim_runs = []
-    context.scenario_table = context.table
-    for row in context.table:
-        run_params = context.params_dict.copy()
-        run_params['interventions'] = [cv.test_prob(
-            symp_prob=row['symp_prob'],
-            asymp_prob=row['asymp_prob'],
-            symp_quar_prob=row['symp_quar_prob'],
-            asymp_quar_prob=row['asymp_quar_prob']
-        )]
-        run_params['label']=row['label']
-        context.covasim_runs.append(run_params)
 
-
-@when(u'all simulations are complete')
-def step_impl(context):
-    results = []
-    for run_params in context.covasim_runs:
+def run_covasim(label, params, outputs, results_path):
+    if not os.path.exists(results_path):
         r = run_covasim_by_week(
-            run_params['label'],
-            {k: v for k, v in run_params.items() if k != "label"},
-            context.desired_outputs,
+            label,
+            {k: v for k, v in params.items()},
+            outputs,
             n_runs=10)
-        results.append(r)
-    df = pd.concat(results)
-    write_df(df, "results/sims.csv")
+        r.to_csv(results_path)
+
+@given(u'we run the model with an intervention {i}')
+def step_impl(context, i):
+    context.interventions = [i]
+    context.control_val = i
+    context.treatment_var = "intervention"
+    params = context.params_dict.copy()
+    params['interventions'] = interventions[i]
+    run_covasim(i, params, context.desired_outputs, f"results/{i}.csv")
+
+
+@when(u'we run the model with an intervention {i}')
+def step_impl(context, i):
+    context.interventions.append(i)
+    context.treatment_val = i
+    params = context.params_dict.copy()
+    params['interventions'] = interventions[i]
+    run_covasim(i, params, context.desired_outputs, f"results/{i}.csv")
 
 
 def test(estimate, relationship, ci_low, ci_high):
@@ -136,65 +157,32 @@ def preprocess_data(data):
     return data, treatments
 
 
-@then(u'the "cum_deaths" should be <relationship> <id1>')
-def step_impl(context):
-    for row in context.scenario_table:
-        background = pd.read_csv("results/background.csv")
-        sims = pd.read_csv("results/sims.csv")
-        data = pd.concat([background, sims])
-        data, treatments = preprocess_data(data)
-        data.to_csv("results/data.csv")
-        estimate, (ci_low, ci_high) = run_dowhy(
-                  data,
-                  "dags/causal_dag.dot",
-                  "intervention",
-                  f"cum_deaths_{context.n_weeks}",
-                  treatments[row['id1']],
-                  treatments[row['label']])
-        test(estimate, row['relationship'], ci_low, ci_high)
-
-@given(u'a testing intervention {label} with parameters: {symp_prob}, {asymp_prob}, {symp_quar_prob}, {asymp_quar_prob}')
-def step_impl(context, label, symp_prob, asymp_prob, symp_quar_prob, asymp_quar_prob):
-    context.scenario_table = context.table
-    context.run_params = context.params_dict.copy()
-    context.run_params['label'] = label
-    context.run_params['interventions'] = [cv.test_prob(
-        symp_prob=symp_prob,
-        asymp_prob=asymp_prob,
-        symp_quar_prob=symp_quar_prob,
-        asymp_quar_prob=asymp_quar_prob
-    )]
-
-
-@given(u'a tracing intervention <label> with parameters: trace_probs=dict(h=<h>, w=<w>, s=<s>, c=<c>)')
-def step_impl(context):
-    context.covasim_runs = []
-    context.scenario_table = context.table
-    for row in context.table:
-        run_params = context.run_params.copy()
-        run_params['interventions'] = run_params['interventions'].copy()
-        run_params['interventions'].append(cv.contact_tracing(
-            trace_probs=dict(h=float(row['h']), s=float(row['s']), w=float(row['w']), c=float(row['c'])), quar_period=14)
-        )
-        run_params['label']=row['label']
-        context.covasim_runs.append(run_params)
-
-
-@given(u'a tracing intervention with parameters: trace_probs=dict(h={h}, s={s}, w={w}, c={c})')
-def step_impl(context, h, s, w, c):
-    context.run_params['interventions'].append(cv.contact_tracing(
-        trace_probs=dict(h=float(h), s=float(s), w=float(w), c=float(c)), quar_period=14)
-    )
-
-@then(u'the "{outcome}" should be "{relationship}" {control}')
+@then(u'the "{outcome}" should be {relationship} {control}')
 def step_impl(context, outcome, relationship, control):
-    data, treatments = preprocess_data(pd.read_csv("results/background.csv"))
-    print(treatments)
+    data = pd.concat([pd.read_csv(f"results/{i}") for i in os.listdir("results")])
+    data, treatments = preprocess_data(data)
+    print("len(data):", len(data))
+    print("treatments:", treatments)
+    print("treatment_val: ", context.treatment_val)
+    print("control_val: ", context.control_val)
     estimate, (ci_low, ci_high) = run_dowhy(
-              data,
-              "dags/causal_dag.dot",
-              "intervention",
-              f"{outcome}_{context.n_weeks}",
-              treatments[context.scenario.name],
-              treatments[control], verbose=True)
+              data=data,
+              graph="dags/causal_dag.dot",
+              treatment_var=context.treatment_var,
+              outcome_var=f"{outcome}_{context.n_weeks}",
+              control_val=treatments[context.control_val] if context.control_val in treatments else int(context.control_val),
+              treatment_val=treatments[context.treatment_val] if context.treatment_val in treatments else int(context.treatment_val),
+              verbose=True)
     test(estimate, relationship, ci_low, ci_high)
+
+
+@given(u'a control scenario where {treatment_var}={control_val}')
+def step_impl(context, treatment_var, control_val):
+    context.treatment_var = treatment_var
+    context.control_val = control_val
+
+@when(u'{treatment_var}={treatment_val}')
+def step_impl(context, treatment_var, treatment_val):
+    if context.treatment_var != treatment_var:
+        raise ValueError(f"Specified treatment variable {treatment_var} is not the same as the one in the Given ({context.treatment_var})")
+    context.treatment_val = treatment_val

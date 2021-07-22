@@ -23,11 +23,12 @@ Feature: Compare interventions
 
   @current
   Scenario: Baseline
-    Given a simulation run with only the background parameters
-    When the simulation is complete
+    Given we run the model with an intervention baseline
     Then all weekly variables are recorded
 
-  @current
+  # TODO: this is a bit clunky. It might not be  reasonable to assume that a
+  # domain expert would be able to list all edges that wouldn’t be present
+  # before seeing the connected graph
   Scenario: Draw DAG
     Given a connected repeating unit
     When we prune the following edges
@@ -107,28 +108,28 @@ Feature: Compare interventions
       | cum_deaths_n      | cum_critical_n1    |
     Then we obtain the causal DAG for 12 weeks
 
-  Scenario: Testing
-    Given testing interventions <label> with parameters: <symp_prob>, <asymp_prob>, <symp_quar_prob>, <asymp_quar_prob>
-      | label        | symp_prob | asymp_prob | symp_quar_prob | asymp_quar_prob | relationship | id1          |
-      | standardTest | 0.2       | 0.001      | 1              | 1               | <            | Baseline     |
-      | noTest       | 0         | 0          | 0              | 0               | =            | Baseline     |
-      | optimalTest  | 1         | 1          | 1              | 1               | <            | standardTest |
-    When all simulations are complete
-    Then the "cum_deaths" should be <relationship> <id1>
+  Scenario Outline: Testing
+    Given we run the model with an intervention <control>
+    When we run the model with an intervention <treatment>
+    Then the "cum_deaths" should be <relationship> <control>
+    Examples:
+      | control       | treatment     | relationship |
+      | baseline      | standardTest  | <            |
+      | baseline      | noTest        | =            |
+      | standardTest  | optimalTest   | <            |
+      | baseline      | standardTrace | <            |
+      | standardTest  | standardTrace | <            |
+      | standardTest  | noTrace       | =            |
+      | standardTrace | optimalTrace  | <            |
+      | baseline      | traceNoTest   | =            |
 
-  Scenario: Contact Tracing
-    Given a testing intervention standardTest with parameters: 0.2, 0.001, 1, 1
-    And a tracing intervention <label> with parameters: trace_probs=dict(h=<h>, w=<w>, s=<s>, c=<c>)
-      | label         | h | w   | s   | c   | relationship | id1            |
-      | standardTrace | 1 | 0.5 | 0.5 | 0.3 | <            | Baseline       |
-      | optimalTrace  | 1 | 1   | 1   | 1   | <            | standardTest   |
-      | noTrace       | 0 | 0   | 0   | 0   | =            | standardTest   |
-    When all simulations are complete
-    Then the "cum_deaths" should be <relationship> <id1>
+  # This depends on the existence of observational data. We need lots of runs to
+  # get a reliable estimate. Essentially, we need to just run the model with
+  # some different starting parameters. We can reuse data from prior test runs
+  # by just pulling it all in. This works under the assumption that all the
+  # CSV files have the same columns.
 
-  @current
-  Scenario: Contact Tracing Without Testing
-      Given a testing intervention noTest with parameters: 0, 0, 0, 0
-      And a tracing intervention with parameters: trace_probs=dict(h=1, s=0.5, w=0.5, c=0.3)
-      When the simulation is complete
-      Then the "cum_deaths" should be "equal to" Baseline
+  Scenario: Subsequent mortality (has confounding)
+    Given a control scenario where cum_infections_7=4000
+    When cum_infections_7=5000
+    Then the "cum_deaths" should be "more than" control
