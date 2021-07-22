@@ -1,0 +1,249 @@
+digraph "" {
+	graph [newrank=True,
+		rankdir=LR
+	];
+	{
+		graph [graph_name=cluster_inputs,
+			label=inputs
+		];
+		n_days;
+		pop_type;
+		pop_size;
+		pop_infected;
+		location;
+		intervention;
+	}
+	{
+		graph [graph_name=cluster_1,
+			label=<t<sub>0</sub>>
+		];
+		cum_vaccinated_1;
+		cum_infections_1;
+		cum_symptomatic_1;
+		cum_severe_1;
+		cum_critical_1;
+		cum_deaths_1;
+	}
+	{
+		graph [graph_name=cluster_2,
+			label=<t<sub>2</sub>>
+		];
+		cum_infections_2;
+		cum_symptomatic_2;
+		cum_vaccinated_2;
+		cum_severe_2;
+		cum_critical_2;
+		cum_deaths_2;
+	}
+	{
+		graph [graph_name=cluster_3,
+			label=<t<sub>3</sub>>
+		];
+		cum_infections_3;
+		cum_symptomatic_3;
+		cum_vaccinated_3;
+		cum_severe_3;
+		cum_critical_3;
+		cum_deaths_3;
+	}
+	{
+		graph [graph_name=cluster_4,
+			label=<t<sub>4</sub>>
+		];
+		cum_infections_4;
+		cum_symptomatic_4;
+		cum_vaccinated_4;
+		cum_severe_4;
+		cum_critical_4;
+		cum_deaths_4;
+	}
+	{
+		graph [graph_name=cluster_5,
+			label=<t<sub>5</sub>>
+		];
+		cum_infections_5;
+		cum_symptomatic_5;
+		cum_vaccinated_5;
+		cum_severe_5;
+		cum_critical_5;
+		cum_deaths_5;
+	}
+	n_days -> cum_vaccinated_1;
+	n_days -> cum_vaccinated_2;
+	n_days -> cum_vaccinated_3;
+	n_days -> cum_vaccinated_4;
+	n_days -> cum_vaccinated_5;
+	cum_vaccinated_1 -> cum_infections_2;
+	cum_vaccinated_1 -> cum_vaccinated_2;
+	pop_type -> cum_vaccinated_1;
+	pop_type -> cum_infections_1;
+	pop_type -> cum_symptomatic_1;
+	pop_type -> cum_severe_1;
+	pop_type -> cum_critical_1;
+	pop_type -> cum_infections_2;
+	pop_type -> cum_symptomatic_2;
+	pop_type -> cum_vaccinated_2;
+	pop_type -> cum_severe_2;
+	pop_type -> cum_critical_2;
+	pop_type -> cum_infections_3;
+	pop_type -> cum_symptomatic_3;
+	pop_type -> cum_vaccinated_3;
+	pop_type -> cum_severe_3;
+	pop_type -> cum_critical_3;
+	pop_type -> cum_infections_4;
+	pop_type -> cum_symptomatic_4;
+	pop_type -> cum_vaccinated_4;
+	pop_type -> cum_severe_4;
+	pop_type -> cum_critical_4;
+	pop_type -> cum_infections_5;
+	pop_type -> cum_symptomatic_5;
+	pop_type -> cum_vaccinated_5;
+	pop_type -> cum_severe_5;
+	pop_type -> cum_critical_5;
+	cum_infections_1 -> cum_infections_2;
+	cum_infections_1 -> cum_symptomatic_2;
+	cum_infections_1 -> cum_vaccinated_2;
+	cum_symptomatic_1 -> cum_infections_2;
+	cum_symptomatic_1 -> cum_symptomatic_2;
+	cum_symptomatic_1 -> cum_vaccinated_2;
+	cum_symptomatic_1 -> cum_severe_2;
+	cum_severe_1 -> cum_vaccinated_2;
+	cum_severe_1 -> cum_severe_2;
+	cum_severe_1 -> cum_critical_2;
+	cum_critical_1 -> cum_vaccinated_2;
+	cum_critical_1 -> cum_critical_2;
+	cum_critical_1 -> cum_deaths_2;
+	pop_size -> cum_vaccinated_1;
+	pop_size -> cum_infections_1;
+	pop_size -> cum_symptomatic_1;
+	pop_size -> cum_severe_1;
+	pop_size -> cum_critical_1;
+	pop_size -> cum_infections_2;
+	pop_size -> cum_symptomatic_2;
+	pop_size -> cum_vaccinated_2;
+	pop_size -> cum_severe_2;
+	pop_size -> cum_critical_2;
+	pop_size -> cum_infections_3;
+	pop_size -> cum_symptomatic_3;
+	pop_size -> cum_vaccinated_3;
+	pop_size -> cum_severe_3;
+	pop_size -> cum_critical_3;
+	pop_size -> cum_infections_4;
+	pop_size -> cum_symptomatic_4;
+	pop_size -> cum_vaccinated_4;
+	pop_size -> cum_severe_4;
+	pop_size -> cum_critical_4;
+	pop_size -> cum_infections_5;
+	pop_size -> cum_symptomatic_5;
+	pop_size -> cum_vaccinated_5;
+	pop_size -> cum_severe_5;
+	pop_size -> cum_critical_5;
+	pop_infected -> cum_vaccinated_1;
+	pop_infected -> cum_infections_1;
+	pop_infected -> cum_symptomatic_1;
+	pop_infected -> cum_severe_1;
+	pop_infected -> cum_critical_1;
+	pop_infected -> cum_infections_2;
+	pop_infected -> cum_symptomatic_2;
+	pop_infected -> cum_vaccinated_2;
+	pop_infected -> cum_severe_2;
+	pop_infected -> cum_critical_2;
+	pop_infected -> cum_infections_3;
+	pop_infected -> cum_symptomatic_3;
+	pop_infected -> cum_vaccinated_3;
+	pop_infected -> cum_severe_3;
+	pop_infected -> cum_critical_3;
+	pop_infected -> cum_infections_4;
+	pop_infected -> cum_symptomatic_4;
+	pop_infected -> cum_vaccinated_4;
+	pop_infected -> cum_severe_4;
+	pop_infected -> cum_critical_4;
+	pop_infected -> cum_infections_5;
+	pop_infected -> cum_symptomatic_5;
+	pop_infected -> cum_vaccinated_5;
+	pop_infected -> cum_severe_5;
+	pop_infected -> cum_critical_5;
+	location -> cum_vaccinated_1;
+	location -> cum_infections_1;
+	location -> cum_symptomatic_1;
+	location -> cum_severe_1;
+	location -> cum_critical_1;
+	location -> cum_infections_2;
+	location -> cum_symptomatic_2;
+	location -> cum_vaccinated_2;
+	location -> cum_severe_2;
+	location -> cum_critical_2;
+	location -> cum_infections_3;
+	location -> cum_symptomatic_3;
+	location -> cum_vaccinated_3;
+	location -> cum_severe_3;
+	location -> cum_critical_3;
+	location -> cum_infections_4;
+	location -> cum_symptomatic_4;
+	location -> cum_vaccinated_4;
+	location -> cum_severe_4;
+	location -> cum_critical_4;
+	location -> cum_infections_5;
+	location -> cum_symptomatic_5;
+	location -> cum_vaccinated_5;
+	location -> cum_severe_5;
+	location -> cum_critical_5;
+	intervention -> cum_vaccinated_1;
+	intervention -> cum_vaccinated_2;
+	intervention -> cum_vaccinated_3;
+	intervention -> cum_vaccinated_4;
+	intervention -> cum_vaccinated_5;
+	cum_deaths_1 -> cum_vaccinated_2;
+	cum_deaths_1 -> cum_deaths_2;
+	cum_infections_2 -> cum_infections_3;
+	cum_infections_2 -> cum_symptomatic_3;
+	cum_infections_2 -> cum_vaccinated_3;
+	cum_symptomatic_2 -> cum_infections_3;
+	cum_symptomatic_2 -> cum_symptomatic_3;
+	cum_symptomatic_2 -> cum_vaccinated_3;
+	cum_symptomatic_2 -> cum_severe_3;
+	cum_vaccinated_2 -> cum_infections_3;
+	cum_vaccinated_2 -> cum_vaccinated_3;
+	cum_severe_2 -> cum_vaccinated_3;
+	cum_severe_2 -> cum_severe_3;
+	cum_severe_2 -> cum_critical_3;
+	cum_critical_2 -> cum_vaccinated_3;
+	cum_critical_2 -> cum_critical_3;
+	cum_critical_2 -> cum_deaths_3;
+	cum_deaths_2 -> cum_vaccinated_3;
+	cum_deaths_2 -> cum_deaths_3;
+	cum_infections_3 -> cum_infections_4;
+	cum_infections_3 -> cum_symptomatic_4;
+	cum_infections_3 -> cum_vaccinated_4;
+	cum_symptomatic_3 -> cum_infections_4;
+	cum_symptomatic_3 -> cum_symptomatic_4;
+	cum_symptomatic_3 -> cum_vaccinated_4;
+	cum_symptomatic_3 -> cum_severe_4;
+	cum_vaccinated_3 -> cum_infections_4;
+	cum_vaccinated_3 -> cum_vaccinated_4;
+	cum_severe_3 -> cum_vaccinated_4;
+	cum_severe_3 -> cum_severe_4;
+	cum_severe_3 -> cum_critical_4;
+	cum_critical_3 -> cum_vaccinated_4;
+	cum_critical_3 -> cum_critical_4;
+	cum_critical_3 -> cum_deaths_4;
+	cum_deaths_3 -> cum_vaccinated_4;
+	cum_deaths_3 -> cum_deaths_4;
+	cum_infections_4 -> cum_infections_5;
+	cum_infections_4 -> cum_symptomatic_5;
+	cum_infections_4 -> cum_vaccinated_5;
+	cum_symptomatic_4 -> cum_infections_5;
+	cum_symptomatic_4 -> cum_symptomatic_5;
+	cum_symptomatic_4 -> cum_vaccinated_5;
+	cum_symptomatic_4 -> cum_severe_5;
+	cum_vaccinated_4 -> cum_infections_5;
+	cum_vaccinated_4 -> cum_vaccinated_5;
+	cum_severe_4 -> cum_vaccinated_5;
+	cum_severe_4 -> cum_severe_5;
+	cum_severe_4 -> cum_critical_5;
+	cum_critical_4 -> cum_vaccinated_5;
+	cum_critical_4 -> cum_critical_5;
+	cum_critical_4 -> cum_deaths_5;
+	cum_deaths_4 -> cum_vaccinated_5;
+	cum_deaths_4 -> cum_deaths_5;
+}

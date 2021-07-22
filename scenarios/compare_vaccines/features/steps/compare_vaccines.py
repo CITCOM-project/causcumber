@@ -2,7 +2,6 @@ import sys
 sys.path.append("../../../../")  # This one's for native running from within steps
 sys.path.append("../../../")  # This one's for running `behave` in `features`
 sys.path.append("../../")  # This one's for running `behave` in `compare_vaccines`
-
 import pandas as pd
 import covasim as cv
 from collections import defaultdict
@@ -11,7 +10,6 @@ from pydoc import locate
 from behave_utils import table_to_dict
 from covasim_utils import run_covasim_by_week, save_results_df
 from causcumber_utils import run_dowhy, draw_connected_repeating_unit, iterate_repeating_unit
-
 
 use_step_matcher("re")
 
@@ -43,6 +41,7 @@ def step_impl(context):
 
 
 @given("a simulation run with no vaccine available")
+@given("a baseline run of the model")
 def step_impl(context):
     """
     No vaccine is available. Simply run background conditions.
@@ -50,7 +49,7 @@ def step_impl(context):
     pass
 
 
-@when("the simulation is finished")
+@when("the model is run")
 def step_impl(context):
     """ Run Covasim with params_dict. """
     label = context.scenario.name
@@ -72,68 +71,33 @@ def step_impl(context):
     # get baseline_results
     baseline_results = pd.read_csv("./results/no_vaccination_results.csv")
     combined_results = pd.concat([context.results_df, baseline_results])
+    treatment = context.params_df["interventions"][0].label
     causal_graph = "./dags/causal_dag.dot"
 
-    # DoWhy requires categorical data to be numerical
-    vaccine_conversion = {"Baseline": 0, "pfizer": 1, "moderna": 2, "az": 3}
+    # DoWhy requires non-continuous data to be numerical
+    vaccine_conversion = {"Baseline": 0, treatment: 1}
     combined_results["intervention"] = combined_results["intervention"].replace(vaccine_conversion)
-    combined_results["intervention"] = combined_results["intervention"].astype("category")
-
-    results = defaultdict(list)
-    for treatment in combined_results.intervention.unique():
-        if treatment != "Baseline":
-            causal_estimate, confidence_intervals = run_dowhy(combined_results, causal_graph, "intervention",
-                                                              "cum_infections_5", 0, treatment)
-            results["treatment"].append(treatment)
-            results["control"].append("Baseline")
-            results["estimate"].append(causal_estimate)
-            results["confidence_intervals"].append(confidence_intervals)
-
-    # Convert categories back to strings
-    reverse_vaccine_conversion = dict((v, k) for k, v in vaccine_conversion.items())
-    results["treatment"] = [reverse_vaccine_conversion[treatment] for treatment in results["treatment"]]
-
-    # Store test outcome in data frame
-    test_outcomes = []
-    result_df = pd.DataFrame(results)
-    for row in result_df.itertuples():
-        if row.treatment != "Baseline":
-            test_predicate = row.estimate < 0
-        else:
-            test_predicate = row.estimate == 0
-        if test_predicate:
-            test_outcome = "PASS"
-        else:
-            test_outcome = "FAIL"
-        test_outcomes.append(test_outcome)
-        assert test_predicate
-    result_df["test_outcome"] = test_outcomes
-    save_results_df(result_df, RESULTS_PATH, "single_vaccine_causal_inference_weekly")
+    causal_estimate, confidence_intervals = run_dowhy(combined_results, causal_graph, "intervention",
+                                                      "cum_infections_5", 0, 1, verbose=False)
+    test_outcome = causal_estimate < 0
+    results_dict = {"vaccine": [treatment],
+                    "causal_estimate": [causal_estimate],
+                    "ci_low": [confidence_intervals[0]],
+                    "ci_high": [confidence_intervals[1]],
+                    "test_passed": [test_outcome]}
+    save_results_df(pd.DataFrame(results_dict), RESULTS_PATH, f"{treatment}_vaccine_causal_inference")
+    assert test_outcome
 
 
-
-
-@given("a single one of the following vaccines is available in the model")
-def step_impl(context):
+@when("the model is run with vaccine (?P<vaccine_name>.+)")
+def step_impl(context, vaccine_name):
     """ Instantiate the vaccine objects and make them available to the simulation. """
-    # Make an object for each specified vaccine (TODO: move this to covasim_utils)
-    vaccines = [row["vaccine"] for row in context.table.rows]
+    # Make an object for each specified vaccine
     vaccinate_days = list(range(context.params_df["n_days"][0]))
-    vaccine_objects = [cv.vaccinate_prob(vaccine, vaccinate_days, label=str(vaccine)) for vaccine in vaccines]
-
-    # For each vaccine object, create a duplicate row in params df
-    context.params_df = pd.concat([context.params_df]*len(vaccine_objects))
-
-    # Add vaccines to interventions column in params df
-    context.params_df["interventions"] = vaccine_objects
-
-    # Add waning for vaccination to be used
+    vaccine = cv.vaccinate_prob(vaccine_name, vaccinate_days, label=vaccine_name)
+    context.params_df["interventions"] = vaccine
     context.params_df["use_waning"] = True
 
-
-@when("the simulation is finished for all vaccines")
-def step_impl(context):
-    """  Run the model for each vaccine. """
     model_runs = context.params_df.to_dict("records")
     desired_outputs = list(context.results_df)
     result_dfs = []
@@ -150,7 +114,6 @@ def step_impl(context):
     inputs = list(context.params_df)
     inputs.append("intervention")
     outputs = list(context.results_df)
-    print(inputs, outputs)
     context.repeating_unit = draw_connected_repeating_unit(inputs, outputs)
 
 

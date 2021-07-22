@@ -1,0 +1,4 @@
+,Unnamed: 0,vaccine,causal_estimate,ci_low,ci_high,test_passed
+0,0,pfizer,-3017.8,-3497.5,-2538.1,True
+0,0,moderna,-3015.3,-3495.01,-2535.59,True
+0,0,az,-2459.7000000000003,-2945.37,-1974.03,True
