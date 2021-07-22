@@ -147,7 +147,7 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
 
     if verbose:
         print("Running Do Why with params")
-        print("\n".join([f"  {k}: {v}" for k, v in locals().items() if k != "data"]))
+        print("\n".join([f"  {k}: {v}"+(f"::{type(v)}" if k.endswith("_val") else "") for k, v in locals().items() if k != "data"]))
 
     if treatment_var not in data:
         raise ValueError(f"Treatment variable {treatment_var} must be a column in the data, i.e. one of {data.columns}")
@@ -167,8 +167,15 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         treatment. """
     if verbose:
         print(f"Datatype of treatment '{treatment_var}':", data.dtypes[treatment_var])
+
     if str(data.dtypes[treatment_var]) == "category":
         data = data.loc[data[treatment_var].isin([control_val, treatment_val])]
+        grouped = data.groupby(treatment_var)
+        groups = {k: i for i, (k, _) in enumerate(grouped)}
+        data[treatment_var] = [groups[i] for i in data[treatment_var]]
+        data[treatment_var] = data[treatment_var].astype('category')
+        control_val = groups[control_val]
+        treatment_val = groups[treatment_val]
 
     model = dowhy.CausalModel(
         data=data,

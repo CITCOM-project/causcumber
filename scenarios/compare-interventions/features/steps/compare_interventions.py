@@ -63,6 +63,7 @@ def step_impl(context):
     for row in context.table:
         cast_type = locate(row["type"])
         context.params_dict[row["parameter"]] = cast_type(row["value"])
+        context.types[row["parameter"]] = cast_type
     context.n_weeks = round(context.params_dict['n_days']/7)
 
 
@@ -73,6 +74,8 @@ def step_impl(context):
     """
     results_dict = table_to_dict(context.table)
     context.desired_outputs = results_dict['variable']
+    for row in context.table:
+        context.types[row['variable']] = locate(row['type'])
 
 
 def write_df(df, fname):
@@ -106,7 +109,7 @@ def step_impl(context):
 @then(u'we obtain the causal DAG for {n} weeks')
 def step_impl(context, n):
     dag = iterate_repeating_unit(context.repeating_unit, int(n), start=1)
-    dag.write("dags/causal_dag.dot")
+    dag.write(f"dags/{context.dotpath}")
 
 
 def run_covasim(label, params, outputs, results_path):
@@ -118,22 +121,28 @@ def run_covasim(label, params, outputs, results_path):
             n_runs=10)
         r.to_csv(results_path)
 
-@given(u'we run the model with an intervention {i}')
-def step_impl(context, i):
+@given(u'we run the model with {treatment_var}={i}')
+def step_impl(context, treatment_var, i):
     context.interventions = [i]
-    context.control_val = i
-    context.treatment_var = "intervention"
+    context.treatment_var = treatment_var
+    context.control_val = context.types[treatment_var](i) if treatment_var in context.types else i
     params = context.params_dict.copy()
-    params['interventions'] = interventions[i]
+    if treatment_var == "intervention":
+        params['interventions'] = interventions[i]
+    else:
+        params[treatment_var] = i
     run_covasim(i, params, context.desired_outputs, f"results/{i}.csv")
 
 
-@when(u'we run the model with an intervention {i}')
-def step_impl(context, i):
+@when(u'we run the model with {treatment_var}={i}')
+def step_impl(context, treatment_var, i):
     context.interventions.append(i)
-    context.treatment_val = i
+    context.treatment_val = context.types[treatment_var](i) if treatment_var in context.types else i
     params = context.params_dict.copy()
-    params['interventions'] = interventions[i]
+    if treatment_var == "intervention":
+        params['interventions'] = interventions[i]
+    else:
+        params[treatment_var] = i
     run_covasim(i, params, context.desired_outputs, f"results/{i}.csv")
 
 
@@ -147,31 +156,26 @@ def test(estimate, relationship, ci_low, ci_high):
 
 
 def preprocess_data(data):
-    grouped = data.groupby("intervention")
-    treatments = {k: i for i, (k, _) in enumerate(grouped)}
-    data['intervention'] = [treatments[i] for i in data['intervention']]
-    data['intervention'] = data['intervention'].astype('category')
-    data['pop_type'] = data['pop_type'].astype('category')
-    data['location'] = data['location'].astype('category')
-    data = data.drop(["interventions"], axis=1)
-    return data, treatments
+    data['intervention'] = data['intervention'].astype("category")
+    data['pop_type'] = data['pop_type'].astype("category")
+    data['location'] = data['location'].astype("category")
+    if "start_day" in data:
+        data['start_day'] = data['start_day'].astype("category")
+    return data
 
 
-@then(u'the "{outcome}" should be {relationship} {control}')
+@then(u'the {outcome} should be {relationship} {control}')
 def step_impl(context, outcome, relationship, control):
     data = pd.concat([pd.read_csv(f"results/{i}") for i in os.listdir("results")])
-    data, treatments = preprocess_data(data)
-    print("len(data):", len(data))
-    print("treatments:", treatments)
-    print("treatment_val: ", context.treatment_val)
-    print("control_val: ", context.control_val)
+    data = preprocess_data(data)
+
     estimate, (ci_low, ci_high) = run_dowhy(
               data=data,
-              graph="dags/causal_dag.dot",
+              graph=f"dags/{context.dotpath}",
               treatment_var=context.treatment_var,
               outcome_var=f"{outcome}_{context.n_weeks}",
-              control_val=treatments[context.control_val] if context.control_val in treatments else int(context.control_val),
-              treatment_val=treatments[context.treatment_val] if context.treatment_val in treatments else int(context.treatment_val),
+              control_val=context.control_val,
+              treatment_val=context.treatment_val,
               verbose=True)
     test(estimate, relationship, ci_low, ci_high)
 
@@ -179,10 +183,11 @@ def step_impl(context, outcome, relationship, control):
 @given(u'a control scenario where {treatment_var}={control_val}')
 def step_impl(context, treatment_var, control_val):
     context.treatment_var = treatment_var
-    context.control_val = control_val
+    context.control_val = context.types[treatment_var](control_val) if treatment_var in context.types else float(control_val) if control_val.isnumeric() else control_val
+
 
 @when(u'{treatment_var}={treatment_val}')
 def step_impl(context, treatment_var, treatment_val):
     if context.treatment_var != treatment_var:
         raise ValueError(f"Specified treatment variable {treatment_var} is not the same as the one in the Given ({context.treatment_var})")
-    context.treatment_val = treatment_val
+    context.treatment_val = context.types[treatment_var](treatment_val) if treatment_var in context.types else float(treatment_val) if treatment_val.isnumeric() else treatment_val

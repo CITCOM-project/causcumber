@@ -14,11 +14,13 @@ def set_desired_outputs(context):
 def set_parameters_dict(context):
     """ Add a parameters dictionary which stores simulation parameters to context."""
     context.params_dict = dict()
-
+    context.types = {}
 
 def before_feature(context, feature):
     print(f"Running Feature `{feature.name}`")
     use_fixture(set_parameters_dict, context)
+    context.dotpath = context.feature.name.lower().replace(" ", "-")+".dot"
+
 
     if not os.path.exists("results"):
         os.mkdir("results")
