@@ -28,6 +28,7 @@ def step_impl(context):
         cast_type = locate(row["type"])
         params_dict[row["parameter"]].append(cast_type(row["value"]))
     context.params_df = pd.DataFrame(params_dict)
+    context.input_params = list(context.params_df)
 
 
 @given("the following variables are recorded weekly")
@@ -38,58 +39,25 @@ def step_impl(context):
     results_dict = table_to_dict(context.table)
     variables_dict = {variable: [] for variable in results_dict["variable"]}
     context.results_df = pd.DataFrame(variables_dict)
+    context.desired_outputs = list(context.results_df)
 
 
-@given("a simulation run with no vaccine available")
-@given("a baseline run of the model")
+@given("no vaccine is available")
 def step_impl(context):
     """
     No vaccine is available. Simply run background conditions.
     """
-    pass
-
-
-@when("the model is run")
-def step_impl(context):
-    """ Run Covasim with params_dict. """
     label = context.scenario.name
     params = context.params_df.to_dict("records")[0]
-    desired_outputs = list(context.results_df)
+    desired_outputs = context.desired_outputs
+    print(f"NO VACCINE DO: {desired_outputs}")
     context.results_df = run_covasim_by_week(label, params, desired_outputs)
-
-
-@then("the weekly cumulative infections should be reported")
-def step_impl(context):
-    """ Record the weekly cumulative infections. """
+    print(f"NO VACCINE OUT: {context.results_df}")
+    context.results_df["intervention"] = "none"
     save_results_df(context.results_df, RESULTS_PATH, "no_vaccination_results")
 
 
-@then("the cumulative number of infections should be less than the baseline")
-def step_impl(context):
-    """ Use causal inference to estimate the causal effect of vaccination on cumulative
-        infections. """
-    # get baseline_results
-    baseline_results = pd.read_csv("./results/no_vaccination_results.csv")
-    combined_results = pd.concat([context.results_df, baseline_results])
-    treatment = context.params_df["interventions"][0].label
-    causal_graph = "./dags/causal_dag.dot"
-
-    # DoWhy requires non-continuous data to be numerical
-    vaccine_conversion = {"Baseline": 0, treatment: 1}
-    combined_results["intervention"] = combined_results["intervention"].replace(vaccine_conversion)
-    causal_estimate, confidence_intervals = run_dowhy(combined_results, causal_graph, "intervention",
-                                                      "cum_infections_5", 0, 1, verbose=False)
-    test_outcome = causal_estimate < 0
-    results_dict = {"vaccine": [treatment],
-                    "causal_estimate": [causal_estimate],
-                    "ci_low": [confidence_intervals[0]],
-                    "ci_high": [confidence_intervals[1]],
-                    "test_passed": [test_outcome]}
-    save_results_df(pd.DataFrame(results_dict), RESULTS_PATH, f"{treatment}_vaccine_causal_inference")
-    assert test_outcome
-
-
-@when("the model is run with vaccine (?P<vaccine_name>.+)")
+@when("the (?P<vaccine_name>.+) is available")
 def step_impl(context, vaccine_name):
     """ Instantiate the vaccine objects and make them available to the simulation. """
     # Make an object for each specified vaccine
@@ -98,15 +66,39 @@ def step_impl(context, vaccine_name):
     context.params_df["interventions"] = vaccine
     context.params_df["use_waning"] = True
 
-    model_runs = context.params_df.to_dict("records")
-    desired_outputs = list(context.results_df)
-    result_dfs = []
-    for run_params in model_runs:
-        label = run_params["interventions"].label
-        params = run_params
-        result_dfs.append(run_covasim_by_week(label, params, desired_outputs))
-    context.results_df = pd.concat(result_dfs)
+    run_params = context.params_df.to_dict("records")[0]
+    desired_outputs = context.desired_outputs
+    print(f"VACCINE DO: {desired_outputs}")
+    label = run_params["interventions"].label
+    params = run_params
+    intervention_results_df = run_covasim_by_week(label, params, desired_outputs)
+    print(f"VACCINE DO: {intervention_results_df}")
+    context.results_df = pd.concat([context.results_df, intervention_results_df])
     save_results_df(context.results_df, RESULTS_PATH, "single_vaccination_results")
+
+
+@then("the cumulative number of infections should decrease")
+def step_impl(context):
+    """ Use causal inference to estimate the causal effect of vaccination on cumulative
+        infections. """
+    # get baseline_results
+    treatment = context.params_df["interventions"][0].label
+    causal_graph = "./dags/causal_dag.dot"
+
+    # DoWhy requires non-continuous data to be numerical
+    vaccine_conversion = {"none": 0, treatment: 1}
+    context.results_df["intervention"] = context.results_df["intervention"].replace(vaccine_conversion)
+    causal_estimate, confidence_intervals = run_dowhy(context.results_df, causal_graph, "intervention",
+                                                      "cum_infections_5", 0, 1, verbose=False)
+
+    test_outcome = causal_estimate < 0
+    results_dict = {"vaccine": [treatment],
+                    "causal_estimate": [causal_estimate],
+                    "ci_low": [confidence_intervals[0]],
+                    "ci_high": [confidence_intervals[1]],
+                    "test_passed": [test_outcome]}
+    save_results_df(pd.DataFrame(results_dict), RESULTS_PATH, f"{treatment}_vaccine_causal_inference")
+    assert test_outcome
 
 
 @given("a connected repeating unit")

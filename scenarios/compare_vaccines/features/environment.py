@@ -12,12 +12,14 @@ from behave import fixture, use_fixture
 def set_results_df(context):
     """ Add a results dataframe which stores simulation outputs to context. """
     context.results_df = pd.DataFrame()
+    context.desired_outputs = []
 
 
 @fixture
 def set_parameters_df(context):
     """ Add a parameters dictionary which stores simulation parameters to context."""
     context.params_df = pd.DataFrame()
+    context.input_params = []
 
 
 def before_feature(context, feature):
@@ -28,7 +30,7 @@ def before_feature(context, feature):
 
 def after_feature(context, feature):
     """ Combine individual results data frames and delete old ones. """
-    scenario_outline = feature.scenarios[2]
+    scenario_outline = feature.scenarios[1]
     print(f"Combining results for {scenario_outline.name}")
     vaccines = [row["vaccine_name"] for row in scenario_outline.examples[0].table.rows]
     vaccine_results_paths = [f"./results/{vaccine}_vaccine_causal_inference.csv" for vaccine in vaccines]

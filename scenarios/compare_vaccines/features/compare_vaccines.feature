@@ -20,11 +20,6 @@ Feature: Compare vaccines
       | cum_deaths        | int      |
       | cum_vaccinated    | int      |
 
-  Scenario: Baseline
-    Given a simulation run with no vaccine available
-    When the model is run
-    Then the weekly cumulative infections should be reported
-
   Scenario: Draw DAG
     Given a connected repeating unit
     When we prune the following edges
@@ -69,9 +64,9 @@ Feature: Compare vaccines
     All vaccines should reduce the cumulative number of infections relative to the
     baseline scenario where no vaccine is available.
 
-    Given a baseline run of the model
-    When the model is run with vaccine <vaccine_name>
-    Then the cumulative number of infections should be less than the baseline
+    Given no vaccine is available
+    When the <vaccine_name> is available
+    Then the cumulative number of infections should decrease
     Examples:
       | vaccine_name |
       | pfizer       |
