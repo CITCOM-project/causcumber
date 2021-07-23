@@ -47,34 +47,33 @@ def step_impl(context):
     """
     No vaccine is available. Simply run background conditions.
     """
-    label = context.scenario.name
-    params = context.params_df.to_dict("records")[0]
-    desired_outputs = context.desired_outputs
-    print(f"NO VACCINE DO: {desired_outputs}")
-    context.results_df = run_covasim_by_week(label, params, desired_outputs)
-    print(f"NO VACCINE OUT: {context.results_df}")
-    context.results_df["intervention"] = "none"
-    save_results_df(context.results_df, RESULTS_PATH, "no_vaccination_results")
+    if not hasattr(context, "observational_data"):
+        label = context.scenario.name
+        params = context.params_df.to_dict("records")[0]
+        desired_outputs = context.desired_outputs
+        context.results_df = run_covasim_by_week(label, params, desired_outputs)
+        context.results_df["intervention"] = "none"
+        save_results_df(context.results_df, RESULTS_PATH, "no_vaccination_results")
 
 
 @when("the (?P<vaccine_name>.+) is available")
 def step_impl(context, vaccine_name):
     """ Instantiate the vaccine objects and make them available to the simulation. """
+
     # Make an object for each specified vaccine
     vaccinate_days = list(range(context.params_df["n_days"][0]))
     vaccine = cv.vaccinate_prob(vaccine_name, vaccinate_days, label=vaccine_name)
     context.params_df["interventions"] = vaccine
     context.params_df["use_waning"] = True
 
-    run_params = context.params_df.to_dict("records")[0]
-    desired_outputs = context.desired_outputs
-    print(f"VACCINE DO: {desired_outputs}")
-    label = run_params["interventions"].label
-    params = run_params
-    intervention_results_df = run_covasim_by_week(label, params, desired_outputs)
-    print(f"VACCINE DO: {intervention_results_df}")
-    context.results_df = pd.concat([context.results_df, intervention_results_df])
-    save_results_df(context.results_df, RESULTS_PATH, "single_vaccination_results")
+    if not hasattr(context, "observational_df"):
+        run_params = context.params_df.to_dict("records")[0]
+        desired_outputs = context.desired_outputs
+        label = run_params["interventions"].label
+        params = run_params
+        intervention_results_df = run_covasim_by_week(label, params, desired_outputs)
+        context.results_df = pd.concat([context.results_df, intervention_results_df])
+        save_results_df(context.results_df, RESULTS_PATH, "single_vaccination_results")
 
 
 @then("the cumulative number of infections should decrease")
@@ -85,11 +84,19 @@ def step_impl(context):
     treatment = context.params_df["interventions"][0].label
     causal_graph = "./dags/causal_dag.dot"
 
+    if hasattr(context, "observational_df"):
+        data = context.observational_df.copy()
+        data = data[(data["intervention"] == treatment) | (data["intervention"] == "none")]
+    else:
+        data = context.results_df
+
+    print(f"Treatment: {treatment}")
     # DoWhy requires non-continuous data to be numerical
     vaccine_conversion = {"none": 0, treatment: 1}
-    context.results_df["intervention"] = context.results_df["intervention"].replace(vaccine_conversion)
-    causal_estimate, confidence_intervals = run_dowhy(context.results_df, causal_graph, "intervention",
-                                                      "cum_infections_5", 0, 1, verbose=False)
+    data["intervention"] = data["intervention"].replace(vaccine_conversion)
+    print(f"DATA: {data['intervention']}")
+    causal_estimate, confidence_intervals = run_dowhy(data, causal_graph, "intervention",
+                                                      "cum_infections_5", 0, 1, verbose=True)
 
     test_outcome = causal_estimate < 0
     results_dict = {"vaccine": [treatment],
