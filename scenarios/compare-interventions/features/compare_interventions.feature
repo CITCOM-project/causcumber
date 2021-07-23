@@ -104,7 +104,7 @@ Feature: Compare interventions
       | cum_deaths_n      | cum_critical_n1    |
     Then we obtain the causal DAG for 12 weeks
 
-  Scenario Outline: Testing
+  Scenario Outline: Test and trace
     Given we run the model with intervention=<control>
     When we run the model with intervention=<treatment>
     Then the cum_deaths should be <relationship> <control>
@@ -124,7 +124,6 @@ Feature: Compare interventions
   # some different starting parameters. We can reuse data from prior test runs
   # by just pulling it all in. This works under the assumption that all the
   # CSV files have the same columns.
-  @current
   Scenario: Subsequent mortality (has confounding)
     Given a control scenario where cum_infections_7=4000
     When cum_infections_7=5000

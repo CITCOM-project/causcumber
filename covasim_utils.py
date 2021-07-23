@@ -4,6 +4,15 @@ import pandas as pd
 import os
 
 
+def preprocess_data(data):
+    data['intervention'] = data['intervention'].astype("category")
+    data['pop_type'] = data['pop_type'].astype("category")
+    data['location'] = data['location'].astype("category")
+    if "start_day" in data:
+        data['start_day'] = data['start_day'].astype("category")
+    return data
+
+
 def dict_plus(dic1, dic2):
     for field in dic2:
         if field not in dic1:
@@ -52,6 +61,32 @@ def run_covasim_by_week(label, params, desired_outputs, n_runs=10):
             week_dic[k] = v
         temporal.append(week_dic)
     return pd.DataFrame(temporal)
+
+
+def run_covasim_basic(label, params, desired_outputs, n_runs=10):
+    intervention_sim = cv.MultiSim(cv.Sim(pars=params, label=label, verbose=0))
+    intervention_sim.run(n_runs=n_runs, verbose=0)
+    results = {k: [] for k in desired_outputs}
+    results['quar_period'] = []
+    results['intervention'] = []
+    for sim in intervention_sim.sims:
+        df = sim.to_df()
+        quar_period = 14
+        for i in sim['interventions']:
+            if hasattr(i, "quar_period"):
+                quar_period = i.quar_period
+        df = df[desired_outputs]
+
+        for k in desired_outputs:
+            results[k].append(df[k].iloc[-1])
+
+        results['quar_period'].append(quar_period)
+        results['intervention'].append(label)
+
+    data = pd.DataFrame(results)
+    for k, v in params.items():
+        data[k] = [v for _ in range(n_runs)]
+    return data
 
 
 def msims(default, investigate, include_baseline=True):

@@ -3,8 +3,8 @@ digraph "" {
 		rankdir=LR
 	];
 
-	intervention -> cum_tests;
-	intervention -> cum_quarantined;
+	interventions -> cum_tests;
+	interventions -> cum_quarantined;
 
 	cum_critical -> cum_deaths;
 

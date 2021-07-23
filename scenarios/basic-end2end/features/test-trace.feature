@@ -1,95 +1,111 @@
-Feature: Test and Trace
-  Some properties of the testing and tracing interventions.
-
-  # We're going to need a way to explicitly specify datatypes and hooks to deserialise values
-  # It's annoying, but otherwise covasim tries to parse n_days=84 as a date
-  # I suggest a format like "n_days:int = 84" or "n_days = 84:int"
+# This file MUST be run from inside ../compare_interventions, otherwise it won't
+# be able to find the causal DAG. Run as `behave features/compare_interventions.feature`
+Feature: Compare interventions
   Background:
-    Given a simulation run with the basic parameters:
-      * pop_type=hybrid
-      * pop_size=50000
-      * pop_infected=100
-      * n_days=84
-      * location=UK
-    And final values for variables:
-      * cum_infections
-      * cum_symptomatic
-      * cum_severe
-      * cum_critical
-      * cum_deaths
-      * cum_tests
-      * cum_quarantined
+    Given a simulation with parameters
+      | parameter    | value      | type |
+      | quar_period  | 14         | int  |
+      | n_days       | 84         | int  |
+      | pop_type     | hybrid     | str  |
+      | pop_size     | 50000      | int  |
+      | pop_infected | 100        | int  |
+      | location     | UK         | str  |
+    And the following variables are recorded at the end of the simulation
+      | variable          | type |
+      | cum_tests         | int  |
+      | cum_quarantined   | int  |
+      | cum_infections    | int  |
+      | cum_symptomatic   | int  |
+      | cum_severe        | int  |
+      | cum_critical      | int  |
+      | cum_deaths        | int  |
 
-  # Scenario: Baseline
-  #   Given a simulation run with only the background parameters
+  # TODO: this is a bit clunky. It might not be  reasonable to assume that a
+  # domain expert would be able to list all edges that wouldn’t be present
+  # before seeing the connected graph
+  @current
+  Scenario: Draw DAG
+    Given a connected DAG
+    When we prune the following edges
+    | s1              | s2              |
+    | cum_deaths      | cum_tests       |
+    | cum_deaths      | cum_infections  |
+    | cum_deaths      | cum_severe      |
+    | cum_deaths      | cum_symptomatic |
+    | cum_deaths      | cum_critical    |
+    | cum_deaths      | cum_quarantined |
+    | cum_tests       | cum_deaths      |
+    | cum_tests       | cum_infections  |
+    | cum_tests       | cum_severe      |
+    | cum_tests       | cum_symptomatic |
+    | cum_tests       | cum_critical    |
+    | cum_infections  | cum_deaths      |
+    | cum_infections  | cum_tests       |
+    | cum_infections  | cum_severe      |
+    | cum_infections  | cum_critical    |
+    | cum_severe      | cum_deaths      |
+    | cum_severe      | cum_tests       |
+    | cum_severe      | cum_infections  |
+    | cum_severe      | cum_symptomatic |
+    | cum_severe      | cum_quarantined |
+    | cum_symptomatic | cum_deaths      |
+    | cum_symptomatic | cum_tests       |
+    | cum_symptomatic | cum_infections  |
+    | cum_symptomatic | cum_critical    |
+    | cum_critical    | cum_tests       |
+    | cum_critical    | cum_infections  |
+    | cum_critical    | cum_severe      |
+    | cum_critical    | cum_symptomatic |
+    | cum_critical    | cum_quarantined |
+    | cum_quarantined | cum_deaths      |
+    | cum_quarantined | cum_tests       |
+    | cum_quarantined | cum_infections  |
+    | cum_quarantined | cum_severe      |
+    | cum_quarantined | cum_symptomatic |
+    | cum_quarantined | cum_critical    |
+    | intervention    | cum_deaths      |
+    | intervention    | cum_infections  |
+    | intervention    | cum_severe      |
+    | intervention    | cum_symptomatic |
+    | intervention    | cum_critical    |
+    Then we obtain the causal DAG
 
-  Scenario: Standard testing
-    Given a testing intervention with parameters:
-      * symp_prob=0.2
-      * asymp_prob=0.001
-      * symp_quar_prob=1
-      * asymp_quar_prob=1
-    When the simulation is complete
-    Then the "cum_deaths" should be "less than" Baseline
+  Scenario Outline: Test and trace
+    Given we run the model with intervention=<control>
+    When we run the model with intervention=<treatment>
+    Then the cum_deaths should be <relationship> <control>
+    Examples:
+      | treatment     | relationship | control       |
+      | standardTest  | <            | baseline      |
+      | noTest        | =            | baseline      |
+      | optimalTest   | <            | standardTest  |
+      | standardTrace | <            | baseline      |
+      | standardTrace | <            | standardTest  |
+      | noTrace       | =            | standardTest  |
+      | optimalTrace  | <            | standardTrace |
+      | traceNoTest   | =            | baseline      |
 
-  Scenario: Standard tracing
-    Given a testing intervention with parameters:
-      * symp_prob=0.2
-      * asymp_prob=0.001
-      * symp_quar_prob=1
-      * asymp_quar_prob=1
-    And a tracing intervention with parameters:
-      * trace_probs=dict(h=1, s=0.5, w=0.5, c=0.3)
-    When the simulation is complete
-    Then the "cum_deaths" should be "less than" Standard testing
+  # This depends on the existence of observational data. We need lots of runs to
+  # get a reliable estimate. Essentially, we need to just run the model with
+  # some different starting parameters. We can reuse data from prior test runs
+  # by just pulling it all in. This works under the assumption that all the
+  # CSV files have the same columns.
+  Scenario: Subsequent mortality (has confounding)
+    Given a control scenario where cum_infections=4000
+    When cum_infections=5000
+    Then the cum_infections should be > control
 
-  Scenario: No testing
-    Given a testing intervention with parameters:
-      * symp_prob=0
-      * asymp_prob=0
-      * symp_quar_prob=0
-      * asymp_quar_prob=0
-    When the simulation is complete
-    Then the "cum_deaths" should be "equal to" Baseline
+  Scenario Outline: Locations
+    Given we run the model with location=<control>
+    When we run the model with location=<treatment>
+    Then the cum_deaths should be <relationship> <control>
+    Examples:
+      | treatment | relationship | control | note                                    |
+      | Japan     | >            | UK      | Because Japan has an older population   |
+      | Rwanda    | <            | UK      | Because Rwanda has a younger population |
 
-  Scenario: No tracing
-    Given a testing intervention with parameters:
-      * symp_prob=0.2
-      * asymp_prob=0.001
-      * symp_quar_prob=1
-      * asymp_quar_prob=1
-    And a tracing intervention with parameters:
-      * trace_probs=dict(h=0, s=0, w=0, c=0)
-    When the simulation is complete
-    Then the "cum_deaths" should be "equal to" Standard testing
-
-  Scenario: Trace without test
-    Given a testing intervention with parameters:
-      * symp_prob=0
-      * asymp_prob=0
-      * symp_quar_prob=0
-      * asymp_quar_prob=0
-    And a tracing intervention with parameters:
-      * trace_probs=dict(h=1, s=0.5, w=0.5, c=0.3)
-    When the simulation is complete
-    Then the "cum_deaths" should be "equal to" Baseline
-
-  Scenario: Optimal testing
-    Given a testing intervention with parameters:
-      * symp_prob=1
-      * asymp_prob=1
-      * symp_quar_prob=1
-      * asymp_quar_prob=1
-    When the simulation is complete
-    Then the "cum_deaths" should be "less than" Standard testing
-
-  Scenario: Optimal tracing
-    Given a testing intervention with parameters:
-      * symp_prob=0.2
-      * asymp_prob=0.001
-      * symp_quar_prob=1
-      * asymp_quar_prob=1
-    And a tracing intervention with parameters:
-      * trace_probs=dict(h=1, s=1, w=1, c=1)
-    When the simulation is complete
-    Then the "cum_deaths" should be "less than" Standard tracing
+  Scenario: Large population
+    Given we run the model with pop_size=50000
+    When we run the model with pop_size=100000
+    Then the cum_infections should be > control
+    # And the peak should appear later # Need phase detection preprocessing for this

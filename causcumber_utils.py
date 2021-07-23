@@ -8,6 +8,15 @@ import dowhy
 import pydot
 
 
+def test(estimate, relationship, ci_low, ci_high):
+    if relationship == "<":
+        assert estimate < 0 and ci_high < 0, f"Expected estimate < 0, got {ci_low} < {estimate} < {ci_high}"
+    elif relationship == "=":
+        assert ci_low < 0 < ci_high, f"Expected estimate ~0, got {ci_low} < {estimate} < {ci_high}"
+    elif relationship == ">":
+        assert estimate > 0 and ci_low > 0, f"Expected estimate > 0, got {ci_low} < {estimate} < {ci_high}"
+
+
 def draw_connected_repeating_unit(inputs, time_steps=[],
                                   suffix_n="_n", suffix_n1="_n1"):
     g = pygraphviz.AGraph(strict=False, directed=True,
@@ -28,7 +37,26 @@ def draw_connected_repeating_unit(inputs, time_steps=[],
             g.add_edge(n, n1)
         for i in ips:
             g.add_edge(i, n)
+    return g
 
+
+def draw_connected_dag(inputs, outputs):
+    g = pygraphviz.AGraph(strict=False, directed=True,
+                          rankdir="LR", newrank=True)
+    ips = g.add_subgraph(name="cluster_inputs", label="Model inputs")
+    ops = g.add_subgraph(name="cluster_outputs", label="Model outputs")
+
+    for i in inputs:
+        ips.add_node(i)
+
+    for o in outputs:
+        ops.add_node(o)
+
+    for o in ops:
+        for o1 in ops:
+            g.add_edge(o, o1)
+        for i in ips:
+            g.add_edge(i, o)
     return g
 
 
@@ -99,8 +127,10 @@ def dagitty_identification(dot_file_path, treatment, outcome):
        """
     r_pkg = STAP(r_identification_fn, "r_pkg")
     min_adjustment_set = r_pkg.R_identification(dagitty_dag_str, treatment, outcome)
-    min_adjustment_list = np.array(min_adjustment_set).tolist()[0]
-    return min_adjustment_list
+    min_adjustment_list = np.array(min_adjustment_set).tolist()
+    if len(np.array(min_adjustment_set).tolist()) == 0:
+        return []
+    return min_adjustment_list[0]
 
 
 def _install_r_packages(package_names):
@@ -169,11 +199,13 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         print(f"Datatype of treatment '{treatment_var}':", data.dtypes[treatment_var])
 
     if str(data.dtypes[treatment_var]) == "category":
+        print(data[treatment_var])
         data = data.loc[data[treatment_var].isin([control_val, treatment_val])]
         grouped = data.groupby(treatment_var)
         groups = {k: i for i, (k, _) in enumerate(grouped)}
         data[treatment_var] = [groups[i] for i in data[treatment_var]]
         data[treatment_var] = data[treatment_var].astype('category')
+        print("GROUPS:", groups)
         control_val = groups[control_val]
         treatment_val = groups[treatment_val]
 
