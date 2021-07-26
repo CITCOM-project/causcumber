@@ -24,7 +24,6 @@ Feature: Compare interventions
   # TODO: this is a bit clunky. It might not be  reasonable to assume that a
   # domain expert would be able to list all edges that wouldn’t be present
   # before seeing the connected graph
-  @current
   Scenario: Draw DAG
     Given a connected repeating unit
     When we prune the following edges
