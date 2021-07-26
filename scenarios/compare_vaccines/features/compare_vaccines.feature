@@ -59,7 +59,7 @@ Feature: Compare vaccines
       | cum_vaccinated_n  | cum_deaths_n1      |
     Then we obtain the causal DAG for 5 weeks
 
-  @combine
+  @observational.single_vaccine
   Scenario Outline: Single vaccine
     All vaccines should reduce the cumulative number of infections relative to the
     baseline scenario where no vaccine is available.

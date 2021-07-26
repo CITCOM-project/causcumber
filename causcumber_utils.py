@@ -243,3 +243,9 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         print("Total Effect Estimate:", estimate.value)
         print("95% Confidence Intervals: [{}, {}]".format(ci_low, ci_high))
     return estimate.value, (ci_low, ci_high)
+
+
+def scenario_name_to_snake_case(string):
+    lowercase_string = string.lower()
+    snake_case_string = lowercase_string.replace(' ', '_')
+    return snake_case_string
