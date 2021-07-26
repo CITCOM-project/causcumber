@@ -3,14 +3,15 @@
 Feature: Compare start dates
   Background:
     Given a simulation with parameters
-      | parameter    | value      | type |
-      | quar_period  | 14         | int  |
-      | n_days       | 84         | int  |
-      | pop_type     | hybrid     | str  |
-      | pop_size     | 50000      | int  |
-      | pop_infected | 100        | int  |
-      | location     | UK         | str  |
-      | start_day    | 2020-01-03 | str  |
+      | parameter     | value      | type |
+      | quar_period   | 14         | int  |
+      | n_days        | 84         | int  |
+      | pop_type      | hybrid     | str  |
+      | pop_size      | 50000      | int  |
+      | pop_infected  | 100        | int  |
+      | location      | UK         | str  |
+      | start_day     | 2020-01-03 | str  |
+      | interventions |            | list |
     And the following variables are recorded weekly
       | variable          | type |
       | cum_tests         | int  |
@@ -36,11 +37,11 @@ Feature: Compare start dates
       | quar_period       | cum_critical_n     |
       | quar_period       | cum_deaths_n       |
       | quar_period       | cum_tests_n        |
-      | intervention      | cum_infections_n   |
-      | intervention      | cum_symptomatic_n  |
-      | intervention      | cum_severe_n       |
-      | intervention      | cum_critical_n     |
-      | intervention      | cum_deaths_n       |
+      | interventions      | cum_infections_n   |
+      | interventions      | cum_symptomatic_n  |
+      | interventions      | cum_severe_n       |
+      | interventions      | cum_critical_n     |
+      | interventions      | cum_deaths_n       |
       | pop_type          | cum_deaths_n       |
       | pop_type          | cum_tests_n        |
       | pop_size          | cum_deaths_n       |
@@ -111,4 +112,4 @@ Feature: Compare start dates
     Given we run the model with start_day=2020-06-01
     When we run the model with start_day=2020-11-01
     # Because the cold wet weather in winter more easily facilitates disease spread
-    Then the cum_infections should be > control
+    Then the cum_infections_12 should be > control

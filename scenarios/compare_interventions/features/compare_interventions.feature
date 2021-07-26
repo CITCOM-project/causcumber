@@ -3,13 +3,14 @@
 Feature: Compare interventions
   Background:
     Given a simulation with parameters
-      | parameter    | value      | type |
-      | quar_period  | 14         | int  |
-      | n_days       | 84         | int  |
-      | pop_type     | hybrid     | str  |
-      | pop_size     | 50000      | int  |
-      | pop_infected | 100        | int  |
-      | location     | UK         | str  |
+      | parameter     | value      | type |
+      | quar_period   | 14         | int  |
+      | n_days        | 84         | int  |
+      | pop_type      | hybrid     | str  |
+      | pop_size      | 50000      | int  |
+      | pop_infected  | 100        | int  |
+      | location      | UK         | str  |
+      | interventions |            | list |
     And the following variables are recorded weekly
       | variable          | type |
       | cum_tests         | int  |
@@ -35,11 +36,11 @@ Feature: Compare interventions
       | quar_period       | cum_critical_n     |
       | quar_period       | cum_deaths_n       |
       | quar_period       | cum_tests_n        |
-      | intervention      | cum_infections_n   |
-      | intervention      | cum_symptomatic_n  |
-      | intervention      | cum_severe_n       |
-      | intervention      | cum_critical_n     |
-      | intervention      | cum_deaths_n       |
+      | interventions     | cum_infections_n   |
+      | interventions     | cum_symptomatic_n  |
+      | interventions     | cum_severe_n       |
+      | interventions     | cum_critical_n     |
+      | interventions     | cum_deaths_n       |
       | pop_type          | cum_deaths_n       |
       | pop_type          | cum_tests_n        |
       | pop_size          | cum_deaths_n       |
@@ -104,9 +105,9 @@ Feature: Compare interventions
     Then we obtain the causal DAG for 12 weeks
 
   Scenario Outline: Test and trace
-    Given we run the model with intervention=<control>
-    When we run the model with intervention=<treatment>
-    Then the cum_deaths should be <relationship> <control>
+    Given we run the model with interventions=<control>
+    When we run the model with interventions=<treatment>
+    Then the cum_deaths_12 should be <relationship> <control>
     Examples:
       | treatment     | relationship | control       |
       | standardTest  | <            | baseline      |
@@ -126,12 +127,12 @@ Feature: Compare interventions
   Scenario: Subsequent mortality (has confounding)
     Given a control scenario where cum_infections_7=4000
     When cum_infections_7=5000
-    Then the cum_infections should be > control
+    Then the cum_infections_12 should be > control
 
   Scenario Outline: Locations
     Given we run the model with location=<control>
     When we run the model with location=<treatment>
-    Then the cum_deaths should be <relationship> <control>
+    Then the cum_deaths_12 should be <relationship> <control>
     Examples:
       | treatment | relationship | control | note                                    |
       | Japan     | >            | UK      | Because Japan has an older population   |
@@ -140,5 +141,5 @@ Feature: Compare interventions
   Scenario: Large population
     Given we run the model with pop_size=50000
     When we run the model with pop_size=100000
-    Then the cum_infections should be > control
+    Then the cum_infections_12 should be > control
     # And the peak should appear later # Need phase detection preprocessing for this

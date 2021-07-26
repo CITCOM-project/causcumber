@@ -6,7 +6,7 @@ from rpy2.robjects.vectors import StrVector
 from rpy2.robjects.packages import STAP
 import dowhy
 import pydot
-
+from collections import Hashable
 
 def test(estimate, relationship, ci_low, ci_high):
     if relationship == "<":
@@ -190,24 +190,28 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
     adjustment_set = dagitty_identification(graph, treatment_var, outcome_var)
     if verbose:
         print("  adjustment_set", adjustment_set)
-
-    """ TODO: This is a hack to get around the fact that doWhy draws a straight line through
-        the entire data rather than through pairs of categorical values. This slices the data such
-        that it only contains the two values we're interested in, effectively binarising the
-        treatment. """
-    if verbose:
         print(f"Datatype of treatment '{treatment_var}':", data.dtypes[treatment_var])
 
+    """
+    TODO: This is a hack to get around the fact that doWhy draws a straight line
+    through the entire data rather than through pairs of categorical values.
+    This slices the data such that it only contains the two values we're
+    interested in, effectively binarising the treatment.
+    """
     if str(data.dtypes[treatment_var]) == "category":
         print(data[treatment_var])
-        data = data.loc[data[treatment_var].isin([control_val, treatment_val])]
+        assert isinstance(control_val, Hashable), f"Categorical control value {control_val} must be hashable."
+        assert isinstance(treatment_val, Hashable), f"Categorical treatment value {treatment_val} must be hashable."
+        assert all([isinstance(x, Hashable) for x in data[treatment_var]]), f"Categorical treatments must be hashable."
+        data[treatment_var] = [str(x) for x in data[treatment_var]]
         grouped = data.groupby(treatment_var)
         groups = {k: i for i, (k, _) in enumerate(grouped)}
         data[treatment_var] = [groups[i] for i in data[treatment_var]]
         data[treatment_var] = data[treatment_var].astype('category')
         print("GROUPS:", groups)
-        control_val = groups[control_val]
-        treatment_val = groups[treatment_val]
+        control_val = groups[str(control_val)]
+        treatment_val = groups[str(treatment_val)]
+        data = data.loc[data[treatment_var].isin([control_val, treatment_val])]
 
     model = dowhy.CausalModel(
         data=data,

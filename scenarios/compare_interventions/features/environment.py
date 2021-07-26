@@ -19,14 +19,11 @@ def set_parameters_dict(context):
 def before_feature(context, feature):
     print(f"Running Feature `{feature.name}`")
     use_fixture(set_parameters_dict, context)
-    context.dotpath = context.feature.name.lower().replace(" ", "-")+".dot"
-
-
-    if not os.path.exists("results"):
-        os.mkdir("results")
-    # for f in os.listdir("results"):
-    #     if f.endswith(".csv"):
-    #         os.remove(os.path.join("results", f))
+    feature_name = context.feature.name.lower().replace(" ", "-")
+    context.dag_path = f"dags/{feature_name}.dot"
+    context.results_dir = f"results/{feature_name}"
+    if not os.path.exists(context.results_dir):
+        os.makedirs(context.results_dir, exist_ok=True)
 
 
 def after_feature(context, feature):

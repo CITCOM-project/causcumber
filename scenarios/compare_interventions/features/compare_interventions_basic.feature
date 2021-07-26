@@ -1,15 +1,16 @@
 # This file MUST be run from inside ../compare_interventions, otherwise it won't
 # be able to find the causal DAG. Run as `behave features/compare_interventions.feature`
-Feature: Compare interventions
+Feature: Compare interventions basic
   Background:
     Given a simulation with parameters
-      | parameter    | value      | type |
-      | quar_period  | 14         | int  |
-      | n_days       | 84         | int  |
-      | pop_type     | hybrid     | str  |
-      | pop_size     | 50000      | int  |
-      | pop_infected | 100        | int  |
-      | location     | UK         | str  |
+      | parameter     | value      | type |
+      | quar_period   | 14         | int  |
+      | n_days        | 84         | int  |
+      | pop_type      | hybrid     | str  |
+      | pop_size      | 50000      | int  |
+      | pop_infected  | 100        | int  |
+      | location      | UK         | str  |
+      | interventions |            | list |
     And the following variables are recorded at the end of the simulation
       | variable          | type |
       | cum_tests         | int  |
@@ -23,7 +24,6 @@ Feature: Compare interventions
   # TODO: this is a bit clunky. It might not be  reasonable to assume that a
   # domain expert would be able to list all edges that wouldn’t be present
   # before seeing the connected graph
-  @current
   Scenario: Draw DAG
     Given a connected DAG
     When we prune the following edges
@@ -71,8 +71,8 @@ Feature: Compare interventions
     Then we obtain the causal DAG
 
   Scenario Outline: Test and trace
-    Given we run the model with intervention=<control>
-    When we run the model with intervention=<treatment>
+    Given we run the model with interventions=<control>
+    When we run the model with interventions=<treatment>
     Then the cum_deaths should be <relationship> <control>
     Examples:
       | treatment     | relationship | control       |

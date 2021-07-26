@@ -5,7 +5,9 @@ import os
 
 
 def preprocess_data(data):
-    data['intervention'] = data['intervention'].astype("category")
+    assert "intervention" not in data, "intervention is a column in data"
+    data['interventions'] = [str(x) for x in data['interventions']]
+    data['interventions'] = data['interventions'].astype("category")
     data['pop_type'] = data['pop_type'].astype("category")
     data['location'] = data['location'].astype("category")
     if "start_day" in data:
@@ -56,7 +58,6 @@ def run_covasim_by_week(label, params, desired_outputs, n_runs=10):
         dic = week_by_week.to_dict(orient='list')
         week_dic = {f"{k}_{w+1}": item for k in desired_outputs for w, item in enumerate(dic[k])}
         week_dic['quar_period'] = quar_period
-        week_dic['intervention'] = sim.label
         for k, v in params.items():
             week_dic[k] = v
         temporal.append(week_dic)
@@ -68,7 +69,6 @@ def run_covasim_basic(label, params, desired_outputs, n_runs=10):
     intervention_sim.run(n_runs=n_runs, verbose=0)
     results = {k: [] for k in desired_outputs}
     results['quar_period'] = []
-    results['intervention'] = []
     for sim in intervention_sim.sims:
         df = sim.to_df()
         quar_period = 14
@@ -81,7 +81,6 @@ def run_covasim_basic(label, params, desired_outputs, n_runs=10):
             results[k].append(df[k].iloc[-1])
 
         results['quar_period'].append(quar_period)
-        results['intervention'].append(label)
 
     data = pd.DataFrame(results)
     for k, v in params.items():

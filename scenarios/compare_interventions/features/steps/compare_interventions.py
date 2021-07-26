@@ -10,12 +10,12 @@ sys.path.append("../../../") # This one's for running `behave` in `features`
 sys.path.append("../../") # This one's for running `behave` in `compare-inverventions`
 
 from behave_utils import table_to_dict
-from covasim_utils import run_covasim_by_week, preprocess_data
+from covasim_utils import run_covasim_by_week, run_covasim_basic, preprocess_data
 from causcumber_utils import run_dowhy, draw_connected_repeating_unit, iterate_repeating_unit, test
 
-use_step_matcher("parse")
+import pygraphviz
 
-RESULTS_PATH = "scenarios/compare_interventions/results"
+use_step_matcher("parse")
 
 # Instantiate named covasim interventions with parameters
 intervention = {
@@ -67,88 +67,97 @@ def step_impl(context):
     context.n_weeks = round(context.params_dict['n_days']/7)
 
 
-@given("the following variables are recorded weekly")
-def step_impl(context):
+@given("the following variables are recorded {frequency}")
+def step_impl(context, frequency):
     """
     Create a results df to record only the specified values.
     """
+    print("Frequency:", frequency)
     results_dict = table_to_dict(context.table)
     context.desired_outputs = results_dict['variable']
     for row in context.table:
         context.types[row['variable']] = locate(row['type'])
-
-
-@then(u'all weekly variables are recorded')
-def step_impl(context):
-    df = pd.read_csv("results/baseline.csv")
-    for week in range(1, round(context.params_dict['n_days']/7)+1):
-        for column in context.desired_outputs:
-            assert f"{column}_{week}" in df.columns, f"{column}_{week} not recorded"
+    context.frequency = frequency
 
 
 @given(u'a connected repeating unit')
 def step_impl(context):
     inputs = list(context.params_dict.keys())
-    inputs.append("intervention")
     context.repeating_unit = draw_connected_repeating_unit(inputs, context.desired_outputs)
 
 
 @when(u'we prune the following edges')
 def step_impl(context):
     for row in context.table:
+        print(f"deleting edge {row['s1']} -> {row['s2']}")
         context.repeating_unit.delete_edge(row['s1'], row['s2'])
 
 
 @then(u'we obtain the causal DAG for {n} weeks')
 def step_impl(context, n):
     dag = iterate_repeating_unit(context.repeating_unit, int(n), start=1)
-    dag.write(f"dags/{context.dotpath}")
+    dag.write(context.dag_path)
 
 
-def run_covasim(label, params, outputs, results_path, n_runs=10):
+def run_covasim(frequency, label, params, outputs, results_path, n_runs=10):
     if not os.path.exists(results_path):
-        r = run_covasim_by_week(
-            label,
-            {k: v for k, v in params.items()},
-            outputs,
-            n_runs=n_runs)
+        if frequency == "weekly":
+            print("Running covasim by week")
+            r = run_covasim_by_week(
+                label,
+                {k: v for k, v in params.items()},
+                outputs,
+                n_runs=n_runs)
+        else:
+            print("Running covasim basic")
+            r = run_covasim_basic(
+                label,
+                {k: v for k, v in params.items()},
+                outputs,
+                n_runs=n_runs)
         r.to_csv(results_path)
 
-@given(u'we run the model with {treatment_var}={i}')
-def step_impl(context, treatment_var, i):
-    context.interventions = [i]
+@given(u'we run the model with {treatment_var}={control_val}')
+def step_impl(context, treatment_var, control_val):
     context.treatment_var = treatment_var
-    context.control_val = context.types[treatment_var](i) if treatment_var in context.types else i
     params = context.params_dict.copy()
-    if treatment_var == "intervention":
-        params['interventions'] = interventions[i]
+    if treatment_var == "interventions":
+        params['interventions'] = interventions[control_val]
+        context.control_val = str(interventions[control_val])
     else:
-        params[treatment_var] = i
-    run_covasim(i, params, context.desired_outputs, f"results/{i}.csv")
+        params[treatment_var] = control_val
+        context.control_val = context.types[treatment_var](control_val) if treatment_var in context.types else control_val
+    run_covasim(context.frequency, control_val, params, context.desired_outputs, f"{context.results_dir}/{control_val}.csv")
 
 
-@when(u'we run the model with {treatment_var}={i}')
-def step_impl(context, treatment_var, i):
-    context.interventions.append(i)
-    context.treatment_val = context.types[treatment_var](i) if treatment_var in context.types else i
+@when(u'we run the model with {treatment_var}={treatment_val}')
+def step_impl(context, treatment_var, treatment_val):
     params = context.params_dict.copy()
-    if treatment_var == "intervention":
-        params['interventions'] = interventions[i]
+    if treatment_var == "interventions":
+        params['interventions'] = interventions[treatment_val]
+        context.treatment_val = str(interventions[treatment_val])
     else:
-        params[treatment_var] = i
-    run_covasim(i, params, context.desired_outputs, f"results/{i}.csv")
+        params[treatment_var] = treatment_val
+        context.treatment_val = context.types[treatment_var](treatment_val) if treatment_var in context.types else treatment_val
+    run_covasim(context.frequency, treatment_val, params, context.desired_outputs, f"{context.results_dir}/{treatment_val}.csv")
 
 
 @then(u'the {outcome} should be {relationship} {control}')
 def step_impl(context, outcome, relationship, control):
-    data = pd.concat([pd.read_csv(f"results/{i}") for i in os.listdir("results")])
+    data = pd.concat([pd.read_csv(f"{context.results_dir}/{i}") for i in os.listdir(context.results_dir)])
     data = preprocess_data(data)
+
+    dag = pygraphviz.AGraph(context.dag_path)
+    assert outcome in dag.nodes(), f"Outcome {outcome} not in graph nodes. Must be one of {dag.nodes()}"
+    assert outcome in data, f"Outcome variable {outcome} not in data. Must be one of {data.columns}."
+
+
 
     estimate, (ci_low, ci_high) = run_dowhy(
               data=data,
-              graph=f"dags/{context.dotpath}",
+              graph=context.dag_path,
               treatment_var=context.treatment_var,
-              outcome_var=f"{outcome}_{context.n_weeks}",
+              outcome_var=outcome,
               control_val=context.control_val,
               treatment_val=context.treatment_val,
               verbose=True)

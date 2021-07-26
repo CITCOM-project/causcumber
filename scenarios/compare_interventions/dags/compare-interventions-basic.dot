@@ -2,16 +2,6 @@ digraph "" {
 	graph [newrank=True,
 		rankdir=LR
 	];
-	subgraph cluster_inputs {
-		graph [label="Model inputs"];
-		quar_period;
-		n_days;
-		pop_type;
-		pop_size;
-		pop_infected;
-		location;
-		intervention;
-	}
 	subgraph cluster_outputs {
 		graph [label="Model outputs"];
 		cum_tests;
@@ -21,6 +11,17 @@ digraph "" {
 		cum_severe;
 		cum_critical;
 		cum_deaths;
+	}
+	subgraph cluster_inputs {
+		graph [label="Model inputs"];
+		quar_period;
+		n_days;
+		pop_type;
+		pop_size;
+		pop_infected;
+		location;
+		interventions;
+		intervention;
 	}
 	quar_period -> cum_tests;
 	quar_period -> cum_quarantined;
@@ -64,6 +65,13 @@ digraph "" {
 	location -> cum_severe;
 	location -> cum_critical;
 	location -> cum_deaths;
+	interventions -> cum_tests;
+	interventions -> cum_quarantined;
+	interventions -> cum_infections;
+	interventions -> cum_symptomatic;
+	interventions -> cum_severe;
+	interventions -> cum_critical;
+	interventions -> cum_deaths;
 	intervention -> cum_tests;
 	intervention -> cum_quarantined;
 	cum_tests -> cum_tests;
