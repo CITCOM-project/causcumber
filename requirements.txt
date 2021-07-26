@@ -49,3 +49,5 @@ tzlocal==2.1
 xlrd==1.2.0
 XlsxWriter==1.4.3
 zipp==3.4.1
+
+behave~=1.2.6
