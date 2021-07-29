@@ -119,16 +119,6 @@ Feature: Compare interventions
       | optimalTrace  | <            | standardTrace |
       | traceNoTest   | =            | baseline      |
 
-  # This depends on the existence of observational data. We need lots of runs to
-  # get a reliable estimate. Essentially, we need to just run the model with
-  # some different starting parameters. We can reuse data from prior test runs
-  # by just pulling it all in. This works under the assumption that all the
-  # CSV files have the same columns.
-  Scenario: Subsequent mortality (has confounding)
-    Given a control scenario where cum_infections_7=4000
-    When cum_infections_7=5000
-    Then the cum_infections_12 should be > control
-
   Scenario Outline: Locations
     Given we run the model with location=<control>
     When we run the model with location=<treatment>
@@ -138,8 +128,19 @@ Feature: Compare interventions
       | Japan     | >            | UK      | Because Japan has an older population   |
       | Rwanda    | <            | UK      | Because Rwanda has a younger population |
 
+  @observational("results/data.csv")
   Scenario: Large population
     Given we run the model with pop_size=50000
     When we run the model with pop_size=100000
-    Then the cum_infections_12 should be > control
+    Then the cum_infections_12 should be < control
     # And the peak should appear later # Need phase detection preprocessing for this
+
+  # This depends on the existence of observational data. We need lots of runs to
+  # get a reliable estimate. Essentially, we need to just run the model with
+  # some different starting parameters. We can reuse data from prior test runs
+  # by just pulling it all in. This works under the assumption that all the
+  # CSV files have the same columns.
+  Scenario: Subsequent mortality (has confounding)
+    Given a control scenario where cum_infections_7=4000
+    When cum_infections_7=5000
+    Then the cum_infections_12 should be > control

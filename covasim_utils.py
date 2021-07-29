@@ -44,6 +44,8 @@ def aggregate_by_week(data, desired_outputs=None):
 
 
 def run_covasim_by_week(label, params, desired_outputs, n_runs=10):
+    print("Params", params)
+    print("Desired outputs", desired_outputs)
     intervention_sim = cv.MultiSim(cv.Sim(pars=params, label=label, verbose=0))
     intervention_sim.run(n_runs=n_runs, verbose=0)
     temporal = []

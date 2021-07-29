@@ -144,7 +144,11 @@ def step_impl(context, treatment_var, treatment_val):
 
 @then(u'the {outcome} should be {relationship} {control}')
 def step_impl(context, outcome, relationship, control):
-    data = pd.concat([pd.read_csv(f"{context.results_dir}/{i}") for i in os.listdir(context.results_dir)])
+    data = None
+    if hasattr(context, "data"):
+        data = context.data
+    else:
+        data = pd.concat([pd.read_csv(f"{context.results_dir}/{i}") for i in os.listdir(context.results_dir)])
     data = preprocess_data(data)
 
     dag = pygraphviz.AGraph(context.dag_path)

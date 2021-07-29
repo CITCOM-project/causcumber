@@ -2,7 +2,9 @@
 import pandas as pd
 from behave import fixture, use_fixture
 import os
+import re
 
+obs_tag_re = re.compile('observational\(("|\')(.+)("|\')\)')
 
 @fixture
 def set_desired_outputs(context):
@@ -28,3 +30,9 @@ def before_feature(context, feature):
 
 def after_feature(context, feature):
     print(f"Finished Feature `{feature.name}`")
+
+
+def before_tag(context, tag):
+    obs_match = obs_tag_re.match(tag)
+    if obs_match:
+        context.data = obs_match.group(2)
