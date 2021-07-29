@@ -2,16 +2,6 @@ digraph "" {
 	graph [newrank=True,
 		rankdir=LR
 	];
-	subgraph cluster_outputs {
-		graph [label="Model outputs"];
-		cum_tests;
-		cum_quarantined;
-		cum_infections;
-		cum_symptomatic;
-		cum_severe;
-		cum_critical;
-		cum_deaths;
-	}
 	subgraph cluster_inputs {
 		graph [label="Model inputs"];
 		quar_period;
@@ -22,6 +12,16 @@ digraph "" {
 		location;
 		interventions;
 		intervention;
+	}
+	subgraph cluster_outputs {
+		graph [label="Model outputs"];
+		cum_tests;
+		cum_quarantined;
+		cum_infections;
+		cum_symptomatic;
+		cum_severe;
+		cum_critical;
+		cum_deaths;
 	}
 	quar_period -> cum_tests;
 	quar_period -> cum_quarantined;

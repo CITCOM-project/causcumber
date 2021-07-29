@@ -7,6 +7,8 @@ from rpy2.robjects.packages import STAP
 import dowhy
 import pydot
 from collections import Hashable
+import os
+import pickle
 
 def test(estimate, relationship, ci_low, ci_high):
     if relationship == "<":
@@ -161,7 +163,6 @@ def _dot_to_dagitty_dag(dot_file_path):
 
 def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val, verbose=False):
     """
-
     :param data: A dataframe representing the observational data.
     :param graph: Filepath of the DOT file representing the causal DAG. Nodes here MUST have a 1:1 correspondence with
                   columns in the data.
@@ -184,14 +185,6 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
     if outcome_var not in data:
         raise ValueError(f"Outcome variable {outcome_var} must be a column in the data, i.e. one of {data.columns}")
 
-    # Create a causal model from the data and given graph
-    if verbose:
-        print("Creating a causal model...")
-    adjustment_set = dagitty_identification(graph, treatment_var, outcome_var)
-    if verbose:
-        print("  adjustment_set", adjustment_set)
-        print(f"Datatype of treatment '{treatment_var}':", data.dtypes[treatment_var])
-
     """
     TODO: This is a hack to get around the fact that doWhy draws a straight line
     through the entire data rather than through pairs of categorical values.
@@ -213,6 +206,25 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         treatment_val = groups[str(treatment_val)]
         data = data.loc[data[treatment_var].isin([control_val, treatment_val])]
 
+    # Create a causal model from the data and given graph
+    if verbose:
+        print("Creating a causal model...")
+
+    adjustment_set = []
+    adjustment_set_path = f'{graph.replace(".dot", "")}-{treatment_var}-{outcome_var}-adjustment.adj'
+    if os.path.exists(adjustment_set_path):
+        with open(adjustment_set_path, 'rb') as f:
+            adjustment_set = pickle.load(f)
+    else:
+        adjustment_set = dagitty_identification(graph, treatment_var, outcome_var)
+        with open(adjustment_set_path, 'wb') as f:
+            pickle.dump(adjustment_set, f)
+
+
+    if verbose:
+        print("  adjustment_set", adjustment_set)
+        print(f"Datatype of treatment '{treatment_var}':", data.dtypes[treatment_var])
+
     model = dowhy.CausalModel(
         data=data,
         treatment=treatment_var,
@@ -223,7 +235,17 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
     # Identify causal effect and return target estimand
     if verbose:
         print("Identifying...")
-    identified_estimand = model.identify_effect(proceed_when_unidentifiable=True)
+
+    identified_estimand = None
+    identified_estimand_path = f'{graph.replace(".dot", "")}-{treatment_var}-{outcome_var}-estimand.est'
+    if os.path.exists(identified_estimand_path):
+        with open(identified_estimand_path, 'rb') as f:
+            identified_estimand = pickle.load(f)
+    else:
+        identified_estimand = model.identify_effect(proceed_when_unidentifiable=True)
+        with open(identified_estimand_path, 'wb') as f:
+            pickle.dump(identified_estimand, f)
+
 
     # Estimate the target estimand using linear regression.
     if verbose:

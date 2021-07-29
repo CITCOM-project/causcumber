@@ -1,6 +1,6 @@
 # This file MUST be run from inside ../compare_interventions, otherwise it won't
 # be able to find the causal DAG. Run as `behave features/compare_interventions.feature`
-@observational("results/data.csv")
+# @observational("results/data.csv")
 Feature: Compare interventions
   Background:
     Given a simulation with parameters
@@ -132,7 +132,7 @@ Feature: Compare interventions
   Scenario: Large population
     Given we run the model with pop_size=50000
     When we run the model with pop_size=100000
-    Then the cum_infections_12 should be < control
+    Then the cum_infections_12 should be > control
     # And the peak should appear later # Need phase detection preprocessing for this
 
   # This depends on the existence of observational data. We need lots of runs to
