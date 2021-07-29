@@ -146,7 +146,7 @@ def step_impl(context, treatment_var, treatment_val):
 def step_impl(context, outcome, relationship, control):
     data = None
     if hasattr(context, "data"):
-        data = context.data
+        data = pd.read_csv(context.data)
     else:
         data = pd.concat([pd.read_csv(f"{context.results_dir}/{i}") for i in os.listdir(context.results_dir)])
     data = preprocess_data(data)
