@@ -64,7 +64,7 @@ interventions = {
 
 
 def params(interventions):
-    quar_period = random.randint(0, 20)
+    quar_period = 14 #random.randint(0, 20)
     return {
         'quar_period': quar_period,
         'n_days': 84,
