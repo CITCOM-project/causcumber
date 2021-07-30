@@ -3,6 +3,7 @@ import pandas as pd
 from behave import fixture, use_fixture
 import os
 import re
+import shutil
 
 obs_tag_re = re.compile('observational\(("|\')(.+)("|\')\)')
 
@@ -24,6 +25,10 @@ def before_feature(context, feature):
     feature_name = context.feature.name.lower().replace(" ", "-")
     context.dag_path = f"dags/{feature_name}.dot"
     context.results_dir = f"results/{feature_name}"
+
+    # Necessary for mutation testing - we want to actually run the mutated program!
+    shutil.rmtree("results")
+
     if not os.path.exists(context.results_dir):
         os.makedirs(context.results_dir, exist_ok=True)
 

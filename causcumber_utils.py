@@ -12,11 +12,13 @@ import pickle
 
 def test(estimate, relationship, ci_low, ci_high):
     if relationship == "<":
-        assert estimate < 0 and ci_high < 0, f"Expected estimate < 0, got {ci_low} < {estimate} < {ci_high}"
+        # assert estimate < 0 and ci_high < 0, f"Expected estimate < 0, got {ci_low} < {estimate} < {ci_high}"
+        assert estimate < 0, f"Expected estimate < 0, got {ci_low} < {estimate} < {ci_high}"
     elif relationship == "=":
         assert ci_low < 0 < ci_high, f"Expected estimate ~0, got {ci_low} < {estimate} < {ci_high}"
     elif relationship == ">":
-        assert estimate > 0 and ci_low > 0, f"Expected estimate > 0, got {ci_low} < {estimate} < {ci_high}"
+        # assert estimate > 0 and ci_low > 0, f"Expected estimate > 0, got {ci_low} < {estimate} < {ci_high}"
+        assert estimate > 0, f"Expected estimate > 0, got {ci_low} < {estimate} < {ci_high}"
 
 
 def draw_connected_repeating_unit(inputs, time_steps=[],
