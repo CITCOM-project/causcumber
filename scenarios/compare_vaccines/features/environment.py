@@ -65,6 +65,7 @@ def before_tag(context, tag):
         directory instead of running the model. """
     # If the tag is badly formed, run the model instead
     if tag.startswith("observational") and '.' in tag:
+        print("E")
         _, file_name = tag.split('.')
         if file_name:
             use_fixture(set_observational_df, context, file_name)

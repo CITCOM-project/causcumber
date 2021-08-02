@@ -1,0 +1,5 @@
+digraph DAG {
+    location -> interventions;
+    location -> cum_infections_5;
+    interventions -> cum_infections_5;
+}

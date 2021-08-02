@@ -11,6 +11,7 @@ def covariate_imbalance(df, covariates, treatment_var, treatment_val, control_va
     total_imbalance = 0
     if covariates:
         for covariate in covariates:
+            print(covariate)
             imbalance = treatment_group[covariate].mean() - control_group[covariate].mean()
             total_imbalance += imbalance
         return total_imbalance / len(covariates)
@@ -19,7 +20,13 @@ def covariate_imbalance(df, covariates, treatment_var, treatment_val, control_va
 
 
 if __name__ == "__main__":
-    observational_data = pd.read_csv("./results/single_vaccination_results.csv")
-    adjustment_set = dagitty_identification("./dags/causal_dag.dot", "intervention", "cum_infections_5")
-    imbalance_score = covariate_imbalance(observational_data, adjustment_set, "intervention", 1, 0)
-    print(imbalance_score)
+    observational_data = pd.read_csv("./observational_data/single_vaccine.csv")
+    adjustment_set = dagitty_identification("./dags/simple_confounding_dag.dot", "interventions", "cum_infections_5")
+
+    # convert categories to numerical scheme
+    countries = observational_data["location"].unique()
+    country_conversion_dict = {country: n for n, country in enumerate(countries)}
+    observational_data["location"] = observational_data["location"].replace(country_conversion_dict)
+
+    imbalance_score = covariate_imbalance(observational_data, adjustment_set, "interventions", "pfizer", "none")
+    print(f"Covariate imbalance: {imbalance_score}")
