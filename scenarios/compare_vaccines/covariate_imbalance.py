@@ -66,20 +66,13 @@ def covariate_imbalance(df, covariates, treatment_var,
     if str(df.dtypes[treatment_var]) == "bool":
         control_group = df.loc[df[treatment_var] == control_val]
         treatment_group = df.loc[df[treatment_var] == treatment_val]
-        imbalances = [abs(treatment_group[covariate].mean() - control_group[covariate].mean()) for covariate in covariates]
+        imbalances = [abs(treatment_group[covariate].mean() - control_group[covariate].mean()) for covariate in
+                      covariates]
     elif str(df.dtypes[treatment_var]) == "category":
         treatments = set(df[treatment_var])
         groups = [df.loc[df[treatment_var] == c] for c in treatments]
-        
-        for c1, c2 in combinations(treatments, 2):
-            for covariate in covariates:
-                g1 = df.loc[df[treatment_var] == c1]
-                g2 = df.loc[df[treatment_var] == c2]
-                mean = abs(g1[covariate].mean() - g2[covariate].mean())
-                print(" ", c1, c2, mean)
-        
-        imbalances = [[abs(g1[covariate].mean() - g2[covariate].mean()) for g1, g2 in combinations(groups, 2)] for covariate in covariates]
-        print(imbalances)
+        imbalances = [[abs(g1[covariate].mean() - g2[covariate].mean()) for g1, g2 in combinations(groups, 2)] for
+                      covariate in covariates]
         imbalances = [max(x) for x in imbalances]
     else:
         imbalances = [df[covariate].corr(df[treatment_var]) for covariate in covariates]
