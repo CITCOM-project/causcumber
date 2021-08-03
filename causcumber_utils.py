@@ -12,8 +12,7 @@ import pickle
 import pandas as pd
 from itertools import combinations
 
-def covariate_imbalance(df, covariates, treatment_var,
-                        control_val=0, treatment_val=1):
+def covariate_imbalance(df, covariates, treatment_var):
     """
     Estimate the covariate imbalance.
     For binary treatments, this is done by taking the mean over the mean
@@ -33,12 +32,6 @@ def covariate_imbalance(df, covariates, treatment_var,
         The covariates for which to calculate the imbalance.
     treatment_var : string
         The name of the treatment.
-    control_val
-        The control value (if treatment is boolean or categorical).
-        Defaults to 0.
-    treatment_val
-        The treatment value (if treatment is boolean or categorical).
-        Defaults to 1.
 
     Returns
     -------
@@ -66,8 +59,8 @@ def covariate_imbalance(df, covariates, treatment_var,
     covariates = new_covariates
 
     if str(df.dtypes[treatment_var]) == "bool":
-        control_group = df.loc[df[treatment_var] == control_val]
-        treatment_group = df.loc[df[treatment_var] == treatment_val]
+        control_group = df.loc[df[treatment_var] == 0]
+        treatment_group = df.loc[df[treatment_var] == 1]
         for covariate in covariates:
             print(covariate, treatment_group[covariate])
         imbalances = [abs(treatment_group[covariate].mean() - control_group[covariate].mean()) for covariate in covariates]

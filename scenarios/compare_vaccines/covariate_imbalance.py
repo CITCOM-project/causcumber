@@ -21,7 +21,7 @@ if __name__ == "__main__":
     imbalance_observational_data["pop_type"] = imbalance_observational_data["pop_type"].astype("category")
 
 
-    normal_imbalance_score = covariate_imbalance(observational_data, adjustment_set, "interventions", "pfizer", "none")
-    imbalanced_imbalance_score = covariate_imbalance(imbalance_observational_data, adjustment_set, "interventions", "pfizer", "none")
+    normal_imbalance_score = covariate_imbalance(observational_data, adjustment_set, "interventions")
+    imbalanced_imbalance_score = covariate_imbalance(imbalance_observational_data, adjustment_set, "interventions")
     print(f"Normal covariate imbalance: {normal_imbalance_score}")
     print(f"Imbalanced covariate imbalance: {imbalanced_imbalance_score}")
