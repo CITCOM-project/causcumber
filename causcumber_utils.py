@@ -10,6 +10,54 @@ from collections import Hashable
 import os
 import pickle
 
+
+def covariate_imbalance(df, covariates, treatment_var,
+                        control_val=0, treatment_val=1):
+    """
+    Estimate the covariate imbalance.
+    For binary and categorical treatments, this is done by taking the mean over
+    the mean difference between the treatment and control group of each
+    covariate.
+    For continuous treatments, this is done by taking the mean over the Pearson
+    correlations between each covariate and the treatment.
+
+    Parameters
+    ----------
+    df : pandas dataframe
+        Dataframe containing the data.
+    covariates : list
+        The covariates for which to calculate the imbalance.
+    treatment_var : string
+        The name of the treatment.
+    control_val
+        The control value (if treatment is boolean or categorical).
+        Defaults to 0.
+    treatment_val
+        The treatment value (if treatment is boolean or categorical).
+        Defaults to 1.
+
+    Returns
+    -------
+    float
+        The covariate imbalance between the supplied covariates.
+
+    """
+
+    covariates = [c for c in covariates if c in df.columns]
+
+    if not covariates:
+        return 0
+
+    if str(df.dtypes[treatment_var]) in ["bool", "category"]:
+        control_group = df.loc[df[treatment_var] == control_val]
+        treatment_group = df.loc[df[treatment_var] == treatment_val]
+        imbalances = [treatment_group[covariate].mean() - control_group[covariate].mean() for covariate in covariates]
+    else:
+        imbalances = [df[covariate].corr(df[treatment_var]) for covariate in covariates]
+
+    return sum(imbalances) / len(covariates)
+
+
 def test(estimate, relationship, ci_low, ci_high):
     if relationship == "<":
         assert estimate < 0 and ci_high < 0, f"Expected estimate < 0, got {ci_low} < {estimate} < {ci_high}"
