@@ -11,7 +11,7 @@ digraph "" {
 		pop_size;
 		pop_infected;
 		location;
-		intervention;
+		interventions;
 	}
 	{
 		graph [graph_name=cluster_1,
@@ -188,11 +188,16 @@ digraph "" {
 	location -> cum_vaccinated_5;
 	location -> cum_severe_5;
 	location -> cum_critical_5;
-	intervention -> cum_vaccinated_1;
-	intervention -> cum_vaccinated_2;
-	intervention -> cum_vaccinated_3;
-	intervention -> cum_vaccinated_4;
-	intervention -> cum_vaccinated_5;
+	interventions -> cum_vaccinated_1;
+	interventions -> cum_infections_1;
+	interventions -> cum_infections_2;
+	interventions -> cum_vaccinated_2;
+	interventions -> cum_infections_3;
+	interventions -> cum_vaccinated_3;
+	interventions -> cum_infections_4;
+	interventions -> cum_vaccinated_4;
+	interventions -> cum_infections_5;
+	interventions -> cum_vaccinated_5;
 	cum_deaths_1 -> cum_vaccinated_2;
 	cum_deaths_1 -> cum_deaths_2;
 	cum_infections_2 -> cum_infections_3;

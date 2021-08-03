@@ -21,6 +21,8 @@ def covariate_imbalance(df, covariates, treatment_var,
     For continuous treatments, this is done by taking the mean over the Pearson
     correlations between each covariate and the treatment.
 
+    NOTE: This does NOT yet handle categorical treatments/covariates.
+
     Parameters
     ----------
     df : pandas dataframe
