@@ -9,19 +9,21 @@ import pydot
 from collections import Hashable
 import os
 import pickle
-
+import pandas as pd
+from itertools import combinations
 
 def covariate_imbalance(df, covariates, treatment_var,
                         control_val=0, treatment_val=1):
     """
     Estimate the covariate imbalance.
-    For binary and categorical treatments, this is done by taking the mean over
-    the mean difference between the treatment and control group of each
-    covariate.
+    For binary treatments, this is done by taking the mean over the mean
+    difference between the treatment and control group of each covariate.
+    For categorical treatments, this is done by calculating pairwise comparisons
+    between treatment groups and taking the largest.
     For continuous treatments, this is done by taking the mean over the Pearson
     correlations between each covariate and the treatment.
-
-    NOTE: This does NOT yet handle categorical treatments/covariates.
+    Categorical covariates are handled using one-hot encoding to transform them
+    into boolean variables.
 
     Parameters
     ----------
@@ -46,19 +48,38 @@ def covariate_imbalance(df, covariates, treatment_var,
     """
 
     covariates = [c for c in covariates if c in df.columns]
+    assert treatment_var not in covariates, f"Treatment var {treatment_var} cannot also be a covariate"
 
     if not covariates:
         return 0
 
-    if str(df.dtypes[treatment_var]) in ["bool", "category"]:
+    new_covariates = []
+    # One-hot encode all categorical covariates
+    for covariate in covariates:
+        if str(df.dtypes[covariate]) == "category":
+            to_one_hot_encode = pd.get_dummies(df[covariate], prefix=covariate)
+            df = df.drop(covariate, axis=1)
+            df = df.join(to_one_hot_encode)
+            new_covariates += list(to_one_hot_encode)
+        else:
+            new_covariates.append(covariate)
+    covariates = new_covariates
+
+    if str(df.dtypes[treatment_var]) == "bool":
         control_group = df.loc[df[treatment_var] == control_val]
         treatment_group = df.loc[df[treatment_var] == treatment_val]
-        imbalances = [treatment_group[covariate].mean() - control_group[covariate].mean() for covariate in covariates]
+        for covariate in covariates:
+            print(covariate, treatment_group[covariate])
+        imbalances = [abs(treatment_group[covariate].mean() - control_group[covariate].mean()) for covariate in covariates]
+    elif str(df.dtypes[treatment_var]) == "category":
+        treatments = set(df[treatment_var])
+        groups = [df.loc[df[treatment_var] == c] for c in treatments]
+        imbalances = [[abs(g1[covariate].mean() - g2[covariate].mean()) for g1, g2 in combinations(groups, 2)] for covariate in covariates]
+        imbalances = [max(x) for x in imbalances]
     else:
         imbalances = [df[covariate].corr(df[treatment_var]) for covariate in covariates]
 
     return sum(imbalances) / len(covariates)
-
 
 def test(estimate, relationship, ci_low, ci_high):
     if relationship == "<":
