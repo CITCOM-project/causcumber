@@ -49,10 +49,19 @@ def covariate_imbalance(df, covariates, treatment_var,
     """
 
     covariates = [c for c in covariates if c in df.columns]
-    print(covariates)
 
     if not covariates:
         return 0
+    else:
+        # One-hot encode all categorical covariates
+        for covariate in covariates:
+            if str(df.dtypes[covariate]) == "category":
+                to_one_hot_encode = pd.get_dummies(df[covariate], prefix=covariate)
+                df = df.drop(covariate, axis=1)
+                df = df.join(to_one_hot_encode)
+                # Remove the original categorical variable and add one-hot encoded categories
+                covariates.remove(covariate)
+                covariates += list(to_one_hot_encode)
 
     if str(df.dtypes[treatment_var]) == "bool":
         control_group = df.loc[df[treatment_var] == control_val]
@@ -64,7 +73,6 @@ def covariate_imbalance(df, covariates, treatment_var,
         
         for c1, c2 in combinations(treatments, 2):
             for covariate in covariates:
-                print(covariate)
                 g1 = df.loc[df[treatment_var] == c1]
                 g2 = df.loc[df[treatment_var] == c2]
                 mean = abs(g1[covariate].mean() - g2[covariate].mean())
