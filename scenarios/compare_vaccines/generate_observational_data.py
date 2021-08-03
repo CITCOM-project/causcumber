@@ -4,13 +4,14 @@ import covasim as cv
 from collections import defaultdict
 from covasim_utils import run_covasim_by_week, save_results_df
 
-N_RUNS = 30
+N_RUNS = 50
+BIAS_LOCATIONS = True
 
 vaccine_names = ["none", "pfizer", "moderna", "az"]
 vaccine_probs_by_country = {"UK": 1, "China": 0.5, "France": 0.8, "Japan": 1.5}
 fixed_params = {"n_days": 35, "pop_type": "hybrid", "use_waning": True}
-variable_params = {"interventions": vaccine_names, "pop_size": (50000, 1000), "pop_infected": (100, 5),  "location":
-                   ["UK", "China", "France", "Japan"]}
+variable_params = {"pop_size": (50000, 1000), "pop_infected": (100, 5),  "location": ["UK", "China", "France", "Japan"],
+                   "interventions": vaccine_names}
 desired_outputs = ["cum_infections", "cum_symptomatic", "cum_severe", "cum_critical", "cum_deaths", "cum_vaccinated"]
 
 
@@ -23,7 +24,8 @@ def generate_observational_data_from_param_list(param_list, n):
 
 
 def generate_biased_observational_data_from_param_list(param_list, n):
-    prob_list = np.random.dirichlet(np.ones(len(param_list))*1000, size=1).flatten()
+    prob_list = np.random.dirichlet(np.ones(len(param_list))/1.2, size=1).flatten()
+    print(prob_list)
     return np.random.choice(param_list, n, p=prob_list)
 
 
@@ -34,9 +36,10 @@ def generate_observational_data(fixed_params, variable_params, outputs, n_runs):
     run_params = defaultdict(list)
     for param, info in variable_params.items():
         if type(info) == list:
-            if param == "location":
+            if param == "location" and BIAS_LOCATIONS:
                 run_params[param] = generate_biased_observational_data_from_param_list(info, n_runs)
-            run_params[param] = generate_observational_data_from_param_list(info, n_runs)
+            else:
+                run_params[param] = generate_observational_data_from_param_list(info, n_runs)
         else:
             mean, variance = info
             run_params[param] = generate_observational_data_from_normal_distribution(mean, variance, n_runs)
@@ -55,7 +58,11 @@ def generate_observational_data(fixed_params, variable_params, outputs, n_runs):
             del params["interventions"]
         else:
             vaccinate_days = list(range(params["n_days"]))
-            vaccine = cv.vaccinate_prob(params["interventions"], vaccinate_days, label=params["interventions"])
+            # If UK, give pfizer with 80% chance
+            vaccine_name = params["interventions"]
+            if params["location"] == "UK":
+                vaccine_name = np.random.choice([params["interventions"], "pfizer"], 1, p=[0.2, 0.8])[0]
+            vaccine = cv.vaccinate_prob(vaccine_name, vaccinate_days, label=params["interventions"])
             # Inject some confounding: vaccine prob depends on country
             country = params["location"]
             vaccine_prob_multiplier = vaccine_probs_by_country[country]
