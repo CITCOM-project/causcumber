@@ -5,7 +5,6 @@ import sys
 sys.path.append("../../../../")  # This one's for native running from within steps
 sys.path.append("../../../")  # This one's for running `behave` in `features`
 sys.path.append("../../")  # This one's for running `behave` in `compare_vaccines`
-
 from causcumber_utils import dagitty_identification, covariate_imbalance
 
 if __name__ == "__main__":
@@ -19,7 +18,6 @@ if __name__ == "__main__":
     imbalance_observational_data["location"] = imbalance_observational_data["location"].astype("category")
     imbalance_observational_data["interventions"] = imbalance_observational_data["interventions"].astype("category")
     imbalance_observational_data["pop_type"] = imbalance_observational_data["pop_type"].astype("category")
-
 
     normal_imbalance_score = covariate_imbalance(observational_data, adjustment_set, "interventions")
     imbalanced_imbalance_score = covariate_imbalance(imbalance_observational_data, adjustment_set, "interventions")
