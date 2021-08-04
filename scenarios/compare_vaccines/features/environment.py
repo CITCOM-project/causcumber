@@ -28,6 +28,12 @@ def set_observational_df(context, file_name):
     context.observational_df = pd.read_csv(f"./observational_data/{file_name}.csv")
 
 
+@fixture
+def set_identification(context):
+    """ Disables identification and makes all estimates purely associational. """
+    context.identification = False
+
+
 def before_feature(context, feature):
     print(f"Running Feature `{feature.name}`")
     use_fixture(set_results_df, context)
@@ -51,8 +57,10 @@ def after_feature(context, feature):
     output_name = f"{scenario_name_to_snake_case(scenario_outline.name)}_causal_inference"
     # If using observational data, add observational to file name
     for tag in scenario_outline.tags:
+        print(tag)
         if "observational" in tag:
             output_name = f"{scenario_name_to_snake_case(scenario_outline.name)}_observational_causal_inference"
+    print(output_name)
     save_results_df(combined_vaccine_results_df, "./results", output_name)
 
     # Delete the individual csv files
@@ -65,7 +73,10 @@ def before_tag(context, tag):
         directory instead of running the model. """
     # If the tag is badly formed, run the model instead
     if tag.startswith("observational") and '.' in tag:
-        print("E")
         _, file_name = tag.split('.')
         if file_name:
             use_fixture(set_observational_df, context, file_name)
+
+    if tag.startswith("disable_identification"):
+        print("DISABLING IDENTIFICATION")
+        use_fixture(set_identification, context)

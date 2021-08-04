@@ -95,8 +95,12 @@ def step_impl(context):
     vaccine_conversion = {"none": 0, treatment: 1}
     data["interventions"] = data["interventions"].replace(vaccine_conversion)
     print(f"DATA: {data['interventions']}")
-    causal_estimate, confidence_intervals = run_dowhy(data, causal_graph, "interventions",
-                                                      "cum_infections_5", 0, 1, verbose=True)
+    if hasattr(context, "identification"):
+        use_identification = context.identification
+    else:
+        use_identification = True
+    causal_estimate, confidence_intervals = run_dowhy(data, causal_graph, "interventions", "cum_infections_5", 0, 1,
+                                                          identification=use_identification, verbose=True)
 
     test_outcome = causal_estimate < 0
     results_dict = {"vaccine": [treatment],
