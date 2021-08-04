@@ -9,6 +9,70 @@ import pydot
 from collections import Hashable
 import os
 import pickle
+import pandas as pd
+from itertools import combinations
+
+def covariate_imbalance(df, covariates, treatment_var):
+    """
+    Estimate the covariate imbalance.
+    For binary treatments, this is done by taking the mean over the mean
+    difference between the treatment and control group of each covariate.
+    For categorical treatments, this is done by calculating pairwise comparisons
+    between treatment groups and taking the largest.
+    For continuous treatments, this is done by taking the mean over the Pearson
+    correlations between each covariate and the treatment.
+    Categorical covariates are handled using one-hot encoding to transform them
+    into boolean variables.
+
+    Parameters
+    ----------
+    df : pandas dataframe
+        Dataframe containing the data.
+    covariates : list
+        The covariates for which to calculate the imbalance.
+    treatment_var : string
+        The name of the treatment.
+
+    Returns
+    -------
+    float
+        The covariate imbalance between the supplied covariates.
+
+    """
+
+    covariates = [c for c in covariates if c in df.columns]
+    assert treatment_var not in covariates, f"Treatment var {treatment_var} cannot also be a covariate"
+
+    if not covariates:
+        return 0
+
+    new_covariates = []
+    # One-hot encode all categorical covariates
+    for covariate in covariates:
+        if str(df.dtypes[covariate]) == "category":
+            to_one_hot_encode = pd.get_dummies(df[covariate], prefix=covariate)
+            df = df.drop(covariate, axis=1)
+            df = df.join(to_one_hot_encode)
+            new_covariates += list(to_one_hot_encode)
+        else:
+            new_covariates.append(covariate)
+    covariates = new_covariates
+
+    if str(df.dtypes[treatment_var]) == "bool":
+        control_group = df.loc[df[treatment_var] == 0]
+        treatment_group = df.loc[df[treatment_var] == 1]
+        for covariate in covariates:
+            print(covariate, treatment_group[covariate])
+        imbalances = [abs(treatment_group[covariate].mean() - control_group[covariate].mean()) for covariate in covariates]
+    elif str(df.dtypes[treatment_var]) == "category":
+        treatments = set(df[treatment_var])
+        groups = [df.loc[df[treatment_var] == c] for c in treatments]
+        imbalances = [[abs(g1[covariate].mean() - g2[covariate].mean()) for g1, g2 in combinations(groups, 2)] for covariate in covariates]
+        imbalances = [max(x) for x in imbalances]
+    else:
+        imbalances = [df[covariate].corr(df[treatment_var]) for covariate in covariates]
+
+    return sum(imbalances) / len(covariates)
 
 def test(estimate, relationship, ci_low, ci_high):
     if relationship == "<":
@@ -161,7 +225,7 @@ def _dot_to_dagitty_dag(dot_file_path):
     return dag_string
 
 
-def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val, verbose=False):
+def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val, identification=True, verbose=False):
     """
     :param data: A dataframe representing the observational data.
     :param graph: Filepath of the DOT file representing the causal DAG. Nodes here MUST have a 1:1 correspondence with
@@ -172,6 +236,8 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
                         receive treatment).
     :param treatment_val: The treated value of the treatment variable (i.e. the value for individuals who DID receive
                           treatment.)
+    :param identification: Set to false to disable identification and make no adjustments, yielding purely associational
+                           estimates.
     :param verbose: Set to True to print additional information to the console (defaults to False).
     :return: The causal estimate calculated by doWhy and the 95% confidence intervals [low, high].
     """
@@ -211,15 +277,15 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         print("Creating a causal model...")
 
     adjustment_set = []
-    adjustment_set_path = f'{graph.replace(".dot", "")}-{treatment_var}-{outcome_var}-adjustment.adj'
-    if os.path.exists(adjustment_set_path):
-        with open(adjustment_set_path, 'rb') as f:
-            adjustment_set = pickle.load(f)
-    else:
-        adjustment_set = dagitty_identification(graph, treatment_var, outcome_var)
-        with open(adjustment_set_path, 'wb') as f:
-            pickle.dump(adjustment_set, f)
-
+    if identification:
+        adjustment_set_path = f'{graph.replace(".dot", "")}-{treatment_var}-{outcome_var}-adjustment.adj'
+        if os.path.exists(adjustment_set_path):
+            with open(adjustment_set_path, 'rb') as f:
+                adjustment_set = pickle.load(f)
+        else:
+            adjustment_set = dagitty_identification(graph, treatment_var, outcome_var)
+            with open(adjustment_set_path, 'wb') as f:
+                pickle.dump(adjustment_set, f)
 
     if verbose:
         print("  adjustment_set", adjustment_set)

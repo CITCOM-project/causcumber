@@ -71,7 +71,7 @@ def params(interventions):
         'pop_type': 'hybrid',
         'pop_size': random.randint(1, 5) * (10 ** random.randint(4, 5)),
         'pop_infected': random.randint(0, 200),
-        'location': 'UK',
+        'location': random.choice(['UK', 'Japan', 'Rwanda']),
         'interventions': interventions(quar_period)
     }
 
