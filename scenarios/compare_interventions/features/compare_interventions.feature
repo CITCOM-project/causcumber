@@ -1,6 +1,6 @@
 # This file MUST be run from inside ../compare_interventions, otherwise it won't
 # be able to find the causal DAG. Run as `behave features/compare_interventions.feature`
-# @observational("results/data.csv")
+@observational("results/data.csv")
 Feature: Compare interventions
   Background:
     Given a simulation with parameters
