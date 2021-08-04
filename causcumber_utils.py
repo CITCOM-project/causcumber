@@ -225,7 +225,7 @@ def _dot_to_dagitty_dag(dot_file_path):
     return dag_string
 
 
-def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val, verbose=False):
+def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val, identification=True, verbose=False):
     """
     :param data: A dataframe representing the observational data.
     :param graph: Filepath of the DOT file representing the causal DAG. Nodes here MUST have a 1:1 correspondence with
@@ -236,6 +236,8 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
                         receive treatment).
     :param treatment_val: The treated value of the treatment variable (i.e. the value for individuals who DID receive
                           treatment.)
+    :param identification: Set to false to disable identification and make no adjustments, yielding purely associational
+                           estimates.
     :param verbose: Set to True to print additional information to the console (defaults to False).
     :return: The causal estimate calculated by doWhy and the 95% confidence intervals [low, high].
     """
@@ -275,15 +277,15 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         print("Creating a causal model...")
 
     adjustment_set = []
-    adjustment_set_path = f'{graph.replace(".dot", "")}-{treatment_var}-{outcome_var}-adjustment.adj'
-    if os.path.exists(adjustment_set_path):
-        with open(adjustment_set_path, 'rb') as f:
-            adjustment_set = pickle.load(f)
-    else:
-        adjustment_set = dagitty_identification(graph, treatment_var, outcome_var)
-        with open(adjustment_set_path, 'wb') as f:
-            pickle.dump(adjustment_set, f)
-
+    if identification:
+        adjustment_set_path = f'{graph.replace(".dot", "")}-{treatment_var}-{outcome_var}-adjustment.adj'
+        if os.path.exists(adjustment_set_path):
+            with open(adjustment_set_path, 'rb') as f:
+                adjustment_set = pickle.load(f)
+        else:
+            adjustment_set = dagitty_identification(graph, treatment_var, outcome_var)
+            with open(adjustment_set_path, 'wb') as f:
+                pickle.dump(adjustment_set, f)
 
     if verbose:
         print("  adjustment_set", adjustment_set)
