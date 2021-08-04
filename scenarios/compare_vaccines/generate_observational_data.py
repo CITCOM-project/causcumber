@@ -58,11 +58,15 @@ def generate_observational_data(fixed_params, variable_params, outputs, n_runs):
             del params["interventions"]
         else:
             vaccinate_days = list(range(params["n_days"]))
-            # If UK, give pfizer with 80% chance
-            vaccine_name = params["interventions"]
             if params["location"] == "UK":
                 vaccine_name = np.random.choice([params["interventions"], "pfizer"], 1, p=[0.2, 0.8])[0]
-            vaccine = cv.vaccinate_prob(vaccine_name, vaccinate_days, label=params["interventions"])
+            elif params["location"] == "France":
+                vaccine_name = np.random.choice([params["interventions"], "moderna"], 1, p=[0.2, 0.8])[0]
+            elif params["location"] == "Japan":
+                vaccine_name = np.random.choice([params["interventions"], "az"], 1, p=[0.2, 0.8])[0]
+            else:
+                vaccine_name = np.random.choice([params["interventions"], "jj"], 1, p=[0.2, 0.8])[0]
+            vaccine = cv.vaccinate_prob(vaccine_name, vaccinate_days, label=vaccine_name)
             # Inject some confounding: vaccine prob depends on country
             country = params["location"]
             vaccine_prob_multiplier = vaccine_probs_by_country[country]
@@ -74,7 +78,7 @@ def generate_observational_data(fixed_params, variable_params, outputs, n_runs):
         run_results["interventions"] = label  # convert vaccine object to label
         results_list.append(run_results)
     results_df = pd.concat(results_list)
-    save_results_df(results_df, "./observational_data", "single_vaccine_imbalance")
+    save_results_df(results_df, "./observational_data", "new_single_vaccine_imbalance")
 
 
 generate_observational_data(fixed_params, variable_params, desired_outputs, N_RUNS)

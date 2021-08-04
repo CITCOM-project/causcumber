@@ -9,7 +9,7 @@ from causcumber_utils import dagitty_identification, covariate_imbalance
 
 if __name__ == "__main__":
     observational_data = pd.read_csv("./observational_data/single_vaccine.csv")
-    imbalance_observational_data = pd.read_csv("./observational_data/single_vaccine_imbalance.csv")
+    imbalance_observational_data = pd.read_csv("./observational_data/new_single_vaccine_imbalance.csv")
     adjustment_set = dagitty_identification("./dags/simple_confounding_dag.dot", "interventions", "cum_infections_5")
 
     observational_data['location'] = observational_data['location'].astype("category")
