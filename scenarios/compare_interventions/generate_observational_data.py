@@ -71,7 +71,7 @@ def params(interventions):
         'pop_type': 'hybrid',
         'pop_size': random.randint(1, 5) * (10 ** random.randint(4, 5)),
         'pop_infected': random.randint(0, 200),
-        'location': 'UK',
+        'location': random.choice(['UK', 'Japan', 'Rwanda']),
         'interventions': interventions(quar_period)
     }
 
@@ -113,9 +113,11 @@ def run_covasim_by_week(label, params, desired_outputs, n_runs=10):
         dic = week_by_week.to_dict(orient='list')
         week_dic = {f"{k}_{w+1}": item for k in desired_outputs for w, item in enumerate(dic[k])}
         week_dic['quar_period'] = quar_period
+        params["interventions"] = label
         for k, v in params.items():
             week_dic[k] = v
         temporal.append(week_dic)
+
     return pd.DataFrame(temporal)
 
 
