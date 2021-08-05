@@ -5,12 +5,13 @@ Feature: Compare vaccines
 
   Background:
     Given a simulation with parameters
-      | parameter    | value  | type |
-      | n_days       | 35     | int  |
-      | pop_type     | hybrid | str  |
-      | pop_size     | 50000  | int  |
-      | pop_infected | 100    | int  |
-      | location     | UK     | str  |
+      | parameter     | value  | type  |
+      | n_days        | 35     | int   |
+      | pop_type      | hybrid | str   |
+      | pop_size      | 50000  | int   |
+      | pop_infected  | 100    | int   |
+      | location      | UK     | str   |
+      | interventions |        | list  |
     And the following variables are recorded weekly
       | variable          | type     |
       | cum_infections    | int      |
@@ -23,43 +24,43 @@ Feature: Compare vaccines
   Scenario: Draw DAG
     Given a connected repeating unit
     When we prune the following edges
-      | s1                | s2                 |
-      | intervention      | cum_infections_n   |
-      | intervention      | cum_symptomatic_n  |
-      | intervention      | cum_severe_n       |
-      | intervention      | cum_critical_n     |
-      | intervention      | cum_deaths_n       |
-      | pop_type          | cum_deaths_n       |
-      | pop_size          | cum_deaths_n       |
-      | location          | cum_deaths_n       |
-      | pop_infected      | cum_deaths_n       |
-      | n_days            | cum_infections_n   |
-      | n_days            | cum_symptomatic_n  |
-      | n_days            | cum_severe_n       |
-      | n_days            | cum_critical_n     |
-      | n_days            | cum_deaths_n       |
-      | cum_infections_n  | cum_severe_n1      |
-      | cum_infections_n  | cum_critical_n1    |
-      | cum_infections_n  | cum_deaths_n1      |
-      | cum_symptomatic_n | cum_critical_n1    |
-      | cum_symptomatic_n | cum_deaths_n1      |
-      | cum_severe_n      | cum_infections_n1  |
-      | cum_severe_n      | cum_symptomatic_n1 |
-      | cum_severe_n      | cum_deaths_n1      |
-      | cum_critical_n    | cum_infections_n1  |
-      | cum_critical_n    | cum_symptomatic_n1 |
-      | cum_critical_n    | cum_severe_n1      |
-      | cum_deaths_n      | cum_infections_n1  |
-      | cum_deaths_n      | cum_symptomatic_n1 |
-      | cum_deaths_n      | cum_severe_n1      |
-      | cum_deaths_n      | cum_critical_n1    |
-      | cum_vaccinated_n  | cum_symptomatic_n1 |
-      | cum_vaccinated_n  | cum_severe_n1      |
-      | cum_vaccinated_n  | cum_critical_n1    |
-      | cum_vaccinated_n  | cum_deaths_n1      |
+      | s1                 | s2                 |
+      | interventions      | cum_symptomatic_n  |
+      | interventions      | cum_severe_n       |
+      | interventions      | cum_critical_n     |
+      | interventions      | cum_deaths_n       |
+      | pop_type           | cum_deaths_n       |
+      | pop_size           | cum_deaths_n       |
+      | location           | cum_deaths_n       |
+      | pop_infected       | cum_deaths_n       |
+      | n_days             | cum_infections_n   |
+      | n_days             | cum_symptomatic_n  |
+      | n_days             | cum_severe_n       |
+      | n_days             | cum_critical_n     |
+      | n_days             | cum_deaths_n       |
+      | cum_infections_n   | cum_severe_n1      |
+      | cum_infections_n   | cum_critical_n1    |
+      | cum_infections_n   | cum_deaths_n1      |
+      | cum_symptomatic_n  | cum_critical_n1    |
+      | cum_symptomatic_n  | cum_deaths_n1      |
+      | cum_severe_n       | cum_infections_n1  |
+      | cum_severe_n       | cum_symptomatic_n1 |
+      | cum_severe_n       | cum_deaths_n1      |
+      | cum_critical_n     | cum_infections_n1  |
+      | cum_critical_n     | cum_symptomatic_n1 |
+      | cum_critical_n     | cum_severe_n1      |
+      | cum_deaths_n       | cum_infections_n1  |
+      | cum_deaths_n       | cum_symptomatic_n1 |
+      | cum_deaths_n       | cum_severe_n1      |
+      | cum_deaths_n       | cum_critical_n1    |
+      | cum_vaccinated_n   | cum_symptomatic_n1 |
+      | cum_vaccinated_n   | cum_severe_n1      |
+      | cum_vaccinated_n   | cum_critical_n1    |
+      | cum_vaccinated_n   | cum_deaths_n1      |
     Then we obtain the causal DAG for 5 weeks
 
-  @observational.single_vaccine
+
+  @observational.new_single_vaccine_imbalance
   Scenario Outline: Single vaccine
     All vaccines should reduce the cumulative number of infections relative to the
     baseline scenario where no vaccine is available.

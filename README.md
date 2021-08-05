@@ -1,25 +1,28 @@
 # Causcumber
-Can we use cucumber specifications to systematically produce causal graphs that can be used to answer causal questions about a particular scenario in the Covasim model?
+Can we use cucumber specifications to systematically produce causal graphs that can be used to test specific scenarios in the Covasim model using causal inference methods?
 
 ## Structure
-The scenarios directory contains different example scenarios implemented in the Covasim model. For each scenario in the directory, a separate sub-directory should be created that contains the simulation and a cucumber specification.
+The `scenarios` directory contains different example scenarios implemented in the Covasim model. For each scenario in the directory, a separate sub-directory should be created that contains the simulation and a cucumber specification. Within each scenario sub-directory, three directories should be created:
+1. `dags/`: this directory should contain any causal graphs as `.dot` files. This is where CauseCumber will place causal graphs too.
+2. `features/`: this directory should contain all of the elements for behave, including `.feature` files, an `environment.py` file, and a directory `steps/` containing python scripts to implement step definitions for each `.feature` file.
+3. `observational_data/`: this directory should contain any observational data that you wish to use instead of running the model. This is optional.
 
 ## Steps to create a virtual environment:
-1. In `./covasim/causcumber`, run `python3 -m venv causcumber_venv`
+1. In `./causcumber`, run `python3 -m venv causcumber_venv`
 2. To activate the virtual environment, run `source causcumber_venv/bin/activate`
 3. To install the necessary requirements, in the root directory (`./causcumber`), run `pip install -r requirements.txt`
 
 
 ## Proposed Causcumber workflow
-1. Create a `.feature` file specifying desired causal properties as scenarios in Gherkin language
-2. Transform each scenario into a causal question
-3. Infer a causal DAG baseline from each scenario - the user may need to correct this
-4. Run the system to get data for each causal question
-   >This is why I'd like to have the scenarios in each feature file use the same DAG. If we make this assumption, we can then use the scenarios to direct the exact runs of the model so we can test multiple scenarios with the same data. If we only test one scenario, we can effectively do an RCT. We could, I guess, only change the parameters according to the scenarios.
-5. Write hooks into the data with Cucumber and use doWhy to calculate causal estimates for each scenario and check that these match the specified behaviour in the `Then` clauses
+1. Create a `.feature` file specifying desired causal properties as scenarios in Gherkin language.
+2. Specify a `Background` scenario that lists the inputs and outputs of interest.
+3. Transform each scenario into a causal question
+4. Infer a fully-connected causal DAG from the `Background` and prune manually.
+5. Run the system to get data for each causal question or, alternatively, select previous execution data to achieve the same.
+6. Write step definitions (AKA hooks) into the data with Cucumber and use DoWhy to calculate causal estimates for each scenario and check that these match the specified behaviour in the `Then` clauses.
 
 ## Results Format
-We work with CSV files produced by the simulations. These have 164 columns, the headings of which is as follows:
+We work with CSV files produced by Covasim simulations. These have 164 columns, the headings of which is as follows:
 - `t` (time step)
 - `date`
 - Cumulative (`cum_`) and new (`new_`)

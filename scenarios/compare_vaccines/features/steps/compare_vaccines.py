@@ -52,7 +52,7 @@ def step_impl(context):
         params = context.params_df.to_dict("records")[0]
         desired_outputs = context.desired_outputs
         context.results_df = run_covasim_by_week(label, params, desired_outputs)
-        context.results_df["intervention"] = "none"
+        context.results_df["interventions"] = "none"
         save_results_df(context.results_df, RESULTS_PATH, "no_vaccination_results")
 
 
@@ -86,17 +86,21 @@ def step_impl(context):
 
     if hasattr(context, "observational_df"):
         data = context.observational_df.copy()
-        data = data[(data["intervention"] == treatment) | (data["intervention"] == "none")]
+        data = data[(data["interventions"] == treatment) | (data["interventions"] == "none")]
     else:
         data = context.results_df
 
     print(f"Treatment: {treatment}")
     # DoWhy requires non-continuous data to be numerical
     vaccine_conversion = {"none": 0, treatment: 1}
-    data["intervention"] = data["intervention"].replace(vaccine_conversion)
-    print(f"DATA: {data['intervention']}")
-    causal_estimate, confidence_intervals = run_dowhy(data, causal_graph, "intervention",
-                                                      "cum_infections_5", 0, 1, verbose=True)
+    data["interventions"] = data["interventions"].replace(vaccine_conversion)
+    print(f"DATA: {data['interventions']}")
+    if hasattr(context, "identification"):
+        use_identification = context.identification
+    else:
+        use_identification = True
+    causal_estimate, confidence_intervals = run_dowhy(data, causal_graph, "interventions", "cum_infections_5", 0, 1,
+                                                          identification=use_identification, verbose=True)
 
     test_outcome = causal_estimate < 0
     results_dict = {"vaccine": [treatment],
@@ -111,7 +115,6 @@ def step_impl(context):
 @given("a connected repeating unit")
 def step_impl(context):
     inputs = list(context.params_df)
-    inputs.append("intervention")
     outputs = list(context.results_df)
     context.repeating_unit = draw_connected_repeating_unit(inputs, outputs)
 

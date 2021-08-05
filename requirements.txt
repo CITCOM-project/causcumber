@@ -1,5 +1,5 @@
 cffi==1.14.6
-covasim==3.0.6
+covasim==3.0.7
 cycler==0.10.0
 decorator==4.4.2
 dill==0.3.4
