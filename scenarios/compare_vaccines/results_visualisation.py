@@ -9,11 +9,13 @@ def plot_data_vs_ate(data_dir):
     """ Plot the amount of data used against the ATE for each vaccine with 95% confidence intervals. """
     df = combine_csvs(data_dir)
     percentages = list(df["percentage"].unique())
+    print(percentages)
     vaccines = list(df["vaccine"].unique())
     fig, ax = plt.subplots()
     ax.set_title("Amount of Data vs. Causal Estimate")
     ax.set_ylabel("Causal Estimate")
     ax.set_xlabel("Percentage of Data Used")
+    ax.set_xticks(percentages)
     for vaccine in vaccines:
         estimates = []
         intervals = []
@@ -32,7 +34,6 @@ def plot_data_vs_ate(data_dir):
     fig.savefig(os.path.join(data_dir, "data_vs_causal_estimate.png"), format="png", dpi=150)
 
 
-
 def combine_csvs(data_dir):
     path = data_dir
     all_csvs = glob.glob(path + "/*.csv")
@@ -42,7 +43,11 @@ def combine_csvs(data_dir):
     for filename in all_csvs:
         df = pd.read_csv(filename, header=0)
         df = df[["vaccine", "causal_estimate", "ci_low", "ci_high"]]
-        df["percentage"] = filename[-6:-4]
+        percentage = filename[-7:-4]
+        if not percentage.isnumeric():
+            percentage = percentage[1:]
+            print(percentage)
+        df["percentage"] = percentage
         run_dfs.append(df)
     df = pd.concat(run_dfs, axis=0, ignore_index=True)
     df["percentage"] = df["percentage"].astype(int)
