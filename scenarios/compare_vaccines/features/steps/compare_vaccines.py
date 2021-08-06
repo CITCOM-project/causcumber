@@ -16,7 +16,7 @@ use_step_matcher("re")
 # If we run behave inside compare_vaccines, then we need the results path to be in there
 # RESULTS_PATH = "scenarios/compare_vaccines/results"
 RESULTS_PATH = "results"
-
+N_RUNS = 30
 
 @given("a simulation with parameters")
 def step_impl(context):
@@ -51,7 +51,7 @@ def step_impl(context):
         label = context.scenario.name
         params = context.params_df.to_dict("records")[0]
         desired_outputs = context.desired_outputs
-        context.results_df = run_covasim_by_week(label, params, desired_outputs)
+        context.results_df = run_covasim_by_week(label, params, desired_outputs, n_runs=N_RUNS)
         context.results_df["interventions"] = "none"
         save_results_df(context.results_df, RESULTS_PATH, "no_vaccination_results")
 
@@ -71,8 +71,10 @@ def step_impl(context, vaccine_name):
         desired_outputs = context.desired_outputs
         label = run_params["interventions"].label
         params = run_params
-        intervention_results_df = run_covasim_by_week(label, params, desired_outputs)
+        intervention_results_df = run_covasim_by_week(label, params, desired_outputs, n_runs=N_RUNS)
         context.results_df = pd.concat([context.results_df, intervention_results_df])
+        print(context.results_df["interventions"])
+        # context.results_df["interventions"] = [vaccine.label for vaccine in context.results_df["interventions"]]
         save_results_df(context.results_df, RESULTS_PATH, "single_vaccination_results")
 
 
@@ -89,12 +91,13 @@ def step_impl(context):
         data = data[(data["interventions"] == treatment) | (data["interventions"] == "none")]
     else:
         data = context.results_df
+        # Convert the vaccine object to its label
+        data["interventions"] = [vaccine.label if (vaccine != "none") else vaccine for vaccine in data["interventions"]]
 
-    print(f"Treatment: {treatment}")
-    # DoWhy requires non-continuous data to be numerical
+    # DoWhy requires categorical data to be numerical
     vaccine_conversion = {"none": 0, treatment: 1}
+    print(data["interventions"])
     data["interventions"] = data["interventions"].replace(vaccine_conversion)
-    print(f"DATA: {data['interventions']}")
     if hasattr(context, "identification"):
         use_identification = context.identification
     else:
