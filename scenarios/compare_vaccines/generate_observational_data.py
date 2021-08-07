@@ -5,7 +5,7 @@ from collections import defaultdict
 from covasim_utils import run_covasim_by_week, save_results_df
 
 N_RUNS = 50
-BIAS_LOCATIONS = True
+BIAS_LOCATIONS = False
 
 vaccine_names = ["none", "pfizer", "moderna", "az"]
 vaccine_probs_by_country = {"UK": 1, "China": 0.5, "France": 0.8, "Japan": 1.5}
@@ -13,6 +13,17 @@ fixed_params = {"n_days": 35, "pop_type": "hybrid", "use_waning": True}
 variable_params = {"pop_size": (50000, 1000), "pop_infected": (100, 5),  "location": ["UK", "China", "France", "Japan"],
                    "interventions": vaccine_names}
 desired_outputs = ["cum_infections", "cum_symptomatic", "cum_severe", "cum_critical", "cum_deaths", "cum_vaccinated"]
+
+
+def split_data_into_chunks(data_csv):
+    """ Takes a dataframe and creates 10 sub-dfs containing 10%, 20%, 30%, ..., 100% of the data. """
+    df = pd.read_csv(data_csv)
+    percentages = [x/10 for x in range(1, 10)]
+    for percentage in percentages:
+        sub_df = df.sample(frac=percentage)
+        sub_df.to_csv(f"../../experiments/observational_data/experiment_1_observational_data_{str(int(percentage*100))}"
+                      f".csv")
+
 
 
 def generate_observational_data_from_normal_distribution(param, variance, n):
@@ -58,22 +69,25 @@ def generate_observational_data(fixed_params, variable_params, outputs, n_runs):
             del params["interventions"]
         else:
             vaccinate_days = list(range(params["n_days"]))
-            if params["location"] == "UK":
-                vaccine_name = np.random.choice([params["interventions"], "pfizer"], 1, p=[0.2, 0.8])[0]
-            elif params["location"] == "France":
-                vaccine_name = np.random.choice([params["interventions"], "moderna"], 1, p=[0.2, 0.8])[0]
-            elif params["location"] == "Japan":
-                vaccine_name = np.random.choice([params["interventions"], "az"], 1, p=[0.2, 0.8])[0]
+            if BIAS_LOCATIONS:
+                if params["location"] == "UK":
+                    vaccine_name = np.random.choice([params["interventions"], "pfizer"], 1, p=[0.2, 0.8])[0]
+                elif params["location"] == "France":
+                    vaccine_name = np.random.choice([params["interventions"], "moderna"], 1, p=[0.2, 0.8])[0]
+                elif params["location"] == "Japan":
+                    vaccine_name = np.random.choice([params["interventions"], "az"], 1, p=[0.2, 0.8])[0]
+                else:
+                    vaccine_name = np.random.choice([params["interventions"], "jj"], 1, p=[0.2, 0.8])[0]
             else:
-                vaccine_name = np.random.choice([params["interventions"], "jj"], 1, p=[0.2, 0.8])[0]
+                vaccine_name = params["interventions"]
             vaccine = cv.vaccinate_prob(vaccine_name, vaccinate_days, label=vaccine_name)
             # Inject some confounding: vaccine prob depends on country
-            country = params["location"]
-            vaccine_prob_multiplier = vaccine_probs_by_country[country]
-            vaccine.prob *= vaccine_prob_multiplier
+            # country = params["location"]
+            # vaccine_prob_multiplier = vaccine_probs_by_country[country]
+            # vaccine.prob *= vaccine_prob_multiplier
             params["interventions"] = vaccine
             label = vaccine.label
-        run_results = run_covasim_by_week(label, params, outputs)
+        run_results = run_covasim_by_week(label, params, outputs, n_runs=30)
         # if "interventions" in run_results.keys():
         run_results["interventions"] = label  # convert vaccine object to label
         results_list.append(run_results)
@@ -81,4 +95,5 @@ def generate_observational_data(fixed_params, variable_params, outputs, n_runs):
     save_results_df(results_df, "./observational_data", "new_single_vaccine_imbalance")
 
 
-generate_observational_data(fixed_params, variable_params, desired_outputs, N_RUNS)
+# generate_observational_data(fixed_params, variable_params, desired_outputs, N_RUNS)
+split_data_into_chunks("../../experiments/observational_data/data/experiment_1_observational_data.csv")

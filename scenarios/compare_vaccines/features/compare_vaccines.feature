@@ -60,7 +60,7 @@ Feature: Compare vaccines
     Then we obtain the causal DAG for 5 weeks
 
 
-  @observational.new_single_vaccine_imbalance
+  @observational.experiment_1_observational_data_90
   Scenario Outline: Single vaccine
     All vaccines should reduce the cumulative number of infections relative to the
     baseline scenario where no vaccine is available.

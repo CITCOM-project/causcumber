@@ -59,8 +59,8 @@ def after_feature(context, feature):
     for tag in scenario_outline.tags:
         print(tag)
         if "observational" in tag:
-            output_name = f"{scenario_name_to_snake_case(scenario_outline.name)}_observational_causal_inference"
-    print(output_name)
+            _, file_name = tag.split('.')
+            output_name = f"{scenario_name_to_snake_case(scenario_outline.name)}_{file_name}"
     save_results_df(combined_vaccine_results_df, "./results", output_name)
 
     # Delete the individual csv files
