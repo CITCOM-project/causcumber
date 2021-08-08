@@ -86,6 +86,7 @@ def run_covasim_basic(label, params, desired_outputs, n_runs=10):
         results['quar_period'].append(quar_period)
 
     data = pd.DataFrame(results)
+    params["interventions"] = label
     for k, v in params.items():
         data[k] = [v for _ in range(n_runs)]
     return data

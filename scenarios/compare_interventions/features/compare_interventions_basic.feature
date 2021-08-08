@@ -10,7 +10,7 @@ Feature: Compare interventions basic
       | pop_size      | 50000      | int  |
       | pop_infected  | 100        | int  |
       | location      | UK         | str  |
-      | interventions |            | list |
+      | interventions | baseline   | str  |
     And the following variables are recorded at the end of the simulation
       | variable          | type |
       | cum_tests         | int  |
