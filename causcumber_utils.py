@@ -208,7 +208,10 @@ def _install_r_packages(package_names):
     utils.chooseCRANmirror(ind=1)
     packages_to_install = [pkg for pkg in package_names if not isinstalled(pkg)]
     if len(packages_to_install) > 0:
-        utils.install_packages(StrVector(packages_to_install))
+        # The silent package install requires user input, which Behave captures, so it appears to hang
+        # This makes the failure "noisy", so the user knows what's going on
+        raise ValueError(f"Please install R packages f{packages_to_install} and try again")
+        # utils.install_packages(StrVector(packages_to_install))
 
 
 def _dot_to_dagitty_dag(dot_file_path):

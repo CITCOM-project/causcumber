@@ -1,6 +1,6 @@
 # This file MUST be run from inside ../compare_interventions, otherwise it won't
 # be able to find the causal DAG. Run as `behave features/compare_interventions.feature`
-@observational("results/data.csv")
+@observational("results/data_back.csv")
 Feature: Compare interventions
   Background:
     Given a simulation with parameters
@@ -11,7 +11,7 @@ Feature: Compare interventions
       | pop_size      | 50000      | int  |
       | pop_infected  | 100        | int  |
       | location      | UK         | str  |
-      | interventions |            | list |
+      | interventions | baseline   | str  |
     And the following variables are recorded weekly
       | variable          | type |
       | cum_tests         | int  |

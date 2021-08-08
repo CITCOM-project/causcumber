@@ -100,6 +100,7 @@ def step_impl(context, n):
 
 
 def run_covasim(frequency, label, params, outputs, results_path, n_runs=10):
+    params['interventions'] = interventions[params['interventions']]
     if not os.path.exists(results_path):
         if frequency == "weekly":
             print("Running covasim by week")
@@ -121,25 +122,21 @@ def run_covasim(frequency, label, params, outputs, results_path, n_runs=10):
 def step_impl(context, treatment_var, control_val):
     context.treatment_var = treatment_var
     params = context.params_dict.copy()
-    if treatment_var == "interventions":
-        params['interventions'] = interventions[control_val]
-        context.control_val = str(interventions[control_val])
-    else:
-        params[treatment_var] = control_val
-        context.control_val = context.types[treatment_var](control_val) if treatment_var in context.types else control_val
-    run_covasim(context.frequency, control_val, params, context.desired_outputs, f"{context.results_dir}/{control_val}.csv")
+    params[treatment_var] = control_val
+    context.control_val = context.types[treatment_var](control_val) if treatment_var in context.types else control_val
+    if not hasattr(context, "data"):
+        run_covasim(context.frequency, control_val, params, context.desired_outputs, f"{context.results_dir}/{control_val}.csv")
 
 
 @when(u'we run the model with {treatment_var}={treatment_val}')
 def step_impl(context, treatment_var, treatment_val):
+    if context.treatment_var != treatment_var:
+        raise ValueError(f"'When' treatment var != {context.treatment_var} previously defined in 'Given' step")
     params = context.params_dict.copy()
-    if treatment_var == "interventions":
-        params['interventions'] = interventions[treatment_val]
-        context.treatment_val = str(interventions[treatment_val])
-    else:
-        params[treatment_var] = treatment_val
-        context.treatment_val = context.types[treatment_var](treatment_val) if treatment_var in context.types else treatment_val
-    run_covasim(context.frequency, treatment_val, params, context.desired_outputs, f"{context.results_dir}/{treatment_val}.csv")
+    params[treatment_var] = treatment_val
+    context.treatment_val = context.types[treatment_var](treatment_val) if treatment_var in context.types else treatment_val
+    if not hasattr(context, "data"):
+        run_covasim(context.frequency, treatment_val, params, context.desired_outputs, f"{context.results_dir}/{treatment_val}.csv")
 
 
 @then(u'the {outcome} should be {relationship} {control}')
@@ -154,8 +151,6 @@ def step_impl(context, outcome, relationship, control):
     dag = pygraphviz.AGraph(context.dag_path)
     assert outcome in dag.nodes(), f"Outcome {outcome} not in graph nodes. Must be one of {dag.nodes()}"
     assert outcome in data, f"Outcome variable {outcome} not in data. Must be one of {data.columns}."
-
-
 
     estimate, (ci_low, ci_high) = run_dowhy(
               data=data,
