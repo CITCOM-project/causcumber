@@ -3,7 +3,7 @@ covasim==3.0.7
 cycler==0.10.0
 decorator==4.4.2
 dill==0.3.4
--e git+git@github.com:microsoft/dowhy.git@56c0b347295587a11fb98b9bec4b8d27962e6a5c#egg=dowhy
+-e git+https://github.com/microsoft/dowhy#egg=dowhy
 et-xmlfile==1.1.0
 gherkin-official==19.0.3
 gitdb==4.0.7
