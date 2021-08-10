@@ -10,50 +10,12 @@ sys.path.append("../../../") # This one's for running `behave` in `features`
 sys.path.append("../../") # This one's for running `behave` in `compare-inverventions`
 
 from behave_utils import table_to_dict
-from covasim_utils import run_covasim_by_week, run_covasim_basic, preprocess_data
-from causcumber_utils import run_dowhy, draw_connected_repeating_unit, iterate_repeating_unit, test
+from covasim_utils import run_covasim_by_week, run_covasim_basic, preprocess_data, interventions
+from causcumber_utils import run_dowhy, draw_connected_repeating_unit, iterate_repeating_unit, test, draw_connected_dag
 
 import pygraphviz
 
 use_step_matcher("parse")
-
-# Instantiate named covasim interventions with parameters
-intervention = {
-    "standardTest": cv.test_prob(
-        symp_prob=0.2,
-        asymp_prob=0.001,
-        symp_quar_prob=1,
-        asymp_quar_prob=1
-    ),
-    "noTest": cv.test_prob(
-        symp_prob=0,
-        asymp_prob=0,
-        symp_quar_prob=0,
-        asymp_quar_prob=0
-    ),
-    "optimalTest": cv.test_prob(
-        symp_prob=1,
-        asymp_prob=1,
-        symp_quar_prob=1,
-        asymp_quar_prob=1
-    ),
-    "standardTrace": cv.contact_tracing(trace_probs={'h': 1, 'w': 0.5, 's': 0.5, 'c': 0.3}, quar_period=14),
-    "noTrace": cv.contact_tracing(trace_probs={'h': 0, 'w': 0, 's': 0, 'c': 0}, quar_period=14),
-    "optimalTrace": cv.contact_tracing(trace_probs={'h': 1, 'w': 1, 's': 1, 'c': 1}, quar_period=14)
-}
-
-# Provide a list of interventions with which to run covasim
-interventions = {
-    "baseline": [],
-    "standardTest": [intervention["standardTest"]],
-    "noTest": [intervention["noTest"]],
-    "optimalTest": [intervention["optimalTest"]],
-    "standardTrace": [intervention["standardTest"], intervention["standardTrace"]],
-    "noTrace": [intervention["standardTest"], intervention["noTrace"]],
-    "optimalTrace": [intervention["standardTest"], intervention["optimalTrace"]],
-    "traceNoTest": [intervention["standardTrace"]]
-}
-
 
 @given("a simulation with parameters")
 def step_impl(context):
@@ -160,6 +122,8 @@ def step_impl(context, outcome, relationship, control):
               control_val=context.control_val,
               treatment_val=context.treatment_val,
               verbose=True)
+    with open(context.estimates_file, 'a') as f:
+        print(f"{context.treatment_var},{outcome},{context.control_val},{context.treatment_val},{estimate},{ci_low},{ci_high}", file=f)
     test(estimate, relationship, ci_low, ci_high)
 
 
@@ -174,3 +138,16 @@ def step_impl(context, treatment_var, treatment_val):
     if context.treatment_var != treatment_var:
         raise ValueError(f"Specified treatment variable {treatment_var} is not the same as the one in the Given ({context.treatment_var})")
     context.treatment_val = context.types[treatment_var](treatment_val) if treatment_var in context.types else float(treatment_val) if treatment_val.isnumeric() else treatment_val
+
+
+# Test trace basic
+@given(u'a connected DAG')
+def step_impl(context):
+    inputs = list(context.params_dict.keys())
+    inputs.append("intervention")
+    context.repeating_unit = draw_connected_dag(inputs, context.desired_outputs)
+
+
+@then(u'we obtain the causal DAG')
+def step_impl(context):
+    context.repeating_unit.write(context.dag_path)

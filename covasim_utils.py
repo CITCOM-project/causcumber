@@ -3,6 +3,43 @@ import covasim as cv
 import pandas as pd
 import os
 
+# Instantiate named covasim interventions with parameters
+intervention = {
+    "standardTest": cv.test_prob(
+        symp_prob=0.2,
+        asymp_prob=0.001,
+        symp_quar_prob=1,
+        asymp_quar_prob=1
+    ),
+    "noTest": cv.test_prob(
+        symp_prob=0,
+        asymp_prob=0,
+        symp_quar_prob=0,
+        asymp_quar_prob=0
+    ),
+    "optimalTest": cv.test_prob(
+        symp_prob=1,
+        asymp_prob=1,
+        symp_quar_prob=1,
+        asymp_quar_prob=1
+    ),
+    "standardTrace": cv.contact_tracing(trace_probs={'h': 1, 'w': 0.5, 's': 0.5, 'c': 0.3}, quar_period=14),
+    "noTrace": cv.contact_tracing(trace_probs={'h': 0, 'w': 0, 's': 0, 'c': 0}, quar_period=14),
+    "optimalTrace": cv.contact_tracing(trace_probs={'h': 1, 'w': 1, 's': 1, 'c': 1}, quar_period=14)
+}
+
+# Provide a list of interventions with which to run covasim
+interventions = {
+    "baseline": [],
+    "standardTest": [intervention["standardTest"]],
+    "noTest": [intervention["noTest"]],
+    "optimalTest": [intervention["optimalTest"]],
+    "standardTrace": [intervention["standardTest"], intervention["standardTrace"]],
+    "noTrace": [intervention["standardTest"], intervention["noTrace"]],
+    "optimalTrace": [intervention["standardTest"], intervention["optimalTrace"]],
+    "traceNoTest": [intervention["standardTrace"]]
+}
+
 
 def preprocess_data(data):
     assert "intervention" not in data, "intervention is a column in data"
@@ -43,7 +80,7 @@ def aggregate_by_week(data, desired_outputs=None):
     return pd.DataFrame(week_by_week)
 
 
-def run_covasim_by_week(label, params, desired_outputs, n_runs=10):
+def run_covasim_by_week(label, params, desired_outputs, n_runs=30):
     print("Params", params)
     print("Desired outputs", desired_outputs)
     intervention_sim = cv.MultiSim(cv.Sim(pars=params, label=label, verbose=0))
@@ -67,7 +104,7 @@ def run_covasim_by_week(label, params, desired_outputs, n_runs=10):
     return pd.DataFrame(temporal)
 
 
-def run_covasim_basic(label, params, desired_outputs, n_runs=10):
+def run_covasim_basic(label, params, desired_outputs, n_runs=30):
     intervention_sim = cv.MultiSim(cv.Sim(pars=params, label=label, verbose=0))
     intervention_sim.run(n_runs=n_runs, verbose=0)
     results = {k: [] for k in desired_outputs}

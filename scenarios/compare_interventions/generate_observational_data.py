@@ -8,7 +8,7 @@ Created on Wed Jul 28 08:27:11 2021
 import covasim as cv
 import pandas as pd
 import random
-
+import sys
 
 # Instantiate named covasim interventions with parameters
 standardTest = cv.test_prob(
@@ -64,7 +64,7 @@ interventions = {
 
 
 def params(interventions):
-    quar_period = 14 #random.randint(0, 20)
+    quar_period = random.randint(0, 20)
     return {
         'quar_period': quar_period,
         'n_days': 84,
@@ -97,7 +97,7 @@ def aggregate_by_week(data, desired_outputs=None):
     return pd.DataFrame(week_by_week)
 
 
-def run_covasim_by_week(label, params, desired_outputs, n_runs=10):
+def run_covasim_by_week(label, params, desired_outputs, n_runs=30):
     print(" ", params)
     intervention_sim = cv.MultiSim(cv.Sim(pars=params, label=label, verbose=0))
     intervention_sim.run(n_runs=n_runs, verbose=0)
@@ -125,17 +125,19 @@ desired_outputs = ['cum_tests', 'n_quarantined', 'n_exposed', 'cum_infections',
                    'cum_symptomatic', 'cum_severe', 'cum_critical', 'cum_deaths']
 
 dfs = []
-num_sims = 10
+num_sims = int(sys.argv[1]) if len(sys.argv) > 1 else 10
 save_head = True
-data_path = "results/data.csv"
+data_path = sys.argv[2] if len(sys.argv) > 2 else "results/data.csv"
+
+print("ARGS", sys.argv)
 
 for i in range(num_sims):
     print(i+1, "of", num_sims)
-    for label in interventions:
-        print(" ", label)
-        df = run_covasim_by_week(label, params(interventions[label]), desired_outputs)
-        if save_head:
-            df.to_csv(data_path)
-            save_head = False
-        else:
-            df.to_csv(data_path, mode='a', header=False)
+    label = random.choice(list(interventions.keys()))
+    print(" ", label)
+    df = run_covasim_by_week(label, params(interventions[label]), desired_outputs, n_runs=1)
+    if save_head:
+        df.to_csv(data_path)
+        save_head = False
+    else:
+        df.to_csv(data_path, mode='a', header=False)

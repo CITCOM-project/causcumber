@@ -11,7 +11,7 @@ Feature: Compare start dates
       | pop_infected  | 100        | int  |
       | location      | UK         | str  |
       | start_day     | 2020-01-03 | str  |
-      | interventions |            | list |
+      | interventions | baseline   | str  |
     And the following variables are recorded weekly
       | variable          | type |
       | cum_tests         | int  |
