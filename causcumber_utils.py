@@ -83,6 +83,15 @@ def test(estimate, relationship, ci_low, ci_high):
         assert estimate > 0 and ci_low > 0, f"Expected estimate > 0, got {ci_low} < {estimate} < {ci_high}"
 
 
+def test_bool(estimate, relationship, ci_low, ci_high):
+    if relationship == "<":
+        return estimate < 0 and ci_high < 0
+    elif relationship == "=":
+        return ci_low < 0 < ci_high
+    elif relationship == ">":
+        return estimate > 0 and ci_low > 0
+
+
 def draw_connected_repeating_unit(inputs, time_steps=[],
                                   suffix_n="_n", suffix_n1="_n1"):
     g = pygraphviz.AGraph(strict=False, directed=True,
@@ -260,6 +269,7 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
     This slices the data such that it only contains the two values we're
     interested in, effectively binarising the treatment.
     """
+    data = data.copy()
     if str(data.dtypes[treatment_var]) == "category":
         print(data[treatment_var])
         assert isinstance(control_val, Hashable), f"Categorical control value {control_val} must be hashable."
@@ -340,7 +350,7 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
     return estimate.value, (ci_low, ci_high)
 
 
-def scenario_name_to_snake_case(string):
+def to_snake_case(string):
     lowercase_string = string.lower()
     snake_case_string = lowercase_string.replace(' ', '_')
     return snake_case_string

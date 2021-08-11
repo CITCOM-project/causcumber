@@ -5,7 +5,7 @@ import sys
 
 sys.path.append("../../")
 from covasim_utils import save_results_df
-from causcumber_utils import scenario_name_to_snake_case
+from causcumber_utils import to_snake_case
 from behave import fixture, use_fixture
 
 
@@ -54,12 +54,12 @@ def after_feature(context, feature):
     combined_vaccine_results_df = pd.concat(vaccine_results_dfs)
 
     # Set output file name and save
-    output_name = f"{scenario_name_to_snake_case(scenario_outline.name)}_causal_inference"
+    output_name = f"{to_snake_case(scenario_outline.name)}_causal_inference"
     # If using observational data, add observational to file name
     for tag in scenario_outline.tags:
         if "observational" in tag:
             _, file_name = tag.split('.')
-            output_name = f"{scenario_name_to_snake_case(scenario_outline.name)}_{file_name}"
+            output_name = f"{to_snake_case(scenario_outline.name)}_{file_name}"
     # If disabling identification, add no_adjustment to file name
     for tag in scenario_outline.tags:
         if "disable_identification" in tag:
