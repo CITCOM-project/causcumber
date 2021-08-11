@@ -11,7 +11,7 @@ sys.path.append("../../") # This one's for running `behave` in `compare-inverven
 
 from behave_utils import table_to_dict
 from covasim_utils import run_covasim_by_week, run_covasim_basic, preprocess_data, interventions
-from causcumber_utils import run_dowhy, draw_connected_repeating_unit, iterate_repeating_unit, test, draw_connected_dag
+from causcumber_utils import run_dowhy, draw_connected_repeating_unit, iterate_repeating_unit, test, test_bool, draw_connected_dag
 
 import pygraphviz
 
@@ -105,7 +105,7 @@ def step_impl(context, treatment_var, treatment_val):
 def step_impl(context, outcome, relationship, control):
     data = None
     if hasattr(context, "data"):
-        data = pd.read_csv(context.data)
+        data = context.data
     else:
         data = pd.concat([pd.read_csv(f"{context.results_dir}/{i}") for i in os.listdir(context.results_dir)])
     data = preprocess_data(data)
@@ -122,8 +122,9 @@ def step_impl(context, outcome, relationship, control):
               control_val=context.control_val,
               treatment_val=context.treatment_val,
               verbose=True)
-    with open(context.estimates_file, 'a') as f:
-        print(f"{context.treatment_var},{outcome},{context.control_val},{context.treatment_val},{estimate},{ci_low},{ci_high}", file=f)
+    if hasattr(context, "estimates_file"):
+        with open(context.estimates_file, 'a') as f:
+            print(f"{context.feature_name},{context.treatment_var},{outcome},{context.control_val},{context.treatment_val},{estimate},{ci_low},{ci_high},{relationship},{'pass' if test_bool(estimate, relationship, ci_low, ci_high) else 'fail'}", file=f)
     test(estimate, relationship, ci_low, ci_high)
 
 
