@@ -15,13 +15,13 @@ base = "results/estimates"
 
 def get_avg(data, col):
     estimates = np.array([list(df[col]) for df in data]).T.tolist()
-    print(estimates)
     estimates = [np.mean(lst) for lst in estimates]
     return estimates
 
 
 def errorMetric(actual, estimated):
-    return [(e-a)/a for e, a in zip(actual, estimated)]
+    assert 0 not in actual, "Can't have 0 in actual"
+    return [abs((e-a)/a) for a, e in zip(actual, estimated)]
 
 
 rct_estimates = get_avg([pd.read_csv(f"{base}/rct/{csv}") for csv in os.listdir(f"{base}/rct")], "estimate")
@@ -32,7 +32,6 @@ failingTests = []
 for sample in os.listdir(base):
     if sample == "rct":
         continue
-    print(sample)
     data = [pd.read_csv(f"{base}/{sample}/{csv}") for csv in os.listdir(f"{base}/{sample}")]
     estimates = get_avg(data, "estimate")
 
@@ -53,6 +52,6 @@ ax1.tick_params(axis='y', labelcolor=color)
 ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 color = 'tab:blue'
 ax2.set_ylabel("Number of failing tests", color=color)
-print(failingTests)
 ax2.plot(range(50, 1050, 50), failingTests, color=color)
 ax2.tick_params(axis='y', labelcolor=color)
+

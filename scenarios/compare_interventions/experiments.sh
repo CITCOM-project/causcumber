@@ -1,4 +1,4 @@
-for run in {1..2}
+for run in $(seq $1 $2)
 do
   for sample in {50..1000..50}
   do
