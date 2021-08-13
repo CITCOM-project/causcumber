@@ -24,8 +24,8 @@ def set_parameters_df(context):
 
 
 @fixture
-def set_observational_df(context, file_name):
-    context.observational_df = pd.read_csv(f"./observational_data/{file_name}.csv")
+def set_observational_df(context, csv_path):
+    context.observational_df = pd.read_csv(csv_path)
 
 
 @fixture
@@ -38,6 +38,14 @@ def before_feature(context, feature):
     print(f"Running Feature `{feature.name}`")
     use_fixture(set_results_df, context)
     use_fixture(set_parameters_df, context)
+    # If data CL argument is used, load the specified csv
+    if "data" in context.config.userdata:
+        print(context.config.userdata["data"])
+        use_fixture(set_observational_df, context, context.config.userdata["data"])
+
+    # If disable identification CL argument is used, do not run identification
+    if "disable_identification" in context.config.userdata:
+        use_fixture(set_identification, context)
 
 
 def after_feature(context, feature):
@@ -60,11 +68,28 @@ def after_feature(context, feature):
         if "observational" in tag:
             _, file_name = tag.split('.')
             output_name = f"{to_snake_case(scenario_outline.name)}_{file_name}"
+
     # If disabling identification, add no_adjustment to file name
     for tag in scenario_outline.tags:
         if "disable_identification" in tag:
             output_name = output_name + "_no_adjustment"
-    save_results_df(combined_vaccine_results_df, "./results", output_name)
+
+    # If data CL argument is used, add observational to file name
+    if "data" in context.config.userdata:
+        print("DATA")
+        file_name = context.config.userdata["data"].split('/')[-1].replace(".csv", '')
+        output_name = f"{to_snake_case(scenario_outline.name)}_{file_name}"
+
+    if "disable_identification" in context.config.userdata:
+        print("DISABLE IDENTIFICATION")
+        output_name = output_name + "_no_adjustment"
+
+    if "output_directory" in context.config.userdata:
+        output_dir = context.config.userdata["output_directory"]
+    else:
+        output_dir = "./results"
+
+    save_results_df(combined_vaccine_results_df, output_dir, output_name)
 
     # Delete the individual csv files
     for old_result_csv in vaccine_results_paths:
@@ -72,14 +97,13 @@ def after_feature(context, feature):
 
 
 def before_tag(context, tag):
-    """ If a scenario is tagged with observational.X, get X.csv from observational_data
-        directory instead of running the model. """
-    # If the tag is badly formed, run the model instead
+    # If observational tag is used, load this csv
     if tag.startswith("observational") and '.' in tag:
         _, file_name = tag.split('.')
         if file_name:
-            use_fixture(set_observational_df, context, file_name)
+            use_fixture(set_observational_df, context, f"./observational_data/{file_name}.csv")
 
+    # If disable identification tag is used, do not run identification
     if tag.startswith("disable_identification"):
         print("DISABLING IDENTIFICATION")
         use_fixture(set_identification, context)

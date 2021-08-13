@@ -57,10 +57,12 @@ Feature: Compare vaccines
       | cum_vaccinated_n   | cum_severe_n1      |
       | cum_vaccinated_n   | cum_critical_n1    |
       | cum_vaccinated_n   | cum_deaths_n1      |
+    And add the following edges
+      | s1                 | s2                 |
+      | location           | interventions      |
+      | location           | pop_size           |
     Then we obtain the causal DAG for 5 weeks
 
-
-  @observational.experiment_2_c10_r2
   Scenario Outline: Single vaccine
     All vaccines should reduce the cumulative number of infections relative to the
     baseline scenario where no vaccine is available.
@@ -73,22 +75,3 @@ Feature: Compare vaccines
       | pfizer       |
       | moderna      |
       | az           |
-
-#  Scenario Outline: Multiple vaccines
-#    Any pair of vaccines should not be significantly worse than a single vaccine.
-#
-#    Given that the <first_vaccine_name> and <second_vaccine_name> vaccines are available
-#    When the simulation is complete
-#    Then the cumulative number of infections should be less than when just <single_vaccine_name> is available.
-#    Examples:
-#      | first_vaccine_name | second_vaccine_name | single_vaccine_name |
-#      | pfizer             | moderna             | pfizer              |
-#      | pfizer             | moderna             | moderna             |
-#      | pfizer             | moderna             | az                  |
-#      | pfizer             | az                  | pfizer              |
-#      | pfizer             | az                  | az                  |
-#      | pfizer             | az                  | moderna             |
-#      | moderna            | az                  | az                  |
-#      | moderna            | az                  | moderna             |
-#      | moderna            | az                  | pfizer              |
-

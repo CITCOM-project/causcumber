@@ -47,7 +47,7 @@ def step_impl(context):
     """
     No vaccine is available. Simply run background conditions.
     """
-    if not hasattr(context, "observational_data"):
+    if not hasattr(context, "observational_df"):
         label = context.scenario.name
         params = context.params_df.to_dict("records")[0]
         desired_outputs = context.desired_outputs
@@ -73,7 +73,6 @@ def step_impl(context, vaccine_name):
         params = run_params
         intervention_results_df = run_covasim_by_week(label, params, desired_outputs, n_runs=N_RUNS)
         context.results_df = pd.concat([context.results_df, intervention_results_df])
-        print(context.results_df["interventions"])
         # context.results_df["interventions"] = [vaccine.label for vaccine in context.results_df["interventions"]]
         save_results_df(context.results_df, RESULTS_PATH, "single_vaccination_results")
 
@@ -84,7 +83,7 @@ def step_impl(context):
         infections. """
     # get baseline_results
     treatment = context.params_df["interventions"][0].label
-    causal_graph = "./dags/simple_confounding_dag.dot"
+    causal_graph = "./dags/causal_dag.dot"
 
     if hasattr(context, "observational_df"):
         data = context.observational_df.copy()
@@ -110,6 +109,8 @@ def step_impl(context):
                     "causal_estimate": [causal_estimate],
                     "ci_low": [confidence_intervals[0]],
                     "ci_high": [confidence_intervals[1]],
+                    "pop_size": data["pop_size"].values[0],
+                    "pop_infected": data["pop_infected"].values[0],
                     "test_passed": [test_outcome]}
     save_results_df(pd.DataFrame(results_dict), RESULTS_PATH, f"{treatment}_vaccine_causal_inference")
     assert test_outcome
@@ -128,7 +129,16 @@ def step_impl(context):
         context.repeating_unit.delete_edge(row['s1'], row['s2'])
 
 
+@step("add the following edges")
+def step_impl(context):
+    for row in context.table:
+        context.repeating_unit.add_edge(row['s1'], row['s2'])
+        print(context.repeating_unit.edges())
+
+
 @then("we obtain the causal DAG for 5 weeks")
 def step_impl(context):
     dag = iterate_repeating_unit(context.repeating_unit, 5, start=1)
     dag.write("./dags/causal_dag.dot")
+
+
