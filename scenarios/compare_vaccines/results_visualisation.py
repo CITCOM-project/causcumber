@@ -11,7 +11,6 @@ def plot_data_vs_ate(data_dir):
     """ Plot the amount of data used against the ATE for each vaccine with 95% confidence intervals. """
     df = combine_csvs_by_percentage(data_dir)
     percentages = list(df["percentage"].unique())
-    print(percentages)
     vaccines = list(df["vaccine"].unique())
     fig, ax = plt.subplots()
     ax.set_title("Amount of Data vs. Causal Estimate")
@@ -39,8 +38,9 @@ def plot_data_vs_ate(data_dir):
 def plot_covariate_imbalance_vs_ate(causal_inference_data_dir, run_data_dir):
     run_data_csvs = glob.glob(run_data_dir + "/*.csv")
     for file_path in run_data_csvs:
-        imbalance = round(get_imbalance_score(file_path, "./dags/simple_confounding_dag.dot"), 2)
+        imbalance = round(get_imbalance_score(file_path, "./dags/causal_dag.dot"), 2)
         file_name = file_path.replace(run_data_dir, '')
+        print(file_name)
         # Open causal inference results for this run data and add imbalance
         causal_inference_results_path = os.path.join(causal_inference_data_dir, f"single_vaccine_{file_name}")
         association_results_path = causal_inference_results_path.replace(".csv", "_no_adjustment.csv")
@@ -60,14 +60,14 @@ def plot_covariate_imbalance_vs_ate(causal_inference_data_dir, run_data_dir):
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
     fig.suptitle("Covariate Imbalance vs. Causal Estimate")
     min_imbalance, max_imbalance = round(min(imbalances), 2), round(max(imbalances), 2)
-    print(min_imbalance, max_imbalance)
     xticks = [x/10.0 for x in range(floor(min_imbalance*10), ceil(max_imbalance*10)+1, 1)]
     for x, vaccine in enumerate(vaccines):
         axes[x].set_title(vaccine.capitalize())
         axes[x].set_ylabel("Causal Estimate")
         axes[x].set_xlabel("Covariate Imbalance")
         axes[x].set_xticks(xticks)
-        axes[x].set_ylim(-2000, -3500)
+        # axes[x].set_ylim(-3500, -2000)
+        # axes[x].set_ylim(-0.08, -0.035)
         # ground_truth_causal_effect = ground_truth_df.loc[ground_truth_df["vaccine"] == vaccine]["causal_estimate"]
         for method in methods:
             estimates = []
@@ -76,6 +76,7 @@ def plot_covariate_imbalance_vs_ate(causal_inference_data_dir, run_data_dir):
                 result_row = df.loc[(df["imbalance"] == imbalance) & (df["vaccine"] == vaccine)
                                     & (df["method"] == method)]
                 estimates.append(result_row["causal_estimate"].values[0])
+                # estimates.append(result_row["causal_estimate"].values[0] / result_row["pop_size"].values[0])
                 intervals.append([result_row["ci_low"].values[0], result_row["ci_high"].values[0]])
             axes[x].plot(imbalances, estimates, label=method)
         # axes[x].plot(imbalances, [ground_truth_causal_effect]*len(imbalances), label="ground truth", linestyle="--",
@@ -101,7 +102,6 @@ def combine_csvs_by_percentage(data_dir):
         percentage = filename[-7:-4]
         if not percentage.isnumeric():
             percentage = percentage[1:]
-            print(percentage)
         df["percentage"] = percentage
         run_dfs.append(df)
     df = pd.concat(run_dfs, axis=0, ignore_index=True)
@@ -115,7 +115,8 @@ def combine_csvs_by_imbalance(data_dir):
     run_dfs = []
     for filename in all_csvs:
         df = pd.read_csv(filename, header=0)
-        df = df[["vaccine", "causal_estimate", "ci_low", "ci_high", "imbalance", "method"]]
+        print(df)
+        df = df[["vaccine", "causal_estimate", "ci_low", "ci_high", "imbalance", "method", "pop_size", "pop_infected"]]
         run_dfs.append(df)
     df = pd.concat(run_dfs, axis=0, ignore_index=True)
     df["imbalance"] = df["imbalance"].astype(float)
@@ -124,7 +125,7 @@ def combine_csvs_by_imbalance(data_dir):
 
 def get_imbalance_score(csv_path, causal_graph_path):
     df = pd.read_csv(csv_path)
-    adjustment_set = dagitty_identification(causal_graph_path, "interventions", "cum_infections_5")
+    adjustment_set = dagitty_identification(causal_graph_path, "interventions", "cum_symptomatic_5")
     df["location"] = df["location"].astype("category")
     df["interventions"] = df["interventions"].astype("category")
     df["pop_type"] = df["pop_type"].astype("category")
@@ -133,5 +134,5 @@ def get_imbalance_score(csv_path, causal_graph_path):
     return imbalance_score
 
 
-plot_data_vs_ate("./results/percentage_executions/")
-plot_covariate_imbalance_vs_ate("./results/RQ2/", "./observational_data/RQ2/")
+# plot_data_vs_ate("./results/percentage_executions/")
+plot_covariate_imbalance_vs_ate("./results/RQ2/", "./observational_data/RQ2OLD/")
