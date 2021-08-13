@@ -8,4 +8,4 @@ module load Anaconda3/5.3.0
 
 # We assume that the conda environment 'myexperiment' has already been created
 source activate causecumber
-srun python python generate_observational_data.py 1000 "results/data-1000-$1.csv"
+srun python generate_observational_data.py 1000 "results/data-1000-$1.csv"
