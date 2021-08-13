@@ -29,9 +29,7 @@ rct_estimates = get_avg([pd.read_csv(f"{base}/rct/{csv}") for csv in os.listdir(
 errors = []
 failingTests = []
 
-for sample in os.listdir(base):
-    if sample == "rct":
-        continue
+for sample in sorted([int(x) for x in os.listdir(base) if x != "rct"]):
     data = [pd.read_csv(f"{base}/{sample}/{csv}") for csv in os.listdir(f"{base}/{sample}")]
     estimates = get_avg(data, "estimate")
 
@@ -54,4 +52,3 @@ color = 'tab:blue'
 ax2.set_ylabel("Number of failing tests", color=color)
 ax2.plot(range(50, 1050, 50), failingTests, color=color)
 ax2.tick_params(axis='y', labelcolor=color)
-
