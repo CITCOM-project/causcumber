@@ -17,7 +17,7 @@ BIAS_LOCATIONS = True
 vaccine_names = ["none", "pfizer", "moderna", "az"]
 # vaccine_probs_by_country = {"UK": 1, "France": 0.5, "Japan": 1.5}
 fixed_params = {"n_days": 35, "pop_type": "hybrid", "use_waning": True}
-variable_params = {"pop_size": (50000, 1000), "pop_infected": (100, 5), "location": ["UK", "France", "Japan",
+variable_params = {"pop_size": (50000, 5000), "pop_infected": (100, 10), "location": ["UK", "France", "Japan",
                                                                                      "New Zealand"]}
 desired_outputs = ["cum_infections", "cum_symptomatic", "cum_severe", "cum_critical", "cum_deaths", "cum_vaccinated"]
 
@@ -123,7 +123,6 @@ def batch_generate_observational_data(n_input_configs, n_repeats, experiment_nam
         Repeat this n_repeats number of times.
 
     :param n_input_configs: Number of input configurations to generate and run per repeat.
-    :param n_runs: Number of model executions for each input configuration.
     :param n_repeats: Number of times to repeat the experiment (i.e. generate and run another set of n_input_configs
                       n_runs times).
     :param concentration: Parameter to configure the Dirichlet distribution which controls covariate imbalance.
@@ -161,8 +160,8 @@ def experiment_2_imbalanced_observational_data():
     """
     concentration_params = [0.1, 0.5, 1, 5, 10]
     for concentration_param in concentration_params:
-        experiment_name = f"experiment_2_c{concentration_param}"
-        batch_generate_observational_data(100, 1, experiment_name, concentration_param)
+        experiment_name = f"experiment_2_c{str(concentration_param).replace('.', '')}"
+        batch_generate_observational_data(300, 3, experiment_name, concentration_param)
 
 
 experiment_2_imbalanced_observational_data()

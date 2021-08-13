@@ -290,6 +290,7 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         print("Creating a causal model...")
 
     adjustment_set = []
+    # If you want to use identification, check if adjustment set is already computed
     if identification:
         adjustment_set_path = f'{graph.replace(".dot", "")}-{treatment_var}-{outcome_var}-adjustment.adj'
         if os.path.exists(adjustment_set_path):
@@ -317,13 +318,15 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
 
     identified_estimand = None
     identified_estimand_path = f'{graph.replace(".dot", "")}-{treatment_var}-{outcome_var}-estimand.est'
-    if os.path.exists(identified_estimand_path):
+    # Only use a previous estimand if you are using identification
+    if os.path.exists(identified_estimand_path) and identification:
         with open(identified_estimand_path, 'rb') as f:
             identified_estimand = pickle.load(f)
     else:
         identified_estimand = model.identify_effect(proceed_when_unidentifiable=True)
-        with open(identified_estimand_path, 'wb') as f:
-            pickle.dump(identified_estimand, f)
+        if identification:  # Don't save the empty estimand
+            with open(identified_estimand_path, 'wb') as f:
+                pickle.dump(identified_estimand, f)
 
 
     # Estimate the target estimand using linear regression.

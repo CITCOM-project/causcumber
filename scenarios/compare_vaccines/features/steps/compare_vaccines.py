@@ -84,7 +84,7 @@ def step_impl(context):
         infections. """
     # get baseline_results
     treatment = context.params_df["interventions"][0].label
-    causal_graph = "./dags/causal_dag.dot"
+    causal_graph = "./dags/simple_confounding_dag.dot"
 
     if hasattr(context, "observational_df"):
         data = context.observational_df.copy()
@@ -92,7 +92,7 @@ def step_impl(context):
     else:
         data = context.results_df
         # Convert the vaccine object to its label
-        data["interventions"] = [vaccine.label if (vaccine != "none") else vaccine for vaccine in data["interventions"]]
+        # data["interventions"] = [vaccine.label if (vaccine != "none") else vaccine for vaccine in data["interventions"]]
 
     # DoWhy requires categorical data to be numerical
     vaccine_conversion = {"none": 0, treatment: 1}
