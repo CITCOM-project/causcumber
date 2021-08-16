@@ -158,7 +158,7 @@ def experiment_2_imbalanced_observational_data():
     """ Run the model with 500 randomly generated input configurations and repeat this for five
         increasing levels of covariate imbalance.
     """
-    concentration_params = [0.1, 0.5, 1, 5, 10]
+    concentration_params = [0.3, 0.4, 0.6, 0.7, 0.8]
     for concentration_param in concentration_params:
         experiment_name = f"experiment_2_c{str(concentration_param).replace('.', '')}"
         batch_generate_observational_data(300, 3, experiment_name, concentration_param)

@@ -143,6 +143,7 @@ def iterate_repeating_unit(unit, num_steps, start=0,
                            suffix_n="_n", suffix_n1="_n1"):
     timesteps = []
     inputs = []
+    intra_inputs = []
     tn_nodes = unit.get_subgraph(tn_cluster)
     tn1_nodes = unit.get_subgraph(tn1_cluster)
     ips_nodes = unit.get_subgraph(ips_cluster)
@@ -151,6 +152,8 @@ def iterate_repeating_unit(unit, num_steps, start=0,
             timesteps.append((s1, s2))
         elif s1 in ips_nodes and s2 in tn_nodes:
             inputs.append((s1, s2))
+        elif s1 in ips_nodes and s2 in ips_nodes:
+            intra_inputs.append((s1, s2))
         else:
             raise ValueError("Bad edge: ", s1, s2)
 
@@ -158,6 +161,7 @@ def iterate_repeating_unit(unit, num_steps, start=0,
                           rankdir="LR", newrank=True)
 
     g.add_edges_from([(s1, s2.replace(suffix_n, f"_{start}")) for s1, s2 in inputs])
+    g.add_edges_from([(s1, s2.replace(suffix_n, f"_{start}")) for s1, s2 in intra_inputs])
     g.add_subgraph(graph_name="cluster_inputs",
                    label="inputs").add_nodes_from(ips_nodes)
 

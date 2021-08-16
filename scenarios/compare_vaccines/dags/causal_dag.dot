@@ -168,6 +168,8 @@ digraph "" {
 	location -> cum_symptomatic_1;
 	location -> cum_severe_1;
 	location -> cum_critical_1;
+	location -> pop_size;
+	location -> interventions;
 	location -> cum_infections_2;
 	location -> cum_symptomatic_2;
 	location -> cum_vaccinated_2;
