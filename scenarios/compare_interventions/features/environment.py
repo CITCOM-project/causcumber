@@ -30,7 +30,7 @@ def print_head(filename):
     if not os.path.exists(os.path.dirname(filename)):
         os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, 'w') as f:
-        print("feature_name,treatment_var,outcome_var,control_val,treatment_val,estimate,ci_low,ci_high,relationship,result", file=f)
+        print("feature_name,scenario_name,treatment_var,outcome_var,control_val,treatment_val,estimate,ci_low,ci_high,relationship,result", file=f)
 
 
 def before_all(context):
