@@ -1,4 +1,6 @@
 """ Utilities for running Covasim. """
+import numpy as np
+
 import covasim as cv
 import pandas as pd
 import os
@@ -83,7 +85,7 @@ def aggregate_by_week(data, desired_outputs=None):
 def run_covasim_by_week(label, params, desired_outputs, n_runs=30):
     print("Params", params)
     print("Desired outputs", desired_outputs)
-    intervention_sim = cv.MultiSim(cv.Sim(pars=params, label=label, verbose=0))
+    intervention_sim = cv.MultiSim(cv.Sim(pars=params, label=label, verbose=0), keep_people=True)
     intervention_sim.run(n_runs=n_runs, verbose=0)
     temporal = []
     for sim in intervention_sim.sims:
@@ -101,6 +103,12 @@ def run_covasim_by_week(label, params, desired_outputs, n_runs=30):
         for k, v in params.items():
             week_dic[k] = v
         temporal.append(week_dic)
+        # add avg. age and contacts to data
+        week_dic["avg_age"] = np.average(sim.people["age"])
+        week_dic["contacts_h"] = sim.pars["contacts"]["h"]
+        week_dic["contacts_s"] = sim.pars["contacts"]["s"]
+        week_dic["contacts_w"] = sim.pars["contacts"]["w"]
+        week_dic["contacts_c"] = sim.pars["contacts"]["c"]
     return pd.DataFrame(temporal)
 
 
