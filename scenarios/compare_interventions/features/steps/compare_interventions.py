@@ -124,7 +124,7 @@ def step_impl(context, outcome, relationship, control):
               verbose=True)
     if hasattr(context, "estimates_file"):
         with open(context.estimates_file, 'a') as f:
-            print(f"{context.feature_name},{context.treatment_var},{outcome},{context.control_val},{context.treatment_val},{estimate},{ci_low},{ci_high},{relationship},{'pass' if test_bool(estimate, relationship, ci_low, ci_high) else 'fail'}", file=f)
+            print(f"{context.feature_name},{context.scenario.name},{context.treatment_var},{outcome},{context.control_val},{context.treatment_val},{estimate},{ci_low},{ci_high},{relationship},{'pass' if test_bool(estimate, relationship, ci_low, ci_high) else 'fail'}", file=f)
     test(estimate, relationship, ci_low, ci_high)
 
 
