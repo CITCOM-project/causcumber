@@ -12,6 +12,7 @@ import pickle
 import pandas as pd
 from itertools import combinations
 
+
 def covariate_imbalance(df, covariates, treatment_var):
     """
     Estimate the covariate imbalance.
@@ -41,7 +42,9 @@ def covariate_imbalance(df, covariates, treatment_var):
     """
 
     covariates = [c for c in covariates if c in df.columns]
-    assert treatment_var not in covariates, f"Treatment var {treatment_var} cannot also be a covariate"
+    assert (
+        treatment_var not in covariates
+    ), f"Treatment var {treatment_var} cannot also be a covariate"
 
     if not covariates:
         return 0
@@ -63,24 +66,40 @@ def covariate_imbalance(df, covariates, treatment_var):
         treatment_group = df.loc[df[treatment_var] == 1]
         for covariate in covariates:
             print(covariate, treatment_group[covariate])
-        imbalances = [abs(treatment_group[covariate].mean() - control_group[covariate].mean()) for covariate in covariates]
+        imbalances = [
+            abs(treatment_group[covariate].mean() - control_group[covariate].mean())
+            for covariate in covariates
+        ]
     elif str(df.dtypes[treatment_var]) == "category":
         treatments = set(df[treatment_var])
         groups = [df.loc[df[treatment_var] == c] for c in treatments]
-        imbalances = [[abs(g1[covariate].mean() - g2[covariate].mean()) for g1, g2 in combinations(groups, 2)] for covariate in covariates]
+        imbalances = [
+            [
+                abs(g1[covariate].mean() - g2[covariate].mean())
+                for g1, g2 in combinations(groups, 2)
+            ]
+            for covariate in covariates
+        ]
         imbalances = [max(x) for x in imbalances]
     else:
         imbalances = [df[covariate].corr(df[treatment_var]) for covariate in covariates]
 
     return sum(imbalances) / len(covariates)
 
+
 def test(estimate, relationship, ci_low, ci_high):
     if relationship == "<":
-        assert estimate < 0 and ci_high < 0, f"Expected estimate < 0, got {ci_low} < {estimate} < {ci_high}"
+        assert (
+            estimate < 0 and ci_high < 0
+        ), f"Expected estimate < 0, got {ci_low} < {estimate} < {ci_high}"
     elif relationship == "=":
-        assert ci_low < 0 < ci_high, f"Expected estimate ~0, got {ci_low} < {estimate} < {ci_high}"
+        assert (
+            ci_low < 0 < ci_high
+        ), f"Expected estimate ~0, got {ci_low} < {estimate} < {ci_high}"
     elif relationship == ">":
-        assert estimate > 0 and ci_low > 0, f"Expected estimate > 0, got {ci_low} < {estimate} < {ci_high}"
+        assert (
+            estimate > 0 and ci_low > 0
+        ), f"Expected estimate > 0, got {ci_low} < {estimate} < {ci_high}"
 
 
 def test_bool(estimate, relationship, ci_low, ci_high):
@@ -92,10 +111,10 @@ def test_bool(estimate, relationship, ci_low, ci_high):
         return estimate > 0 and ci_low > 0
 
 
-def draw_connected_repeating_unit(inputs, time_steps=[],
-                                  suffix_n="_n", suffix_n1="_n1"):
-    g = pygraphviz.AGraph(strict=False, directed=True,
-                          rankdir="LR", newrank=True)
+def draw_connected_repeating_unit(
+    inputs, time_steps=[], suffix_n="_n", suffix_n1="_n1"
+):
+    g = pygraphviz.AGraph(strict=False, directed=True, rankdir="LR", newrank=True)
     tn = g.add_subgraph(name="cluster_tn", label="<Time<sub>n</sub>>")
     tn1 = g.add_subgraph(name="cluster_tn1", label="<Time<sub>n+1</sub>>")
     ips = g.add_subgraph(name="cluster_inputs", label="Model inputs")
@@ -116,8 +135,7 @@ def draw_connected_repeating_unit(inputs, time_steps=[],
 
 
 def draw_connected_dag(inputs, outputs):
-    g = pygraphviz.AGraph(strict=False, directed=True,
-                          rankdir="LR", newrank=True)
+    g = pygraphviz.AGraph(strict=False, directed=True, rankdir="LR", newrank=True)
     ips = g.add_subgraph(name="cluster_inputs", label="Model inputs")
     ops = g.add_subgraph(name="cluster_outputs", label="Model outputs")
 
@@ -135,12 +153,17 @@ def draw_connected_dag(inputs, outputs):
     return g
 
 
-def iterate_repeating_unit(unit, num_steps, start=0,
-                           inputs_cluster="cluster_inputs",
-                           ips_cluster="cluster_inputs",
-                           tn_cluster="cluster_tn",
-                           tn1_cluster="cluster_tn1",
-                           suffix_n="_n", suffix_n1="_n1"):
+def iterate_repeating_unit(
+    unit,
+    num_steps,
+    start=0,
+    inputs_cluster="cluster_inputs",
+    ips_cluster="cluster_inputs",
+    tn_cluster="cluster_tn",
+    tn1_cluster="cluster_tn1",
+    suffix_n="_n",
+    suffix_n1="_n1",
+):
     timesteps = []
     inputs = []
     intra_inputs = []
@@ -157,27 +180,32 @@ def iterate_repeating_unit(unit, num_steps, start=0,
         else:
             raise ValueError("Bad edge: ", s1, s2)
 
-    g = pygraphviz.AGraph(strict=False, directed=True,
-                          rankdir="LR", newrank=True)
+    g = pygraphviz.AGraph(strict=False, directed=True, rankdir="LR", newrank=True)
 
     g.add_edges_from([(s1, s2.replace(suffix_n, f"_{start}")) for s1, s2 in inputs])
-    g.add_edges_from([(s1, s2.replace(suffix_n, f"_{start}")) for s1, s2 in intra_inputs])
-    g.add_subgraph(graph_name="cluster_inputs",
-                   label="inputs").add_nodes_from(ips_nodes)
+    g.add_edges_from(
+        [(s1, s2.replace(suffix_n, f"_{start}")) for s1, s2 in intra_inputs]
+    )
+    g.add_subgraph(graph_name="cluster_inputs", label="inputs").add_nodes_from(
+        ips_nodes
+    )
 
-    cluster_start = g.add_subgraph(graph_name=f"cluster_{start}",
-                               label="<t<sub>0</sub>>")
-    cluster_start.add_nodes_from([s1.replace(suffix_n, f"_{start}") for s1, _ in timesteps])
+    cluster_start = g.add_subgraph(
+        graph_name=f"cluster_{start}", label="<t<sub>0</sub>>"
+    )
+    cluster_start.add_nodes_from(
+        [s1.replace(suffix_n, f"_{start}") for s1, _ in timesteps]
+    )
 
-    for t in range(start+1, num_steps+1):
-        edges = [(s1.replace(suffix_n, f"_{t-1}"),
-                  s2.replace(suffix_n1, f"_{t}")) for s1, s2 in timesteps]
+    for t in range(start + 1, num_steps + 1):
+        edges = [
+            (s1.replace(suffix_n, f"_{t-1}"), s2.replace(suffix_n1, f"_{t}"))
+            for s1, s2 in timesteps
+        ]
         g.add_edges_from(edges)
-        g.add_edges_from([(s1, s2.replace(suffix_n, f"_{t}"))
-                          for s1, s2 in inputs])
+        g.add_edges_from([(s1, s2.replace(suffix_n, f"_{t}")) for s1, s2 in inputs])
 
-        c = g.add_subgraph(graph_name=f"cluster_{t}",
-                           label=f"<t<sub>{t}</sub>>")
+        c = g.add_subgraph(graph_name=f"cluster_{t}", label=f"<t<sub>{t}</sub>>")
         c.add_nodes_from([s2 for _, s2 in edges])
     return g
 
@@ -223,7 +251,9 @@ def _install_r_packages(package_names):
     if len(packages_to_install) > 0:
         # The silent package install requires user input, which Behave captures, so it appears to hang
         # This makes the failure "noisy", so the user knows what's going on
-        raise ValueError(f"Please install R packages f{packages_to_install} and try again")
+        raise ValueError(
+            f"Please install R packages f{packages_to_install} and try again"
+        )
         # utils.install_packages(StrVector(packages_to_install))
 
 
@@ -236,12 +266,24 @@ def _dot_to_dagitty_dag(dot_file_path):
     # dot_graph = pydot.graph_from_dot_data(dot_file_path)
     # dot_string = "dag {" + "\n".join([e.to_string() for e in dot_graph[0].get_edges()]) + "}"
     dot_graph = pygraphviz.AGraph(dot_file_path)
-    dot_string = "dag {" + "\n".join([f"{s1} -> {s2};" for s1, s2 in dot_graph.edges()]) + "}"
+    dot_string = (
+        "dag {" + "\n".join([f"{s1} -> {s2};" for s1, s2 in dot_graph.edges()]) + "}"
+    )
     dag_string = dot_string.replace("digraph", "dag")
     return dag_string
 
 
-def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_val, identification=True, verbose=False):
+def run_dowhy(
+    data,
+    graph,
+    treatment_var,
+    outcome_var,
+    control_val,
+    treatment_val,
+    identification=True,
+    verbose=False,
+    **kwargs,
+):
     """
     :param data: A dataframe representing the observational data.
     :param graph: Filepath of the DOT file representing the causal DAG. Nodes here MUST have a 1:1 correspondence with
@@ -260,12 +302,24 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
 
     if verbose:
         print("Running Do Why with params")
-        print("\n".join([f"  {k}: {v}"+(f"::{type(v)}" if k.endswith("_val") else "") for k, v in locals().items() if k != "data"]))
+        print(
+            "\n".join(
+                [
+                    f"  {k}: {v}" + (f"::{type(v)}" if k.endswith("_val") else "")
+                    for k, v in locals().items()
+                    if k != "data"
+                ]
+            )
+        )
 
     if treatment_var not in data:
-        raise ValueError(f"Treatment variable {treatment_var} must be a column in the data, i.e. one of {data.columns}")
+        raise ValueError(
+            f"Treatment variable {treatment_var} must be a column in the data, i.e. one of {data.columns}"
+        )
     if outcome_var not in data:
-        raise ValueError(f"Outcome variable {outcome_var} must be a column in the data, i.e. one of {data.columns}")
+        raise ValueError(
+            f"Outcome variable {outcome_var} must be a column in the data, i.e. one of {data.columns}"
+        )
 
     """
     TODO: This is a hack to get around the fact that doWhy draws a straight line
@@ -276,14 +330,20 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
     data = data.copy()
     if str(data.dtypes[treatment_var]) == "category":
         print(data[treatment_var])
-        assert isinstance(control_val, Hashable), f"Categorical control value {control_val} must be hashable."
-        assert isinstance(treatment_val, Hashable), f"Categorical treatment value {treatment_val} must be hashable."
-        assert all([isinstance(x, Hashable) for x in data[treatment_var]]), f"Categorical treatments must be hashable."
+        assert isinstance(
+            control_val, Hashable
+        ), f"Categorical control value {control_val} must be hashable."
+        assert isinstance(
+            treatment_val, Hashable
+        ), f"Categorical treatment value {treatment_val} must be hashable."
+        assert all(
+            [isinstance(x, Hashable) for x in data[treatment_var]]
+        ), "Categorical treatments must be hashable."
         data[treatment_var] = [str(x) for x in data[treatment_var]]
         grouped = data.groupby(treatment_var)
         groups = {k: i for i, (k, _) in enumerate(grouped)}
         data[treatment_var] = [groups[i] for i in data[treatment_var]]
-        data[treatment_var] = data[treatment_var].astype('category')
+        data[treatment_var] = data[treatment_var].astype("category")
         print("GROUPS:", groups)
         control_val = groups[str(control_val)]
         treatment_val = groups[str(treatment_val)]
@@ -296,13 +356,15 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
     adjustment_set = []
     # If you want to use identification, check if adjustment set is already computed
     if identification:
-        adjustment_set_path = f'{graph.replace(".dot", "")}-{treatment_var}-{outcome_var}-adjustment.adj'
+        adjustment_set_path = (
+            f'{graph.replace(".dot", "")}-{treatment_var}-{outcome_var}-adjustment.adj'
+        )
         if os.path.exists(adjustment_set_path):
-            with open(adjustment_set_path, 'rb') as f:
+            with open(adjustment_set_path, "rb") as f:
                 adjustment_set = pickle.load(f)
         else:
             adjustment_set = dagitty_identification(graph, treatment_var, outcome_var)
-            with open(adjustment_set_path, 'wb') as f:
+            with open(adjustment_set_path, "wb") as f:
                 pickle.dump(adjustment_set, f)
 
     if verbose:
@@ -313,7 +375,7 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         data=data,
         treatment=treatment_var,
         outcome=outcome_var,
-        common_causes=adjustment_set
+        common_causes=adjustment_set,
     )
 
     # Identify causal effect and return target estimand
@@ -321,17 +383,18 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
         print("Identifying...")
 
     identified_estimand = None
-    identified_estimand_path = f'{graph.replace(".dot", "")}-{treatment_var}-{outcome_var}-estimand.est'
+    identified_estimand_path = (
+        f'{graph.replace(".dot", "")}-{treatment_var}-{outcome_var}-estimand.est'
+    )
     # Only use a previous estimand if you are using identification
     if os.path.exists(identified_estimand_path) and identification:
-        with open(identified_estimand_path, 'rb') as f:
+        with open(identified_estimand_path, "rb") as f:
             identified_estimand = pickle.load(f)
     else:
         identified_estimand = model.identify_effect(proceed_when_unidentifiable=True)
         if identification:  # Don't save the empty estimand
-            with open(identified_estimand_path, 'wb') as f:
+            with open(identified_estimand_path, "wb") as f:
                 pickle.dump(identified_estimand, f)
-
 
     # Estimate the target estimand using linear regression.
     if verbose:
@@ -340,11 +403,11 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
     # TODO: Should give user the ability to select different estimation methods
     estimate = model.estimate_effect(
         identified_estimand,
-        method_name="backdoor.linear_regression",
         treatment_value=treatment_val,
         control_value=control_val,
         confidence_intervals=True,
-        )
+        **kwargs,
+    )
 
     # TODO: there's a *potential* bug in doWhy such that ci_low and ci_high don't always correspond to the minimum and maximum respectively
     # This is why we need to sort
@@ -359,5 +422,5 @@ def run_dowhy(data, graph, treatment_var, outcome_var, control_val, treatment_va
 
 def to_snake_case(string):
     lowercase_string = string.lower()
-    snake_case_string = lowercase_string.replace(' ', '_')
+    snake_case_string = lowercase_string.replace(" ", "_")
     return snake_case_string

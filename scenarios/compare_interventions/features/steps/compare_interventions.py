@@ -121,7 +121,8 @@ def step_impl(context, outcome, relationship, control):
               outcome_var=outcome,
               control_val=context.control_val,
               treatment_val=context.treatment_val,
-              verbose=True)
+              verbose=True,
+              method_name="backdoor.linear_regression")
     if hasattr(context, "estimates_file"):
         with open(context.estimates_file, 'a') as f:
             print(f"{context.feature_name},{context.scenario.name},{context.treatment_var},{outcome},{context.control_val},{context.treatment_val},{estimate},{ci_low},{ci_high},{relationship},{'pass' if test_bool(estimate, relationship, ci_low, ci_high) else 'fail'}", file=f)
