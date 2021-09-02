@@ -340,7 +340,7 @@ def compare_association_to_causation(csv_path, smoothing=False):
         do_why_causal_ate = calculate_binary_ate(true_ate_df, "interventions", "cum_infections_5", 1, 0, "avg_age",
                                                  "dowhy")
         print(f"True ATE - DoWhy: {do_why_causal_ate}; Ours: {true_causal_ate}")  # Sometimes differs by a little bit
-
+        print(causal_ate)
         id_specific_ates[id]["adjusted"] = causal_ate
         id_specific_ates[id]["unadjusted"] = non_causal_ate
         id_specific_ates[id]["imbalance"] = imbalance
@@ -549,7 +549,7 @@ def run_age_restricted_vaccine_experiment_age_directly(n_input_configs, n_runs, 
     for i, input_config in enumerate(input_configs):
         print(f"Input configuration {i + 1}/{n_input_configs}")
         age_dists = create_sorted_age_dist_list_from_cv_location_data(input_config["pop_size"])
-        # age_dists = age_dists[::10]
+        # age_dists = age_dists[::20]
         max_target_imbalance = len(age_dists)
         target_imbalance_results_dfs = []
         for target_imbalance in range(max_target_imbalance):
@@ -579,9 +579,9 @@ if __name__ == "__main__":
     n_samples = int(sys.argv[2]) if len(sys.argv) > 2 else 30
     out_path = str(sys.argv[3]) if len(sys.argv) > 3 else "imbalance_experiment_results.csv"
     print(f"n_input_configs: {n_input_configs}, n_samples: {n_samples}, out_path: {out_path}")
-    # out_path = "./full_results_actual_countries_1ic_30r.csv"
+    # # out_path = "scenarios/compare_vaccines/covariate_imbalance_1ic_6ns_20pc.csv"
     start_time = time.time()
     run_age_restricted_vaccine_experiment_age_directly(n_input_configs, n_samples, out_path)
     end_time = time.time()
     print(f"Run time: {round(end_time - start_time, 2)}s")
-    # compare_association_to_causation("imbalance_experiment_ic1_ns30_10percent.csv", True)
+    compare_association_to_causation(out_path, False)
