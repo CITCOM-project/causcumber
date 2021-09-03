@@ -6,3 +6,4 @@ local/
 __pycache__/
 results/
 *.pdf
+/scenarios/compare_vaccines/*.csv
