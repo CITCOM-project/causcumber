@@ -3,8 +3,8 @@ import numpy as np
 import random
 import covasim as cv
 import matplotlib.pyplot as plt
-import time
 import sys
+import time
 from dowhy import CausalModel
 from collections import defaultdict
 sys.path.append("../../")
@@ -15,7 +15,7 @@ from sklearn.linear_model import LinearRegression
 LOCATIONS = ["UK", "France"]
 FIXED_PARAMS = {"n_days": 35, "pop_type": "hybrid", "use_waning": True}
 VARIABLE_PARAMS = {"pop_size": (50000, 5000), "pop_infected": (100, 10)}
-
+DESIRED_OUTPUTS = ["cum_infections", "cum_deaths", "cum_symptomatic", "cum_severe", "cum_critical", "cum_vaccinated"]
 
 def run_covasim_by_week_with_age_dist(label, params, age_dist, desired_outputs, n_runs=30):
     print("Params", params)
@@ -130,9 +130,9 @@ def run_covasim_with_age_bias(target_imbalance, params, n_runs, age_dists, id):
                                                           days=list(range(35)),
                                                           subtarget=vaccinate_by_age)
     treatment_results = run_covasim_by_week_with_age_dist("treatment", treatment_params, default_age_dist,
-                                                          desired_outputs=["cum_infections"], n_runs=1)
+                                                          desired_outputs=DESIRED_OUTPUTS, n_runs=1)
     control_results = run_covasim_by_week_with_age_dist("control", control_params, default_age_dist,
-                                                        desired_outputs=["cum_infections"], n_runs=1)
+                                                        desired_outputs=DESIRED_OUTPUTS, n_runs=1)
 
     results_lists += [treatment_results, control_results]
 
@@ -149,7 +149,7 @@ def run_covasim_with_age_bias(target_imbalance, params, n_runs, age_dists, id):
         random_age_treatment_results = run_covasim_by_week_with_age_dist("treatment",
                                                                          treatment_params,
                                                                          treatment_age_dist,
-                                                                         desired_outputs=["cum_infections"],
+                                                                         desired_outputs=DESIRED_OUTPUTS,
                                                                          n_runs=n_runs)
         results_lists.append(random_age_treatment_results)
     if (default_age_index - int(target_imbalance/2)) >= 0:
@@ -158,7 +158,7 @@ def run_covasim_with_age_bias(target_imbalance, params, n_runs, age_dists, id):
         random_age_control_results = run_covasim_by_week_with_age_dist("control",
                                                                        control_params,
                                                                        control_age_dist,
-                                                                       desired_outputs=["cum_infections"],
+                                                                       desired_outputs=DESIRED_OUTPUTS,
                                                                        n_runs=n_runs)
         results_lists.append(random_age_control_results)
     results_df = pd.concat(results_lists, ignore_index=True)
@@ -292,9 +292,9 @@ def run_model_with_control_and_treatment_for_location(control_params, treatment_
     else:
         control_params["rand_seed"] = treatment_params["rand_seed"]  # Make sure they are the same
     control_results = run_covasim_by_week(label="control", params=control_params,
-                                          desired_outputs=["cum_infections", "cum_deaths"], n_runs=1)
+                                          desired_outputs=DESIRED_OUTPUTS, n_runs=1)
     treatment_results = run_covasim_by_week(label="treatment", params=treatment_params,
-                                            desired_outputs=["cum_infections", "cum_deaths"], n_runs=1)
+                                            desired_outputs=DESIRED_OUTPUTS, n_runs=1)
 
     # control_results["interventions"] = "none"
     # treatment_results["interventions"] = [vaccine.label for vaccine in treatment_results["interventions"]]
@@ -313,7 +313,7 @@ def compare_association_to_causation(csv_path, smoothing=False):
     for id in ids:
         sub_df = df.loc[df["id"] == id]
         locations = list(sub_df["location"].unique())
-        imbalance = round(sub_df["imbalance"].iloc[0], 2)
+        imbalance = round(sub_df["imbalance"].iloc[0], 4)
 
         # Mathematical check: higher imbalance should result in a greater difference between ATEs obtained via
         # adjustment and no adjustment. First we need to convert categorical data to numerical categories.
@@ -340,7 +340,6 @@ def compare_association_to_causation(csv_path, smoothing=False):
         do_why_causal_ate = calculate_binary_ate(true_ate_df, "interventions", "cum_infections_5", 1, 0, "avg_age",
                                                  "dowhy")
         print(f"True ATE - DoWhy: {do_why_causal_ate}; Ours: {true_causal_ate}")  # Sometimes differs by a little bit
-        print(causal_ate)
         id_specific_ates[id]["adjusted"] = causal_ate
         id_specific_ates[id]["unadjusted"] = non_causal_ate
         id_specific_ates[id]["imbalance"] = imbalance
@@ -368,9 +367,10 @@ def plot_imbalance_vs_ate_error(id_specific_ates_dict, smoothing=False):
         ys_adjusted.append(results["adjusted_error"])
         ys_unadjusted.append(results["unadjusted_error"])
     if smoothing:
-        ys_unadjusted = moving_average(ys_unadjusted, 8)
-        ys_adjusted = moving_average(ys_adjusted, 8)
-        imbalances = moving_average(imbalances, 8)
+        window_size = 8
+        ys_unadjusted = moving_average(ys_unadjusted, window_size)
+        ys_adjusted = moving_average(ys_adjusted, window_size)
+        imbalances = moving_average(imbalances, window_size)
     plt.plot(imbalances, ys_adjusted, label="Adjusted")
     plt.plot(imbalances, ys_unadjusted, label="Unadjusted ")
     plt.xlabel("Imbalance")
@@ -584,4 +584,4 @@ if __name__ == "__main__":
     run_age_restricted_vaccine_experiment_age_directly(n_input_configs, n_samples, out_path)
     end_time = time.time()
     print(f"Run time: {round(end_time - start_time, 2)}s")
-    compare_association_to_causation(out_path, False)
+    # compare_association_to_causation(out_path, False)
