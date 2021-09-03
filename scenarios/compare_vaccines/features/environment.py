@@ -58,42 +58,48 @@ def after_feature(context, feature):
     # Get the results csv for each vaccine and combine into a single df
     vaccines = [row["vaccine_name"] for row in scenario_outline.examples[0].table.rows]
     vaccine_results_paths = [f"./results/{vaccine}_vaccine_causal_inference.csv" for vaccine in vaccines]
-    vaccine_results_dfs = [pd.read_csv(vaccine_results_path) for vaccine_results_path in vaccine_results_paths]
-    combined_vaccine_results_df = pd.concat(vaccine_results_dfs)
+    vaccine_results_dfs = []
+    for path in vaccine_results_paths:
+        if os.path.isfile(path):
+            print("Is file")
+            vaccine_results_dfs.append(pd.read_csv(path))
+    if len(vaccine_results_dfs) > 1:  # Only combine if there are multiple dfs
+        print("Vaccine results dfs", vaccine_results_dfs)
+        combined_vaccine_results_df = pd.concat(vaccine_results_dfs)
 
-    # Set output file name and save
-    output_name = f"{to_snake_case(scenario_outline.name)}_causal_inference"
-    # If using observational data, add observational to file name
-    for tag in scenario_outline.tags:
-        if "observational" in tag:
-            _, file_name = tag.split('.')
+        # Set output file name and save
+        output_name = f"{to_snake_case(scenario_outline.name)}_causal_inference"
+        # If using observational data, add observational to file name
+        for tag in scenario_outline.tags:
+            if "observational" in tag:
+                _, file_name = tag.split('.')
+                output_name = f"{to_snake_case(scenario_outline.name)}_{file_name}"
+
+        # If disabling identification, add no_adjustment to file name
+        for tag in scenario_outline.tags:
+            if "disable_identification" in tag:
+                output_name = output_name + "_no_adjustment"
+
+        # If data CL argument is used, add observational to file name
+        if "data" in context.config.userdata:
+            print("DATA")
+            file_name = context.config.userdata["data"].split('/')[-1].replace(".csv", '')
             output_name = f"{to_snake_case(scenario_outline.name)}_{file_name}"
 
-    # If disabling identification, add no_adjustment to file name
-    for tag in scenario_outline.tags:
-        if "disable_identification" in tag:
+        if "disable_identification" in context.config.userdata:
+            print("DISABLE IDENTIFICATION")
             output_name = output_name + "_no_adjustment"
 
-    # If data CL argument is used, add observational to file name
-    if "data" in context.config.userdata:
-        print("DATA")
-        file_name = context.config.userdata["data"].split('/')[-1].replace(".csv", '')
-        output_name = f"{to_snake_case(scenario_outline.name)}_{file_name}"
+        if "output_directory" in context.config.userdata:
+            output_dir = context.config.userdata["output_directory"]
+        else:
+            output_dir = "./results"
 
-    if "disable_identification" in context.config.userdata:
-        print("DISABLE IDENTIFICATION")
-        output_name = output_name + "_no_adjustment"
+        save_results_df(combined_vaccine_results_df, output_dir, output_name)
 
-    if "output_directory" in context.config.userdata:
-        output_dir = context.config.userdata["output_directory"]
-    else:
-        output_dir = "./results"
-
-    save_results_df(combined_vaccine_results_df, output_dir, output_name)
-
-    # Delete the individual csv files
-    for old_result_csv in vaccine_results_paths:
-        os.remove(old_result_csv)
+        # Delete the individual csv files
+        for old_result_csv in vaccine_results_paths:
+            os.remove(old_result_csv)
 
 
 def before_tag(context, tag):
