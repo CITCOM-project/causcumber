@@ -4,6 +4,7 @@ import random
 import covasim as cv
 import matplotlib.pyplot as plt
 import sys
+import glob
 import time
 from dowhy import CausalModel
 from collections import defaultdict
@@ -16,6 +17,7 @@ LOCATIONS = ["UK", "France"]
 FIXED_PARAMS = {"n_days": 35, "pop_type": "hybrid", "use_waning": True}
 VARIABLE_PARAMS = {"pop_size": (50000, 5000), "pop_infected": (100, 10)}
 DESIRED_OUTPUTS = ["cum_infections", "cum_deaths", "cum_symptomatic", "cum_severe", "cum_critical", "cum_vaccinated"]
+
 
 def run_covasim_by_week_with_age_dist(label, params, age_dist, desired_outputs, n_runs=30):
     print("Params", params)
@@ -117,7 +119,6 @@ def vaccinate_by_age(sim):
 def run_covasim_with_age_bias(target_imbalance, params, n_runs, age_dists, id):
     results_lists = []
     params["location"] = "UK"
-    # age_dists = age_dists[::10]
     default_age_index = len(age_dists) // 2
     default_age_dist = age_dists[default_age_index][1]  # Get middle item in list
 
@@ -146,6 +147,7 @@ def run_covasim_with_age_bias(target_imbalance, params, n_runs, age_dists, id):
     if (default_age_index + int(target_imbalance/2)) <= (len(age_dists) - 1):
         treatment_age_dist_index = default_age_index + int(target_imbalance/2)
         treatment_age_dist = age_dists[treatment_age_dist_index][1]
+        print(age_dists[treatment_age_dist_index][0])
         random_age_treatment_results = run_covasim_by_week_with_age_dist("treatment",
                                                                          treatment_params,
                                                                          treatment_age_dist,
@@ -155,6 +157,7 @@ def run_covasim_with_age_bias(target_imbalance, params, n_runs, age_dists, id):
     if (default_age_index - int(target_imbalance/2)) >= 0:
         control_age_dist_index = default_age_index - int(target_imbalance/2)
         control_age_dist = age_dists[control_age_dist_index][1]
+        print(age_dists[control_age_dist_index][0])
         random_age_control_results = run_covasim_by_week_with_age_dist("control",
                                                                        control_params,
                                                                        control_age_dist,
@@ -335,11 +338,13 @@ def compare_association_to_causation(csv_path, smoothing=False):
         # assert true_ate_df_imbalance < 0.1
         true_causal_ate = calculate_binary_ate(true_ate_df, "interventions", "cum_infections_5", 1, 0, "avg_age",
                                                "stratification")
+        print(f"True ATE: {true_causal_ate}")
 
-        # Sanity check: is the true ATE equivalent to dowhy ATE?
-        do_why_causal_ate = calculate_binary_ate(true_ate_df, "interventions", "cum_infections_5", 1, 0, "avg_age",
-                                                 "dowhy")
-        print(f"True ATE - DoWhy: {do_why_causal_ate}; Ours: {true_causal_ate}")  # Sometimes differs by a little bit
+        # Sanity check: is the true ATE equivalent to dowhy ATE? This causes a divide by zero warning since the model
+        # has a perfect fit for the target trial dataset and thus the denominator (error) is zero.
+        # do_why_causal_ate = calculate_binary_ate(true_ate_df, "interventions", "cum_infections_5", 1, 0, "avg_age",
+        #                                          "dowhy")
+        # print(f"True ATE - DoWhy: {do_why_causal_ate}; Ours: {true_causal_ate}")  # Sometimes differs by a little bit
         id_specific_ates[id]["adjusted"] = causal_ate
         id_specific_ates[id]["unadjusted"] = non_causal_ate
         id_specific_ates[id]["imbalance"] = imbalance
@@ -387,7 +392,6 @@ def average_id_specific_ates_with_same_imbalance(ate_dict):
                     v}, {"imbalance": v}, {"adjusted_error": v}, {"unadjusted_error": v}}
     :return: The ate_dict with any duplicate imbalance ATEs averaged and replaced, sorted by ascending imbalance.
     """
-    print(ate_dict)
     ate_dict_no_duplicate_imbalances = defaultdict(dict)
     visited_ids = []
     for id, results in ate_dict.items():
@@ -549,11 +553,11 @@ def run_age_restricted_vaccine_experiment_age_directly(n_input_configs, n_runs, 
     for i, input_config in enumerate(input_configs):
         print(f"Input configuration {i + 1}/{n_input_configs}")
         age_dists = create_sorted_age_dist_list_from_cv_location_data(input_config["pop_size"])
-        # age_dists = age_dists[::20]
+        # age_dists = age_dists[::2]
         max_target_imbalance = len(age_dists)
         target_imbalance_results_dfs = []
-        for target_imbalance in range(max_target_imbalance):
-            print(f"Target imbalance {target_imbalance + 1}/{max_target_imbalance}")
+        for target_imbalance in range(0, max_target_imbalance, 2):  # Loop over even numbers to avoid repeat comparisons
+            print(f"Target imbalance {int(target_imbalance/2) + 1}/{(max_target_imbalance//2) + 1}")
             id = f"ic{i}_ti{target_imbalance}"
             target_imbalance_results_df = run_covasim_with_age_bias(target_imbalance, input_config, n_runs, age_dists,
                                                                     id)
@@ -574,14 +578,28 @@ def moving_average(results_list, window_size):
     return np.convolve(results_list, np.ones(window_size), 'valid') / window_size
 
 
+def combine_results_csv_dir(dir_path, out_path):
+    """ Combine a directory of results csvs for the covariate imbalance experiment.
+    :param dir_path: Path to the directory containing results csvs.
+    :param out_path: Path to the directory to save combined csv.
+    """
+    results_csvs = glob.glob(dir_path + "/*.csv")
+    run_dfs = []
+    for x, filename in enumerate(results_csvs):
+        results_df = pd.read_csv(filename, header=0)
+        results_df["id"] = results_df["id"].str.replace("ic0", f"ic{x}")
+        run_dfs.append(results_df)
+    results_df = pd.concat(run_dfs, axis=0, ignore_index=True)
+    save_results_df(results_df, out_path, "imbalance_results")
+
+
 if __name__ == "__main__":
     n_input_configs = int(sys.argv[1]) if len(sys.argv) > 1 else 1
     n_samples = int(sys.argv[2]) if len(sys.argv) > 2 else 30
     out_path = str(sys.argv[3]) if len(sys.argv) > 3 else "imbalance_experiment_results.csv"
     print(f"n_input_configs: {n_input_configs}, n_samples: {n_samples}, out_path: {out_path}")
-    # # out_path = "scenarios/compare_vaccines/covariate_imbalance_1ic_6ns_20pc.csv"
     start_time = time.time()
     run_age_restricted_vaccine_experiment_age_directly(n_input_configs, n_samples, out_path)
     end_time = time.time()
     print(f"Run time: {round(end_time - start_time, 2)}s")
-    # compare_association_to_causation(out_path, False)
+    compare_association_to_causation(out_path, False)
