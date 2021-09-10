@@ -16,18 +16,39 @@ from sklearn.linear_model import LinearRegression
 LOCATIONS = ["UK", "France"]
 FIXED_PARAMS = {"n_days": 35, "pop_type": "hybrid", "use_waning": True}
 VARIABLE_PARAMS = {"pop_size": (50000, 5000), "pop_infected": (100, 10)}
-DESIRED_OUTPUTS = ["cum_infections", "cum_deaths", "cum_symptomatic", "cum_severe", "cum_critical", "cum_vaccinated"]
+DESIRED_OUTPUTS = ["cum_infections", "cum_deaths", "cum_vaccinated"]
+
+
+class StoreAverageAge(cv.Analyzer):
+    """ Get the average age of all agents in the simulation on the start day. This is to avoid keeping people from
+        simulation runs which requires a lot of memory. """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.avg_age = 0
+        return
+
+    def initialize(self, sim):
+        super().initialize()
+        self.initialized = True
+        return
+
+    def apply(self, sim):
+        if sim.t == 0:
+            self.avg_age = np.average(sim.people.age)
+        return
+
+    def get_age(self):
+        return self.avg_age
 
 
 def run_covasim_by_week_with_age_dist(label, params, age_dist, desired_outputs, n_runs=30):
     print("Params", params)
-    print("Desired outputs", desired_outputs)
     cv.data.country_age_data.data[params["location"]] = age_dist
-
-    intervention_sim = cv.MultiSim(cv.Sim(pars=params, label=label, verbose=0), keep_people=True)
+    intervention_sim = cv.MultiSim(cv.Sim(pars=params, analyzers=StoreAverageAge(), label=label, verbose=0))
     intervention_sim.run(n_runs=n_runs, verbose=0)
     temporal = []
-    for sim in intervention_sim.sims:
+    for s, sim in enumerate(intervention_sim.sims):
+        # print(f"Sim {s+1} / {len(intervention_sim.sims)}")
         df = sim.to_df()
         quar_period = 14
         for i in sim['interventions']:
@@ -43,11 +64,7 @@ def run_covasim_by_week_with_age_dist(label, params, age_dist, desired_outputs, 
             week_dic[k] = v
         temporal.append(week_dic)
         # add avg. age and contacts to data
-        week_dic["avg_age"] = np.average(sim.people["age"])
-        week_dic["contacts_h"] = sim.pars["contacts"]["h"]
-        week_dic["contacts_s"] = sim.pars["contacts"]["s"]
-        week_dic["contacts_w"] = sim.pars["contacts"]["w"]
-        week_dic["contacts_c"] = sim.pars["contacts"]["c"]
+        week_dic["avg_age"] = StoreAverageAge.get_age(sim.get_analyzer())
         week_dic["age_dist"] = age_dist
         week_dic["rand_seed"] = sim.pars["rand_seed"]
     return pd.DataFrame(temporal)
@@ -137,7 +154,9 @@ def run_covasim_with_age_bias(target_imbalance, params, n_runs, age_dists, id):
 
     results_lists += [treatment_results, control_results]
 
-    # 2. Generate a treatment and control age distribution
+    # 2. Generate a treatment and control age districv.vaccinate_prob(vaccine="pfizer", label="pfizer",
+    #                                                           days=list(range(35)),
+    #                                                           subtarget=vaccinate_by_age)bution
     control_params["interventions"] = None
     treatment_params["interventions"] = cv.vaccinate_prob(vaccine="pfizer", label="pfizer",
                                                           days=list(range(35)),
@@ -322,20 +341,19 @@ def compare_association_to_causation(csv_path, smoothing=False):
         # adjustment and no adjustment. First we need to convert categorical data to numerical categories.
         dowhy_sub_df = sub_df.copy()
         dowhy_sub_df["interventions"] = dowhy_sub_df["interventions"].replace({"control": 0, "treatment": 1})
+        dowhy_sub_df["interventions"] = dowhy_sub_df["interventions"].astype(bool)
         dowhy_sub_df["location"] = dowhy_sub_df["location"].replace({"UK": 0, "France": 1, "Japan": 2,
                                                                      "New Zealand": 3, "Austria": 4, "Finland": 5})
         dowhy_sub_df["location"] = dowhy_sub_df["location"].astype("category")
 
         # Estimate the ATE with and without adjustment
-        causal_ate = calculate_binary_ate(dowhy_sub_df, "interventions", "cum_infections_5", 1, 0, "avg_age",
-                                          "dowhy")
-        non_causal_ate = calculate_binary_ate(dowhy_sub_df, "interventions", "cum_infections_5", 1, 0, None,
-                                              "dowhy")
+        causal_ate, causal_cis = calculate_binary_ate(dowhy_sub_df, "interventions", "cum_infections_5", 1, 0,
+                                                      "avg_age", "dowhy")
+        non_causal_ate, non_causal_cis = calculate_binary_ate(dowhy_sub_df, "interventions", "cum_infections_5", 1, 0,
+                                                              None, "dowhy")
 
         # Get the true ATE
         true_ate_df = dowhy_sub_df.head(len(locations) * 2)  # These rows contain 0 imbalance and give true ATE
-        true_ate_df_imbalance = covariate_imbalance(true_ate_df, ["avg_age"], "interventions")
-        # assert true_ate_df_imbalance < 0.1
         true_causal_ate = calculate_binary_ate(true_ate_df, "interventions", "cum_infections_5", 1, 0, "avg_age",
                                                "stratification")
         print(f"True ATE: {true_causal_ate}")
@@ -346,15 +364,20 @@ def compare_association_to_causation(csv_path, smoothing=False):
         #                                          "dowhy")
         # print(f"True ATE - DoWhy: {do_why_causal_ate}; Ours: {true_causal_ate}")  # Sometimes differs by a little bit
         id_specific_ates[id]["adjusted"] = causal_ate
+        id_specific_ates[id]["adjusted_cis"] = [true_causal_ate - causal_cis[0][0],
+                                                true_causal_ate - causal_cis[0][1]]
         id_specific_ates[id]["unadjusted"] = non_causal_ate
+        id_specific_ates[id]["unadjusted_cis"] = [true_causal_ate - non_causal_cis[0][0],
+                                                  true_causal_ate - non_causal_cis[0][1]]
         id_specific_ates[id]["imbalance"] = imbalance
         id_specific_ates[id]["true_ate"] = true_causal_ate
-        id_specific_ates[id]["adjusted_error"] = abs(true_causal_ate - causal_ate)
-        id_specific_ates[id]["unadjusted_error"] = abs(true_causal_ate - non_causal_ate)
+        id_specific_ates[id]["adjusted_error"] = true_causal_ate - causal_ate
+        id_specific_ates[id]["unadjusted_error"] = true_causal_ate - non_causal_ate
 
     # Average any ATEs with the same imbalance
-    sorted_id_specific_ates_no_duplicate_imbalances = average_id_specific_ates_with_same_imbalance(id_specific_ates)
-    plot_imbalance_vs_ate_error(sorted_id_specific_ates_no_duplicate_imbalances, smoothing=smoothing)
+    sorted_id_specific_ates = dict(sorted(id_specific_ates.items(), key=lambda item: item[1]["imbalance"]))
+    # sorted_id_specific_ates_no_duplicate_imbalances = average_id_specific_ates_with_same_imbalance(id_specific_ates)
+    plot_imbalance_vs_ate_error(sorted_id_specific_ates, smoothing=smoothing)
 
 
 def plot_imbalance_vs_ate_error(id_specific_ates_dict, smoothing=False):
@@ -367,17 +390,31 @@ def plot_imbalance_vs_ate_error(id_specific_ates_dict, smoothing=False):
     imbalances = []
     ys_adjusted = []
     ys_unadjusted = []
+    cis_low_adjusted = []
+    cis_high_adjusted = []
+    cis_low_unadjusted = []
+    cis_high_unadjusted = []
     for _, results in id_specific_ates_dict.items():
         imbalances.append(results["imbalance"])
         ys_adjusted.append(results["adjusted_error"])
         ys_unadjusted.append(results["unadjusted_error"])
+        cis_low_adjusted.append(results["adjusted_cis"][0])
+        cis_high_adjusted.append(results["adjusted_cis"][1])
+        cis_low_unadjusted.append(results["unadjusted_cis"][0])
+        cis_high_unadjusted.append(results["unadjusted_cis"][1])
     if smoothing:
         window_size = 8
         ys_unadjusted = moving_average(ys_unadjusted, window_size)
         ys_adjusted = moving_average(ys_adjusted, window_size)
+        cis_low_adjusted = moving_average(cis_low_adjusted, window_size)
+        cis_high_adjusted = moving_average(cis_high_adjusted, window_size)
+        cis_low_unadjusted = moving_average(cis_low_unadjusted, window_size)
+        cis_high_unadjusted = moving_average(cis_high_unadjusted, window_size)
         imbalances = moving_average(imbalances, window_size)
     plt.plot(imbalances, ys_adjusted, label="Adjusted")
-    plt.plot(imbalances, ys_unadjusted, label="Unadjusted ")
+    plt.plot(imbalances, ys_unadjusted, label="Unadjusted")
+    plt.fill_between(imbalances, cis_low_adjusted, cis_high_adjusted, alpha=.2)
+    plt.fill_between(imbalances, cis_low_unadjusted, cis_high_unadjusted, alpha=.2)
     plt.xlabel("Imbalance")
     plt.ylabel("ATE Error")
     plt.legend()
@@ -457,11 +494,13 @@ def calculate_binary_ate(df, treatment_variable, outcome_variable, treatment_val
             common_causes = [adjustment_var]
         else:
             common_causes = []
+        df[treatment_variable] = df[treatment_variable].astype(bool)
         causal_model = CausalModel(data=df, treatment=treatment_variable, outcome=outcome_variable,
                                    common_causes=common_causes)
         causal_estimand = causal_model.identify_effect(proceed_when_unidentifiable=True)
-        ate = causal_model.estimate_effect(causal_estimand, method_name="backdoor.linear_regression").value
-        return round(ate, 2)
+        causal_effect = causal_model.estimate_effect(causal_estimand, method_name="backdoor.linear_regression")
+        print(causal_effect.estimator.model.summary())
+        return round(causal_effect.value, 2), causal_effect.get_confidence_intervals()
     else:
         treated_df = df.loc[df[treatment_variable] == treatment_val]
         control_df = df.loc[df[treatment_variable] == control_val]
@@ -553,7 +592,7 @@ def run_age_restricted_vaccine_experiment_age_directly(n_input_configs, n_runs, 
     for i, input_config in enumerate(input_configs):
         print(f"Input configuration {i + 1}/{n_input_configs}")
         age_dists = create_sorted_age_dist_list_from_cv_location_data(input_config["pop_size"])
-        # age_dists = age_dists[::2]
+        age_dists = age_dists[::20]
         max_target_imbalance = len(age_dists)
         target_imbalance_results_dfs = []
         for target_imbalance in range(0, max_target_imbalance, 2):  # Loop over even numbers to avoid repeat comparisons
