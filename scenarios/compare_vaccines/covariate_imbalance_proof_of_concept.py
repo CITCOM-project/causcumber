@@ -14,8 +14,9 @@ from covasim_utils import run_covasim_by_week, save_results_df, preprocess_data
 from sklearn.linear_model import LinearRegression
 
 LOCATIONS = ["UK", "France"]
-FIXED_PARAMS = {"n_days": 35, "pop_type": "hybrid", "use_waning": True}
-VARIABLE_PARAMS = {"pop_size": (50000, 5000), "pop_infected": (100, 10)}
+FIXED_PARAMS = {"n_days": 35, "pop_type": "hybrid", "use_waning": True, "pop_size": 50000, "pop_infected": 100}
+# VARIABLE_PARAMS = {"pop_size": (50000, 5000), "pop_infected": (100, 10)}
+VARIABLE_PARAMS = {}
 DESIRED_OUTPUTS = ["cum_infections", "cum_deaths", "cum_vaccinated"]
 
 
@@ -43,6 +44,7 @@ class StoreAverageAge(cv.Analyzer):
 
 def run_covasim_by_week_with_age_dist(label, params, age_dist, desired_outputs, n_runs=30):
     print("Params", params)
+    intervention = params["interventions"]
     cv.data.country_age_data.data[params["location"]] = age_dist
     intervention_sim = cv.MultiSim(cv.Sim(pars=params, analyzers=StoreAverageAge(), label=label, verbose=0))
     intervention_sim.run(n_runs=n_runs, verbose=0)
@@ -67,6 +69,7 @@ def run_covasim_by_week_with_age_dist(label, params, age_dist, desired_outputs, 
         week_dic["avg_age"] = StoreAverageAge.get_age(sim.get_analyzer())
         week_dic["age_dist"] = age_dist
         week_dic["rand_seed"] = sim.pars["rand_seed"]
+        params["interventions"] = intervention
     return pd.DataFrame(temporal)
 
 
@@ -154,35 +157,45 @@ def run_covasim_with_age_bias(target_imbalance, params, n_runs, age_dists, id):
 
     results_lists += [treatment_results, control_results]
 
-    # 2. Generate a treatment and control age districv.vaccinate_prob(vaccine="pfizer", label="pfizer",
-    #                                                           days=list(range(35)),
-    #                                                           subtarget=vaccinate_by_age)bution
-    control_params["interventions"] = None
-    treatment_params["interventions"] = cv.vaccinate_prob(vaccine="pfizer", label="pfizer",
-                                                          days=list(range(35)),
-                                                          subtarget=vaccinate_by_age)
-
+    # 2. Generate a treatment and control age distribution
     n_runs = int((n_runs - 2) / 2)
-    if (default_age_index + int(target_imbalance/2)) <= (len(age_dists) - 1):
+    if (default_age_index + int(target_imbalance/2)) <= (len(age_dists) - 1) and \
+            (default_age_index - int(target_imbalance / 2)) >= 0:
+        # Make the majority of the treatment group old
         treatment_age_dist_index = default_age_index + int(target_imbalance/2)
         treatment_age_dist = age_dists[treatment_age_dist_index][1]
-        print(age_dists[treatment_age_dist_index][0])
-        random_age_treatment_results = run_covasim_by_week_with_age_dist("treatment",
-                                                                         treatment_params,
-                                                                         treatment_age_dist,
-                                                                         desired_outputs=DESIRED_OUTPUTS,
-                                                                         n_runs=n_runs)
-        results_lists.append(random_age_treatment_results)
-    if (default_age_index - int(target_imbalance/2)) >= 0:
-        control_age_dist_index = default_age_index - int(target_imbalance/2)
+        print(f"Treatment age dist location: {age_dists[treatment_age_dist_index][0]}")
+        # Make the majority of the control group young
+        control_age_dist_index = default_age_index - int(target_imbalance / 2)
         control_age_dist = age_dists[control_age_dist_index][1]
-        print(age_dists[control_age_dist_index][0])
-        random_age_control_results = run_covasim_by_week_with_age_dist("control",
-                                                                       control_params,
-                                                                       control_age_dist,
-                                                                       desired_outputs=DESIRED_OUTPUTS,
-                                                                       n_runs=n_runs)
-        results_lists.append(random_age_control_results)
+        old_age_treatment_results = run_covasim_by_week_with_age_dist("treatment",
+                                                                      treatment_params,
+                                                                      treatment_age_dist,
+                                                                      desired_outputs=DESIRED_OUTPUTS,
+                                                                      n_runs=n_runs*.8)
+
+        young_age_treatment_results = run_covasim_by_week_with_age_dist("treatment",
+                                                                        treatment_params,
+                                                                        control_age_dist,
+                                                                        desired_outputs=DESIRED_OUTPUTS,
+                                                                        n_runs=n_runs*.2)
+
+
+        print(f"Control location age dist: {age_dists[control_age_dist_index][0]}")
+        young_age_control_results = run_covasim_by_week_with_age_dist("control",
+                                                                      control_params,
+                                                                      control_age_dist,
+                                                                      desired_outputs=DESIRED_OUTPUTS,
+                                                                      n_runs=n_runs*8)
+
+        old_age_control_results = run_covasim_by_week_with_age_dist("control",
+                                                                    control_params,
+                                                                    treatment_age_dist,
+                                                                    desired_outputs=DESIRED_OUTPUTS,
+                                                                    n_runs=n_runs*.2)
+
+        results_lists += [old_age_treatment_results, young_age_treatment_results,
+                          young_age_control_results, old_age_control_results]
     results_df = pd.concat(results_lists, ignore_index=True)
     results_df["id"] = id
     results_df = preprocess_data(results_df)
@@ -406,17 +419,17 @@ def plot_imbalance_vs_ate_error(id_specific_ates_dict, smoothing=False):
         window_size = 8
         ys_unadjusted = moving_average(ys_unadjusted, window_size)
         ys_adjusted = moving_average(ys_adjusted, window_size)
-        cis_low_adjusted = moving_average(cis_low_adjusted, window_size)
-        cis_high_adjusted = moving_average(cis_high_adjusted, window_size)
-        cis_low_unadjusted = moving_average(cis_low_unadjusted, window_size)
-        cis_high_unadjusted = moving_average(cis_high_unadjusted, window_size)
+        # cis_low_adjusted = moving_average(cis_low_adjusted, window_size)
+        # cis_high_adjusted = moving_average(cis_high_adjusted, window_size)
+        # cis_low_unadjusted = moving_average(cis_low_unadjusted, window_size)
+        # cis_high_unadjusted = moving_average(cis_high_unadjusted, window_size)
         imbalances = moving_average(imbalances, window_size)
     plt.plot(imbalances, ys_adjusted, label="Adjusted")
     plt.plot(imbalances, ys_unadjusted, label="Unadjusted")
     plt.fill_between(imbalances, cis_low_adjusted, cis_high_adjusted, alpha=.2)
     plt.fill_between(imbalances, cis_low_unadjusted, cis_high_unadjusted, alpha=.2)
     plt.xlabel("Imbalance")
-    plt.ylabel("ATE Error")
+    plt.ylabel("ATE")
     plt.legend()
     plt.tight_layout()
     plt.show()
@@ -592,7 +605,7 @@ def run_age_restricted_vaccine_experiment_age_directly(n_input_configs, n_runs, 
     for i, input_config in enumerate(input_configs):
         print(f"Input configuration {i + 1}/{n_input_configs}")
         age_dists = create_sorted_age_dist_list_from_cv_location_data(input_config["pop_size"])
-        age_dists = age_dists[::20]
+        age_dists = age_dists[::10]
         max_target_imbalance = len(age_dists)
         target_imbalance_results_dfs = []
         for target_imbalance in range(0, max_target_imbalance, 2):  # Loop over even numbers to avoid repeat comparisons
