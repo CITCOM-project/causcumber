@@ -1,16 +1,13 @@
 import pandas as pd
 import numpy as np
-import random
 import covasim as cv
 import matplotlib.pyplot as plt
 import sys
-import glob
 import time
 from dowhy import CausalModel
-from collections import defaultdict
 sys.path.append("../../")
 from causcumber_utils import covariate_imbalance
-from covasim_utils import run_covasim_by_week, save_results_df, preprocess_data
+from covasim_utils import run_covasim_by_week, preprocess_data
 from sklearn.linear_model import LinearRegression
 
 LOCATIONS = ["UK", "France"]
@@ -23,14 +20,11 @@ DESIRED_OUTPUTS = ["cum_infections", "cum_deaths", "cum_vaccinated"]
 class StoreAverageAge(cv.Analyzer):
     """ Get the average age of all agents in the simulation on the start day. This is to avoid keeping people from
         simulation runs which requires a lot of memory. """
+    initialized: bool
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.avg_age = 0
-        return
-
-    def initialize(self, sim):
-        super().initialize()
-        self.initialized = True
         return
 
     def apply(self, sim):
@@ -42,34 +36,27 @@ class StoreAverageAge(cv.Analyzer):
         return self.avg_age
 
 
-def run_covasim_by_week_with_age_dist(label, params, age_dist, desired_outputs, n_runs=30):
-    print("Params", params)
-    intervention = params["interventions"]
-    cv.data.country_age_data.data[params["location"]] = age_dist
-    intervention_sim = cv.MultiSim(cv.Sim(pars=params, analyzers=StoreAverageAge(), label=label, verbose=0))
+def run_covasim_by_week_with_age_dist(label, run_params, age_dist, desired_outputs, n_runs=30):
+    print("Params", run_params)
+    intervention = run_params["interventions"]
+    cv.data.country_age_data.data[run_params["location"]] = age_dist
+    intervention_sim = cv.MultiSim(cv.Sim(pars=run_params, analyzers=StoreAverageAge(), label=label, verbose=0))
     intervention_sim.run(n_runs=n_runs, verbose=0)
     temporal = []
     for s, sim in enumerate(intervention_sim.sims):
-        # print(f"Sim {s+1} / {len(intervention_sim.sims)}")
         df = sim.to_df()
-        quar_period = 14
-        for i in sim['interventions']:
-            if hasattr(i, "quar_period"):
-                quar_period = i.quar_period
         df = df[desired_outputs]
         week_by_week = pd.DataFrame(aggregate_by_week(df, desired_outputs))
         dic = week_by_week.to_dict(orient='list')
         week_dic = {f"{k}_{w + 1}": item for k in desired_outputs for w, item in enumerate(dic[k])}
-        week_dic['quar_period'] = quar_period
-        params["interventions"] = label
-        for k, v in params.items():
+        run_params["interventions"] = label
+        for k, v in run_params.items():
             week_dic[k] = v
         temporal.append(week_dic)
-        # add avg. age and contacts to data
         week_dic["avg_age"] = StoreAverageAge.get_age(sim.get_analyzer())
         week_dic["age_dist"] = age_dist
         week_dic["rand_seed"] = sim.pars["rand_seed"]
-        params["interventions"] = intervention
+        run_params["interventions"] = intervention
     return pd.DataFrame(temporal)
 
 
@@ -115,8 +102,8 @@ def generate_observational_data_from_param_list(param_list, n):
 
 
 def vaccinate_by_age(sim):
-    """ Make elderly individuals more likely to receive vaccine than younger individuals. This is used to introduce
-        confounding by age to the effect of vaccination on cumulative infections.
+    """ Make elderly individuals more likely to receive vaccine than younger individuals. This is used
+        to introduce confounding by age to the effect of vaccination on cumulative infections.
 
     :param sim: A Covasim Simulation which this vaccination method should be applied to.
     :return output: A dictionary which maps agents to a vaccination probability based on age.
@@ -125,18 +112,16 @@ def vaccinate_by_age(sim):
     young = cv.true(sim.people.age < 50)
     middle = cv.true((sim.people.age >= 50) * (sim.people.age < 75))
     old = cv.true(sim.people.age > 75)
-    inds = sim.people.uid
-    vals = np.ones(len(sim.people))
-    vals[young] = 0.1
-    vals[middle] = 0.5
-    vals[old] = 0.9
-    ages = sim.people.age
-    vac_probs = [((age + 1) / 100) % 100 for age in ages]
-    output = dict(inds=inds, vals=vals)
+    people = sim.people.uid
+    vaccinate_probabilities = np.ones(len(sim.people))
+    vaccinate_probabilities[young] = 0.1
+    vaccinate_probabilities[middle] = 0.5
+    vaccinate_probabilities[old] = 0.9
+    output = dict(inds=people, vals=vaccinate_probabilities)
     return output
 
 
-def run_covasim_with_age_bias(target_imbalance, params, n_runs, age_dists, id):
+def run_covasim_with_age_bias(target_imbalance, params, n_runs, age_dists, identifier):
     results_lists = []
     params["location"] = "UK"
     default_age_index = len(age_dists) // 2
@@ -159,10 +144,10 @@ def run_covasim_with_age_bias(target_imbalance, params, n_runs, age_dists, id):
 
     # 2. Generate a treatment and control age distribution
     n_runs = int((n_runs - 2) / 2)
-    if (default_age_index + int(target_imbalance/2)) <= (len(age_dists) - 1) and \
+    if (default_age_index + int(target_imbalance / 2)) <= (len(age_dists) - 1) and \
             (default_age_index - int(target_imbalance / 2)) >= 0:
         # Make the majority of the treatment group old
-        treatment_age_dist_index = default_age_index + int(target_imbalance/2)
+        treatment_age_dist_index = default_age_index + int(target_imbalance / 2)
         treatment_age_dist = age_dists[treatment_age_dist_index][1]
         print(f"Treatment age dist location: {age_dists[treatment_age_dist_index][0]}")
         # Make the majority of the control group young
@@ -172,32 +157,31 @@ def run_covasim_with_age_bias(target_imbalance, params, n_runs, age_dists, id):
                                                                       treatment_params,
                                                                       treatment_age_dist,
                                                                       desired_outputs=DESIRED_OUTPUTS,
-                                                                      n_runs=n_runs*.8)
+                                                                      n_runs=int(n_runs * .8))
 
         young_age_treatment_results = run_covasim_by_week_with_age_dist("treatment",
                                                                         treatment_params,
                                                                         control_age_dist,
                                                                         desired_outputs=DESIRED_OUTPUTS,
-                                                                        n_runs=n_runs*.2)
-
+                                                                        n_runs=int(n_runs * .2))
 
         print(f"Control location age dist: {age_dists[control_age_dist_index][0]}")
         young_age_control_results = run_covasim_by_week_with_age_dist("control",
                                                                       control_params,
                                                                       control_age_dist,
                                                                       desired_outputs=DESIRED_OUTPUTS,
-                                                                      n_runs=n_runs*8)
+                                                                      n_runs=int(n_runs * .8))
 
         old_age_control_results = run_covasim_by_week_with_age_dist("control",
                                                                     control_params,
                                                                     treatment_age_dist,
                                                                     desired_outputs=DESIRED_OUTPUTS,
-                                                                    n_runs=n_runs*.2)
+                                                                    n_runs=int(n_runs * .2))
 
         results_lists += [old_age_treatment_results, young_age_treatment_results,
                           young_age_control_results, old_age_control_results]
     results_df = pd.concat(results_lists, ignore_index=True)
-    results_df["id"] = id
+    results_df["id"] = identifier
     results_df = preprocess_data(results_df)
     imbalance = covariate_imbalance(results_df, ["avg_age"], "interventions")
     results_df["imbalance"] = imbalance
@@ -205,6 +189,12 @@ def run_covasim_with_age_bias(target_imbalance, params, n_runs, age_dists, id):
 
 
 def create_sorted_age_dist_list_from_cv_location_data(pop_size):
+    """
+    Create a list of age distributions containing pop_size agents sorted in ascending order of mean age.
+    :param pop_size: The total number of agents to form the distribution.
+    :return: A list of triples (location name, location distribution, location average age) sorted in ascending order
+            of average age.
+    """
     cv_locations_list = cv.data.show_locations(output=True)["age_distributions"]
     locations_list = []
     for location in cv_locations_list:
@@ -217,6 +207,12 @@ def create_sorted_age_dist_list_from_cv_location_data(pop_size):
 
 
 def estimate_average_age_for_cv_location(location):
+    """
+    Given a location, find the age distribution from Covasim and estimate the average age by multiplying the middle
+    age in each bracket by its probability density and summing.
+    :param location: A string for the location name (must be valid Covasim location).
+    :return: Average age for the specified location.
+    """
     age_dist = cv.data.get_age_distribution(location)
     cumulative_avg_age = 0
     for age_bracket in age_dist:
@@ -247,78 +243,12 @@ def create_cv_age_dist(mean, variance, n_agents):
     return age_dist
 
 
-def run_covasim_with_biases(alphas, locations, params, n_runs, id, fixed_seed=True):
-    """ Causal question: what is the effect of vaccinating the elderly on cumulative infections after five weeks?
-
-        Run the model n_runs times, each time selecting two countries at random: one where an elderly-first vaccine
-        is available (treatment), and one where it is not (control). Each run has a different bias which is determined
-        by the alpha parameter of a dirichlet distribution. This distribution is used to select the treatment and
-        control country; if its value is >>> 1, the distribution is approx. normal; if its value is <<< 1, the
-        distribution is highly skewed.
-        """
-    results_list = []
-    control_params = params.copy()
-    treatment_params = params.copy()
-
-    for a, alpha in enumerate(alphas):
-        print(f"Alpha {a + 1}/{len(alphas)}")
-        random.shuffle(locations)  # shuffle locations so that the dominant countries can change on each alpha setting
-        # Generate a probability that each country is selected
-        prob_list = np.random.dirichlet(np.ones(len(locations)) * alpha, size=1).flatten().tolist()
-        prob_list.sort(reverse=True)  # sort the probabilities in descending order
-        control_locations = locations.copy()
-        treatment_locations = locations.copy()
-
-        # Rearrange the order of treatment locations so that treatment and control have a different dominant location
-        treatment_locations[0], treatment_locations[-1] = treatment_locations[-1], treatment_locations[0]
-        combined_results = []
-
-        # Make sure each run contains at least one of each country (positivity)
-        for i, location in enumerate(locations):
-            print(f"Run {i + 1}/{n_runs}")
-            control_params["interventions"] = None
-            treatment_params["interventions"] = cv.vaccinate_prob(vaccine="pfizer", label="pfizer",
-                                                                  days=list(range(35)),
-                                                                  subtarget=vaccinate_by_age)
-            control_params["location"] = location
-            treatment_params["location"] = location
-            run_results = run_model_with_control_and_treatment_for_location(control_params, treatment_params,
-                                                                            fixed_seed=True)
-            combined_results += run_results
-
-        # Then run model using biased data for rest of runs
-        for x in range(n_runs - len(locations)):
-            print(f"Run {x + len(locations) + 1}/{n_runs}")
-            control_params["interventions"] = None
-            treatment_params["interventions"] = cv.vaccinate_prob(vaccine="pfizer", label="pfizer",
-                                                                  days=list(range(35)),
-                                                                  subtarget=vaccinate_by_age)
-            # Select random location for control and treatment runs
-            control_params["location"] = np.random.choice(control_locations, 1, p=prob_list)[0]
-            treatment_params["location"] = np.random.choice(treatment_locations, 1, p=prob_list)[0]
-            run_results = run_model_with_control_and_treatment_for_location(control_params, treatment_params,
-                                                                            fixed_seed)
-            combined_results += run_results
-
-        # For each alpha setting, combine the results and compute imbalance score
-        combined_results_df = pd.concat(combined_results, ignore_index=True)
-        combined_results_df["id"] = f"ic{id}_a{alpha}"
-        combined_results_df = preprocess_data(combined_results_df)
-        imbalance = covariate_imbalance(combined_results_df, ["avg_age"], "interventions")
-        combined_results_df["imbalance"] = imbalance
-        combined_results_df["alpha"] = alpha
-        save_results_df(combined_results_df, f"./results/ic_{id}/", f"alpha_{alpha}")
-        results_list.append(combined_results_df)
-
-    results_df = pd.concat(results_list)
-    return results_df
-
-
 def run_model_with_control_and_treatment_for_location(control_params, treatment_params, fixed_seed):
     """
     Run the model twice for a specific location, once with control params and once with treatment params.
     :param control_params: dictionary containing model parameters for control execution.
     :param treatment_params: dictionary containing model parameters for treatment execution.
+    :param fixed_seed: whether or not to use a fixed seed.
     :return: results_df: a dataframe containing run results reported at weekly intervals.
     """
     if not fixed_seed:
@@ -331,22 +261,20 @@ def run_model_with_control_and_treatment_for_location(control_params, treatment_
     treatment_results = run_covasim_by_week(label="treatment", params=treatment_params,
                                             desired_outputs=DESIRED_OUTPUTS, n_runs=1)
 
-    # control_results["interventions"] = "none"
-    # treatment_results["interventions"] = [vaccine.label for vaccine in treatment_results["interventions"]]
-
     return [control_results, treatment_results]
 
 
 def compare_association_to_causation(csv_path, smoothing=False):
     """ Plot the relationship between imbalance and unadjusted and adjusted ATE error.
     :param csv_path: Path to csv containing observational data.
+    :param smoothing: Whether or not to smooth relationship in plot using moving average.
     """
     df = pd.read_csv(csv_path)
-    ids = list(df["id"].unique())
-    id_specific_ates = {id: {"adjusted": 0, "unadjusted": 0, "imbalance": 0, "true_ate": 0}
-                        for id in ids}
-    for id in ids:
-        sub_df = df.loc[df["id"] == id]
+    identifiers = list(df["id"].unique())
+    identifier_specific_ates = {identifier: {"adjusted": 0, "unadjusted": 0, "imbalance": 0, "true_ate": 0}
+                                for identifier in identifiers}
+    for identifier in identifiers:
+        sub_df = df.loc[df["id"] == identifier]
         locations = list(sub_df["location"].unique())
         imbalance = round(sub_df["imbalance"].iloc[0], 4)
 
@@ -355,8 +283,6 @@ def compare_association_to_causation(csv_path, smoothing=False):
         dowhy_sub_df = sub_df.copy()
         dowhy_sub_df["interventions"] = dowhy_sub_df["interventions"].replace({"control": 0, "treatment": 1})
         dowhy_sub_df["interventions"] = dowhy_sub_df["interventions"].astype(bool)
-        dowhy_sub_df["location"] = dowhy_sub_df["location"].replace({"UK": 0, "France": 1, "Japan": 2,
-                                                                     "New Zealand": 3, "Austria": 4, "Finland": 5})
         dowhy_sub_df["location"] = dowhy_sub_df["location"].astype("category")
 
         # Estimate the ATE with and without adjustment
@@ -369,28 +295,22 @@ def compare_association_to_causation(csv_path, smoothing=False):
         true_ate_df = dowhy_sub_df.head(len(locations) * 2)  # These rows contain 0 imbalance and give true ATE
         true_causal_ate = calculate_binary_ate(true_ate_df, "interventions", "cum_infections_5", 1, 0, "avg_age",
                                                "stratification")
-        print(f"True ATE: {true_causal_ate}")
 
-        # Sanity check: is the true ATE equivalent to dowhy ATE? This causes a divide by zero warning since the model
-        # has a perfect fit for the target trial dataset and thus the denominator (error) is zero.
-        # do_why_causal_ate = calculate_binary_ate(true_ate_df, "interventions", "cum_infections_5", 1, 0, "avg_age",
-        #                                          "dowhy")
-        # print(f"True ATE - DoWhy: {do_why_causal_ate}; Ours: {true_causal_ate}")  # Sometimes differs by a little bit
-        id_specific_ates[id]["adjusted"] = causal_ate
-        id_specific_ates[id]["adjusted_cis"] = [true_causal_ate - causal_cis[0][0],
-                                                true_causal_ate - causal_cis[0][1]]
-        id_specific_ates[id]["unadjusted"] = non_causal_ate
-        id_specific_ates[id]["unadjusted_cis"] = [true_causal_ate - non_causal_cis[0][0],
-                                                  true_causal_ate - non_causal_cis[0][1]]
-        id_specific_ates[id]["imbalance"] = imbalance
-        id_specific_ates[id]["true_ate"] = true_causal_ate
-        id_specific_ates[id]["adjusted_error"] = true_causal_ate - causal_ate
-        id_specific_ates[id]["unadjusted_error"] = true_causal_ate - non_causal_ate
+        identifier_specific_ates[identifier]["adjusted"] = causal_ate
+        identifier_specific_ates[identifier]["adjusted_cis"] = [causal_cis[0][0],
+                                                                causal_cis[0][1]]
+        identifier_specific_ates[identifier]["unadjusted"] = non_causal_ate
+        identifier_specific_ates[identifier]["unadjusted_cis"] = [non_causal_cis[0][0],
+                                                                  non_causal_cis[0][1]]
+        identifier_specific_ates[identifier]["imbalance"] = imbalance
+        identifier_specific_ates[identifier]["true_ate"] = true_causal_ate
+        identifier_specific_ates[identifier]["adjusted_error"] = true_causal_ate - causal_ate
+        identifier_specific_ates[identifier]["unadjusted_error"] = true_causal_ate - non_causal_ate
 
     # Average any ATEs with the same imbalance
-    sorted_id_specific_ates = dict(sorted(id_specific_ates.items(), key=lambda item: item[1]["imbalance"]))
-    # sorted_id_specific_ates_no_duplicate_imbalances = average_id_specific_ates_with_same_imbalance(id_specific_ates)
-    plot_imbalance_vs_ate_error(sorted_id_specific_ates, smoothing=smoothing)
+    sorted_identifier_specific_ates = dict(sorted(identifier_specific_ates.items(),
+                                                  key=lambda item: item[1]["imbalance"]))
+    plot_imbalance_vs_ate_error(sorted_identifier_specific_ates, smoothing=smoothing)
 
 
 def plot_imbalance_vs_ate_error(id_specific_ates_dict, smoothing=False):
@@ -399,72 +319,60 @@ def plot_imbalance_vs_ate_error(id_specific_ates_dict, smoothing=False):
     :param id_specific_ates_dict: A nested dictionary containing the ATE estimate for each id, sorted by ascending
                                   imbalance, of the structure: {id: {"adjusted": v}, {"unadjusted": v}, {"imbalance":
                                   v}, {"adjusted_error": v}, {"unadjusted_error": v}}.
+    :param smoothing: Whether or not to smooth the relationship in the plot using moving average.
     """
     imbalances = []
     ys_adjusted = []
     ys_unadjusted = []
-    cis_low_adjusted = []
-    cis_high_adjusted = []
-    cis_low_unadjusted = []
-    cis_high_unadjusted = []
+    ys_adjusted_error = []
+    ys_unadjusted_error = []
+    cis_low_adjusted, cis_high_adjusted = [], []
+    cis_low_unadjusted, cis_high_unadjusted = [], []
+    cis_low_adjusted_error, cis_high_adjusted_error = [], []
+    cis_low_unadjusted_error, cis_high_unadjusted_error = [], []
     for _, results in id_specific_ates_dict.items():
         imbalances.append(results["imbalance"])
-        ys_adjusted.append(results["adjusted_error"])
-        ys_unadjusted.append(results["unadjusted_error"])
+        ys_adjusted.append(results["adjusted"])
+        ys_unadjusted.append(results["unadjusted"])
+        ys_adjusted_error.append(results["adjusted_error"])
+        ys_unadjusted_error.append(results["unadjusted_error"])
         cis_low_adjusted.append(results["adjusted_cis"][0])
         cis_high_adjusted.append(results["adjusted_cis"][1])
         cis_low_unadjusted.append(results["unadjusted_cis"][0])
         cis_high_unadjusted.append(results["unadjusted_cis"][1])
+        cis_low_unadjusted_error = [results["true_ate"] - ci_low for ci_low in cis_low_unadjusted]
+        cis_high_unadjusted_error = [results["true_ate"] - ci_high for ci_high in cis_high_unadjusted]
+        cis_low_adjusted_error = [results["true_ate"] - ci_low for ci_low in cis_low_adjusted]
+        cis_high_adjusted_error = [results["true_ate"] - ci_high for ci_high in cis_high_adjusted]
     if smoothing:
         window_size = 8
         ys_unadjusted = moving_average(ys_unadjusted, window_size)
         ys_adjusted = moving_average(ys_adjusted, window_size)
-        # cis_low_adjusted = moving_average(cis_low_adjusted, window_size)
-        # cis_high_adjusted = moving_average(cis_high_adjusted, window_size)
-        # cis_low_unadjusted = moving_average(cis_low_unadjusted, window_size)
-        # cis_high_unadjusted = moving_average(cis_high_unadjusted, window_size)
+        ys_unadjusted_error = moving_average(ys_unadjusted_error, window_size)
+        ys_adjusted_error = moving_average(ys_adjusted_error, window_size)
+        cis_low_adjusted = moving_average(cis_low_adjusted, window_size)
+        cis_high_adjusted = moving_average(cis_high_adjusted, window_size)
+        cis_low_unadjusted = moving_average(cis_low_unadjusted, window_size)
+        cis_high_unadjusted = moving_average(cis_high_unadjusted, window_size)
         imbalances = moving_average(imbalances, window_size)
-    plt.plot(imbalances, ys_adjusted, label="Adjusted")
-    plt.plot(imbalances, ys_unadjusted, label="Unadjusted")
-    plt.fill_between(imbalances, cis_low_adjusted, cis_high_adjusted, alpha=.2)
-    plt.fill_between(imbalances, cis_low_unadjusted, cis_high_unadjusted, alpha=.2)
-    plt.xlabel("Imbalance")
-    plt.ylabel("ATE")
-    plt.legend()
+    fig, axs = plt.subplots(2)
+    axs[0].plot(imbalances, ys_adjusted, label="Adjusted")
+    axs[0].plot(imbalances, ys_unadjusted, label="Unadjusted")
+    axs[0].fill_between(imbalances, cis_low_adjusted, cis_high_adjusted, alpha=.2)
+    axs[0].fill_between(imbalances, cis_low_unadjusted, cis_high_unadjusted, alpha=.2)
+    axs[0].set_xlabel("Imbalance")
+    axs[0].set_ylabel("ATE")
+    axs[1].plot(imbalances, ys_adjusted_error, label="Adjusted")
+    axs[1].plot(imbalances, ys_unadjusted_error, label="Unadjusted")
+    axs[1].fill_between(imbalances, cis_low_adjusted_error, cis_high_adjusted_error, alpha=.2)
+    axs[1].fill_between(imbalances, cis_low_unadjusted_error, cis_high_unadjusted_error, alpha=.2)
+    axs[1].set_xlabel("Imbalance")
+    axs[1].set_ylabel("ATE Error")
+    axs[1].axhline(y=0, color="black", linestyle="--", alpha=.5)
+    axs[0].legend()
+    axs[1].legend()
     plt.tight_layout()
     plt.show()
-
-
-def average_id_specific_ates_with_same_imbalance(ate_dict):
-    """
-    Find all ATE estimates that were generated from datasets with the same imbalance score and average them.
-    :param ate_dict: A nested dictionary containing ATE estimates of the structure: {id: {"adjusted": v}, {"unadjusted":
-                    v}, {"imbalance": v}, {"adjusted_error": v}, {"unadjusted_error": v}}
-    :return: The ate_dict with any duplicate imbalance ATEs averaged and replaced, sorted by ascending imbalance.
-    """
-    ate_dict_no_duplicate_imbalances = defaultdict(dict)
-    visited_ids = []
-    for id, results in ate_dict.items():
-        if id not in visited_ids:
-            other_ate_dict = {other_id: ate_dict[other_id] for other_id in ate_dict
-                              if other_id != id}
-            ids_with_duplicate_imbalance = [id]
-
-            # Find all ids with the same imbalance score
-            for other_id, other_results in other_ate_dict.items():
-                if results["imbalance"] == other_results["imbalance"]:
-                    ids_with_duplicate_imbalance.append(other_id)
-            print(ids_with_duplicate_imbalance)
-            # Average the error of all ids with same imbalance
-            ate_dict_no_duplicate_imbalances[id]["adjusted_error"] = \
-                np.average([ate_dict[x]["adjusted_error"] for x in ids_with_duplicate_imbalance])
-            ate_dict_no_duplicate_imbalances[id]["unadjusted_error"] = \
-                np.average([ate_dict[x]["unadjusted_error"] for x in ids_with_duplicate_imbalance])
-            ate_dict_no_duplicate_imbalances[id]["imbalance"] = results["imbalance"]
-
-            # Add duplicate ids to visited list
-            visited_ids += ids_with_duplicate_imbalance
-    return dict(sorted(ate_dict_no_duplicate_imbalances.items(), key=lambda item: item[1]["imbalance"]))
 
 
 def calculate_binary_ate(df, treatment_variable, outcome_variable, treatment_val, control_val, adjustment_var=None,
@@ -479,7 +387,7 @@ def calculate_binary_ate(df, treatment_variable, outcome_variable, treatment_val
         :param outcome_variable: the outcome variable which must be a column in the dataframe.
         :param treatment_val: value of the treatment variable which defines treated group.
         :param control_val: value of the treatment variable which defines control group.
-        :param adjustment_var: the variables to make an adjustment for i.e. confounder.
+        :param adjustment_var: the variables to make an adjustment for i.e. confounders.
         :param method_name: the estimation method to use (dowhy, linear_regression, or stratification).
     """
     if method_name == "linear_regression":
@@ -531,9 +439,9 @@ def calculate_binary_ate(df, treatment_variable, outcome_variable, treatment_val
             return round(treated_df[outcome_variable].mean() - control_df[outcome_variable].mean(), 2)
 
 
-def generate_input_configs(n_input_configs, fixed_params, variable_params):
-    """ Generate n_input_configs input configurations for covasim at radnom.
-    :param n_input_configs: Number of input configurations to generate.
+def generate_input_configs(total_input_configs, fixed_params, variable_params):
+    """ Generate total_input_configs input configurations for covasim at random.
+    :param total_input_configs: Number of input configurations to generate.
     :param fixed_params: Dictionary of parameters which should remain fixed, where key = variable name and value =
                          value to fix.
     :param variable_params: Dictionary of parameters which should be randomly generated, where key = variable name
@@ -541,7 +449,7 @@ def generate_input_configs(n_input_configs, fixed_params, variable_params):
     :return: List of input configurations, each of which is a params dictionary for Covasim.
     """
     input_configs = []
-    for n in range(n_input_configs):
+    for n in range(total_input_configs):
         input_config = {}
         for fixed_input, value in fixed_params.items():
             input_config[fixed_input] = value
@@ -555,29 +463,13 @@ def generate_input_configs(n_input_configs, fixed_params, variable_params):
     return input_configs
 
 
-def run_age_restricted_vaccine_experiment(n_input_configs, n_runs, alphas):
-    """
-    Run the age restricted vaccine experiment with n_input_configs randomly generated input configurations.
-    Run each input configuration n_repeats times. Each input configuration is ran and repeated for each alpha
-    value.
-
-    :param n_input_configs: Number of input configurations to generate.
-    :param n_runs: Number of times to run each input configuration (for each alpha).
-    :param alphas: List of alpha values that determine the level of covariate imbalance between the treatment
-                   and control group. A high value means low imbalance and a low value means a high imbalance.
-    """
-    input_configs = generate_input_configs(n_input_configs, FIXED_PARAMS, VARIABLE_PARAMS)
-    input_config_results_dfs = []
-    # Run covasim with each input configuration for each alpha setting n_runs times
-    for i, input_config in enumerate(input_configs):
-        print(f"Input configuration {i + 1}/{n_input_configs}")
-        input_config_results_df = run_covasim_with_biases(alphas, LOCATIONS, input_config, n_runs, i, True)
-        input_config_results_dfs.append(input_config_results_df)
-    all_input_config_results_df = pd.concat(input_config_results_dfs)
-    all_input_config_results_df.to_csv("./age_restricted_vaccine_direct_age_modification.csv")
-
-
 def convert_age_hist_to_dist(age_hist, pop_size):
+    """ Given the age histogram from Covasim, convert to a population distribution by multiplying population density
+        by pop_size. E.g. age bracket: (50 - 60), population density: 0.1, pop_size: 10,000 --> (50-60): 1,000.
+
+        :param age_hist: 2D numpy array returned by Covasim for location age distribution.
+        :param pop_size: The size of the population to populate.
+    """
     age_dist = {}
     for row in age_hist:
         low_bracket, high_bracket, p_density = int(row[0]), int(row[1]), row[2]
@@ -589,30 +481,29 @@ def convert_age_hist_to_dist(age_hist, pop_size):
     return age_dist
 
 
-def run_age_restricted_vaccine_experiment_age_directly(n_input_configs, n_runs, output_path):
+def run_age_restricted_vaccine_experiment_age_directly(total_input_configs, n_runs, output_path):
     """
-    Run the age restricted vaccine experiment with n_input_configs randomly generated input configurations.
+    Run the age restricted vaccine experiment with total_input_configs randomly generated input configurations.
     Run each input configuration n_repeats times. Each input configuration is ran and repeated for each alpha
     value.
 
-    :param n_input_configs: Number of input configurations to generate.
+    :param total_input_configs: Number of input configurations to generate.
     :param n_runs: Number of times to run each input configuration (for each alpha).
     :param output_path: String path to output csv.
     """
-    input_configs = generate_input_configs(n_input_configs, FIXED_PARAMS, VARIABLE_PARAMS)
+    input_configs = generate_input_configs(total_input_configs, FIXED_PARAMS, VARIABLE_PARAMS)
     input_config_results_dfs = []
     # Run covasim with each input configuration for each alpha setting n_runs times
     for i, input_config in enumerate(input_configs):
-        print(f"Input configuration {i + 1}/{n_input_configs}")
+        print(f"Input configuration {i + 1}/{total_input_configs}")
         age_dists = create_sorted_age_dist_list_from_cv_location_data(input_config["pop_size"])
-        age_dists = age_dists[::10]
         max_target_imbalance = len(age_dists)
         target_imbalance_results_dfs = []
         for target_imbalance in range(0, max_target_imbalance, 2):  # Loop over even numbers to avoid repeat comparisons
-            print(f"Target imbalance {int(target_imbalance/2) + 1}/{(max_target_imbalance//2) + 1}")
-            id = f"ic{i}_ti{target_imbalance}"
+            print(f"Target imbalance {int(target_imbalance / 2) + 1}/{(max_target_imbalance // 2) + 1}")
+            identifier = f"ic{i}_ti{target_imbalance}"
             target_imbalance_results_df = run_covasim_with_age_bias(target_imbalance, input_config, n_runs, age_dists,
-                                                                    id)
+                                                                    identifier)
             target_imbalance_results_dfs.append(target_imbalance_results_df)
         input_config_results_df = pd.concat(target_imbalance_results_dfs)
         input_config_results_dfs.append(input_config_results_df)
@@ -628,21 +519,6 @@ def moving_average(results_list, window_size):
     :param window_size: Size of the window used to compute the moving average.
     """
     return np.convolve(results_list, np.ones(window_size), 'valid') / window_size
-
-
-def combine_results_csv_dir(dir_path, out_path):
-    """ Combine a directory of results csvs for the covariate imbalance experiment.
-    :param dir_path: Path to the directory containing results csvs.
-    :param out_path: Path to the directory to save combined csv.
-    """
-    results_csvs = glob.glob(dir_path + "/*.csv")
-    run_dfs = []
-    for x, filename in enumerate(results_csvs):
-        results_df = pd.read_csv(filename, header=0)
-        results_df["id"] = results_df["id"].str.replace("ic0", f"ic{x}")
-        run_dfs.append(results_df)
-    results_df = pd.concat(run_dfs, axis=0, ignore_index=True)
-    save_results_df(results_df, out_path, "imbalance_results")
 
 
 if __name__ == "__main__":

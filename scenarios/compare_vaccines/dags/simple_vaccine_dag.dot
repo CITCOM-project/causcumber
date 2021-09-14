@@ -1,3 +1,0 @@
-digraph DAG {
-    intervention -> cum_infections_13;
-}
