@@ -75,3 +75,18 @@ Feature: Compare vaccines
       | pfizer       |
       | moderna      |
       | az           |
+
+  Scenario: Age-restricted vaccine
+    An age-restricted vaccine should have a greater effect at reducing the cumulative number
+    of infections in an elderly population.
+
+    Given no vaccine is available
+    When the age-restricted vaccine is available
+    Then the following outcomes should change as follows
+      | outcome         | increase_or_decrease | min_change | max_change |
+      | cum_infections  | decrease             | 2000       | 4000       |
+      | cum_deaths      | decrease             | 0          | 10         |
+      | cum_symptomatic | decrease             | 1000       | 2000       |
+      | cum_severe      | decrease             | 10         | 100        |
+      | cum_critical    | decrease             | 1          | 50         |
+

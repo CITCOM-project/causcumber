@@ -1,5 +1,0 @@
-digraph DAG {
-    location -> interventions;
-    location -> cum_symptomatic_5;
-    interventions -> cum_symptomatic_5;
-}
