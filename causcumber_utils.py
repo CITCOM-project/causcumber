@@ -147,7 +147,8 @@ def draw_connected_dag(inputs, outputs):
 
     for o in ops:
         for o1 in ops:
-            g.add_edge(o, o1)
+            if o != o1:
+                g.add_edge(o, o1)
         for i in ips:
             g.add_edge(i, o)
     return g

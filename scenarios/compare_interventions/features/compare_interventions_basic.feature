@@ -63,11 +63,11 @@ Feature: Compare interventions basic
     | cum_quarantined | cum_severe      |
     | cum_quarantined | cum_symptomatic |
     | cum_quarantined | cum_critical    |
-    | intervention    | cum_deaths      |
-    | intervention    | cum_infections  |
-    | intervention    | cum_severe      |
-    | intervention    | cum_symptomatic |
-    | intervention    | cum_critical    |
+    | interventions    | cum_deaths      |
+    | interventions    | cum_infections  |
+    | interventions    | cum_severe      |
+    | interventions    | cum_symptomatic |
+    | interventions    | cum_critical    |
     Then we obtain the causal DAG
 
   Scenario Outline: Test and trace

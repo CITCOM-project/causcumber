@@ -12,6 +12,7 @@ sys.path.append("../../") # This one's for running `behave` in `compare-inverven
 from behave_utils import table_to_dict
 from covasim_utils import run_covasim_by_week, run_covasim_basic, preprocess_data, interventions
 from causcumber_utils import run_dowhy, draw_connected_repeating_unit, iterate_repeating_unit, test, test_bool, draw_connected_dag
+from draw_dag_steps import *
 
 import pygraphviz
 
@@ -26,7 +27,6 @@ def step_impl(context):
         cast_type = locate(row["type"])
         context.params_dict[row["parameter"]] = cast_type(row["value"])
         context.types[row["parameter"]] = cast_type
-    context.n_weeks = round(context.params_dict['n_days']/7)
 
 
 @given("the following variables are recorded {frequency}")
@@ -34,25 +34,12 @@ def step_impl(context, frequency):
     """
     Create a results df to record only the specified values.
     """
-    print("Frequency:", frequency)
+    context.n_weeks = round(context.params_dict['n_days']/7)
     results_dict = table_to_dict(context.table)
     context.desired_outputs = results_dict['variable']
     for row in context.table:
         context.types[row['variable']] = locate(row['type'])
     context.frequency = frequency
-
-
-@given(u'a connected repeating unit')
-def step_impl(context):
-    inputs = list(context.params_dict.keys())
-    context.repeating_unit = draw_connected_repeating_unit(inputs, context.desired_outputs)
-
-
-@when(u'we prune the following edges')
-def step_impl(context):
-    for row in context.table:
-        print(f"deleting edge {row['s1']} -> {row['s2']}")
-        context.repeating_unit.delete_edge(row['s1'], row['s2'])
 
 
 @then(u'we obtain the causal DAG for {n} weeks')
@@ -146,7 +133,6 @@ def step_impl(context, treatment_var, treatment_val):
 @given(u'a connected DAG')
 def step_impl(context):
     inputs = list(context.params_dict.keys())
-    inputs.append("intervention")
     context.repeating_unit = draw_connected_dag(inputs, context.desired_outputs)
 
 

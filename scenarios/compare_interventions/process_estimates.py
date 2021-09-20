@@ -14,8 +14,11 @@ from sklearn.metrics import mean_squared_error
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 from mpl_axes_aligner import align
 
-base = "results/estimates-1000"
-
+min_sample_size = 50
+max_sample_size = 2500
+increment = 50
+base = f"results/estimates-{max_sample_size}"
+num_test_cases = 12
 
 def get_avg(data, col):
     estimates = np.array([list(df[col]) for df in data]).T.tolist()
@@ -39,25 +42,25 @@ for sample in sorted([int(x) for x in os.listdir(base) if x != "rct"]):
     print(sample)
     data = [pd.read_csv(f"{base}/{sample}/{csv}") for csv in os.listdir(f"{base}/{sample}")]
 
-    failed = [sum([r=="fail" for r in list(df['result'])]) for df in data]
+    failed = [sum([r == "fail" for r in list(df['result'])]) for df in data]
     failingTests.append((min(failed), np.mean(failed), max(failed)))
 
     # We need to think properly how we handle error estimation
-    errors = [rmse(rct_estimates, d['estimate']) for d in data if len(rct_estimates) == len(d['estimate'])]
+    errors = [rmse(rct_estimates, d['estimate']) for d in data]
     print(len(errors))
     estimationErrors.append((min(errors), np.mean(errors), max(errors)))
 
 #%%
 # plt.style.use('ggplot')
 
-x = range(50, 1050, 50)
+x = range(min_sample_size, max_sample_size+increment, increment)
 
 fig, ax1 = plt.subplots()
 ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 ax2.grid(None)
-ax1.set_xticks(range(0, 1050, 200))
+ax1.set_xticks(range(0, max_sample_size+increment, 5*increment))
 ax1.xaxis.set_minor_locator(AutoMinorLocator(4))
-ax1.set_xlim([0, 1000])
+ax1.set_xlim([0, max_sample_size])
 
 color = 'tab:red'
 ax1.set_xlabel("Number of data points")
