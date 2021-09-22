@@ -23,7 +23,17 @@ Feature: Predator_prey_population
   Scenario: Draw DAG
     Given a connected repeating unit
     When we prune the following edges
-    | s1              | s2              |
+    | s1                       | s2      |
+    | PREY_POPULATION_SIZE     | step_n  |
+    | PREDATOR_POPULATION_SIZE | step_n  |
+    | GRASS_POPULATION_SIZE    | step_n  |
+    | GAIN_FROM_FOOD_PREY      | step_n  |
+    | GRASS_REGROW_CYCLES      | step_n  |
+    | PREY_REPRODUCTION_CHANCE | step_n  |
+    | alive_prey_n             | step_n1 |
+    | alive_predators_n        | step_n1 |
+    | available_grass_n        | step_n1 |
+    | oscillations_n           | step_n1 |
     Then we obtain the causal DAG for 1000 time steps
 
   ### Altering initial predator population sizes ###
