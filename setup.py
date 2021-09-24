@@ -11,5 +11,7 @@ setup(
                       'pandas',
                       'pydot',
                       'pygraphviz',
-                      'rpy2']
+                      'rpy2',
+                      'behave',
+                      'pydoc']
 )
