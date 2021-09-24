@@ -12,6 +12,5 @@ setup(
                       'pydot',
                       'pygraphviz',
                       'rpy2',
-                      'behave',
-                      'pydoc']
+                      'behave']
 )
