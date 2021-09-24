@@ -3,7 +3,7 @@ from pydoc import locate
 
 import sys
 sys.path.append("./")
-from causcumber_utils import draw_connected_repeating_unit, iterate_repeating_unit
+from causcumber.causcumber_utils import draw_connected_repeating_unit, iterate_repeating_unit
 
 
 @given("a simulation with parameters")
