@@ -11,7 +11,7 @@ sys.path.append("../../") # This one's for running `behave` in `compare-inverven
 
 from behave_utils import table_to_dict
 from covasim_utils import run_covasim_by_week, run_covasim_basic, preprocess_data, interventions
-from causcumber_utils import run_dowhy, draw_connected_repeating_unit, iterate_repeating_unit, test, test_bool, draw_connected_dag
+from causcumber.causcumber_utils import run_dowhy, draw_connected_repeating_unit, iterate_repeating_unit, test, test_bool, draw_connected_dag
 
 import pygraphviz
 
@@ -105,9 +105,11 @@ def step_impl(context, treatment_var, treatment_val):
 def step_impl(context, outcome, relationship, control):
     data = None
     if hasattr(context, "data"):
+        print("Existing data")
         data = context.data
     else:
-        data = pd.concat([pd.read_csv(f"{context.results_dir}/{i}") for i in os.listdir(context.results_dir)])
+        print(f"Looking for data in {context.results_dir}")
+        data = pd.concat([pd.read_csv(f"{context.results_dir}/{i}", index_col=0) for i in os.listdir(context.results_dir)])
     data = preprocess_data(data)
 
     dag = pygraphviz.AGraph(context.dag_path)

@@ -9,7 +9,7 @@ sys.path.append("../../../../") # This one's for native running from within step
 sys.path.append("../../../") # This one's for running `behave` in `features`
 sys.path.append("../../") # This one's for running `behave` in `compare-inverventions`
 
-from causcumber_utils import to_snake_case
+from causcumber.causcumber_utils import to_snake_case
 from covasim_utils import interventions
 
 obs_tag_re = re.compile('observational\(("|\')(.+)("|\')\)')

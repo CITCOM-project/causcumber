@@ -220,6 +220,7 @@ def dagitty_identification(dot_file_path, treatment, outcome):
     :param outcome: name of outcome variable as a string.
     :return: a list of adjustment variables as strings.
     """
+    print("dagitty_identification")
     _install_r_packages(["devtools", "dagitty", "glue"])
     dagitty_dag_str = _dot_to_dagitty_dag(dot_file_path)
     r_identification_fn = """
@@ -301,6 +302,15 @@ def run_dowhy(
     :return: The causal estimate calculated by doWhy and the 95% confidence intervals [low, high].
     """
 
+    if not isinstance(treatment_var, list):
+        treatment_var =[treatment_var]
+    if not isinstance(outcome_var, list):
+        outcome_var = [outcome_var]
+    if not isinstance(control_val, list):
+        control_val = np.array([control_val])
+    if not isinstance(treatment_val, list):
+        treatment_val = np.array([treatment_val])
+
     if verbose:
         print("Running Do Why with params")
         print(
@@ -313,15 +323,6 @@ def run_dowhy(
             )
         )
 
-    if treatment_var not in data:
-        raise ValueError(
-            f"Treatment variable {treatment_var} must be a column in the data, i.e. one of {data.columns}"
-        )
-    if outcome_var not in data:
-        raise ValueError(
-            f"Outcome variable {outcome_var} must be a column in the data, i.e. one of {data.columns}"
-        )
-
     """
     TODO: This is a hack to get around the fact that doWhy draws a straight line
     through the entire data rather than through pairs of categorical values.
@@ -329,26 +330,28 @@ def run_dowhy(
     interested in, effectively binarising the treatment.
     """
     data = data.copy()
-    if str(data.dtypes[treatment_var]) == "category":
-        print(data[treatment_var])
-        assert isinstance(
-            control_val, Hashable
-        ), f"Categorical control value {control_val} must be hashable."
-        assert isinstance(
-            treatment_val, Hashable
-        ), f"Categorical treatment value {treatment_val} must be hashable."
-        assert all(
-            [isinstance(x, Hashable) for x in data[treatment_var]]
-        ), "Categorical treatments must be hashable."
-        data[treatment_var] = [str(x) for x in data[treatment_var]]
-        grouped = data.groupby(treatment_var)
-        groups = {k: i for i, (k, _) in enumerate(grouped)}
-        data[treatment_var] = [groups[i] for i in data[treatment_var]]
-        data[treatment_var] = data[treatment_var].astype("category")
-        print("GROUPS:", groups)
-        control_val = groups[str(control_val)]
-        treatment_val = groups[str(treatment_val)]
-        data = data.loc[data[treatment_var].isin([control_val, treatment_val])]
+    for i, v in enumerate(treatment_var):
+        if str(data.dtypes[v]) == "category":
+            assert isinstance(
+                control_val[i], Hashable
+            ), f"Categorical control value {control_val[i]} must be hashable."
+            assert isinstance(
+                treatment_val[i], Hashable
+            ), f"Categorical treatment value {treatment_val[i]} must be hashable."
+            assert all(
+                [isinstance(x, Hashable) for x in data[v]]
+            ), "Categorical treatments must be hashable."
+            data[v] = [str(x) for x in data[v]]
+            grouped = data.groupby(v)
+            groups = {k: inx for inx, (k, _) in enumerate(grouped)}
+            data[v] = [groups[d] for d in data[v]]
+            data[v] = data[v].astype("category")
+            print("GROUPS:", groups)
+            control_val[i] = groups[str(control_val[i])]
+            treatment_val[i] = groups[str(treatment_val[i])]
+            data = data.loc[data[v].isin([int(control_val[i]), int(treatment_val[i])])]
+    control_val = control_val.astype("float")
+    treatment_val = treatment_val.astype("float")
 
     # Create a causal model from the data and given graph
     if verbose:
@@ -370,7 +373,10 @@ def run_dowhy(
 
     if verbose:
         print("  adjustment_set", adjustment_set)
-        print(f"Datatype of treatment '{treatment_var}':", data.dtypes[treatment_var])
+        print(f"Datatype of treatment {treatment_var}:", [data.dtypes[v] for v in treatment_var])
+        print(data)
+        print("control_val", control_val)
+        print("treatment_val", treatment_val)
 
     model = dowhy.CausalModel(
         data=data,
