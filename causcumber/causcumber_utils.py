@@ -275,7 +275,7 @@ def _dot_to_dagitty_dag(dot_file_path):
     return dag_string
 
 
-def run_dowhy(
+def estimate_effect(
     data,
     graph,
     treatment_var,
@@ -284,6 +284,7 @@ def run_dowhy(
     treatment_val,
     identification=True,
     verbose=False,
+    confidence_intervals=True,
     **kwargs,
 ):
     """
@@ -299,6 +300,7 @@ def run_dowhy(
     :param identification: Set to false to disable identification and make no adjustments, yielding purely associational
                            estimates.
     :param verbose: Set to True to print additional information to the console (defaults to False).
+    :param confidence_intervals: Boolean Whether or not to produce confidence_intervals.
     :return: The causal estimate calculated by doWhy and the 95% confidence intervals [low, high].
     """
 
@@ -310,6 +312,11 @@ def run_dowhy(
         control_val = np.array([control_val])
     if not isinstance(treatment_val, list):
         treatment_val = np.array([treatment_val])
+
+    effect_modifiers = []
+    if "effect_modifiers" in kwargs:
+        effect_modifiers = kwargs["effect_modifiers"]
+        del kwargs["effect_modifiers"]
 
     if verbose:
         print("Running Do Why with params")
@@ -374,7 +381,7 @@ def run_dowhy(
     if verbose:
         print("  adjustment_set", adjustment_set)
         print(f"Datatype of treatment {treatment_var}:", [data.dtypes[v] for v in treatment_var])
-        print(data)
+        # print(data)
         print("control_val", control_val)
         print("treatment_val", treatment_val)
 
@@ -383,6 +390,7 @@ def run_dowhy(
         treatment=treatment_var,
         outcome=outcome_var,
         common_causes=adjustment_set,
+        effect_modifiers=effect_modifiers
     )
 
     # Identify causal effect and return target estimand
@@ -405,16 +413,62 @@ def run_dowhy(
 
     # Estimate the target estimand using linear regression.
     if verbose:
+        print("Identified estimand")
+        print(identified_estimand)
         print("Estimating...")
 
     # TODO: Should give user the ability to select different estimation methods
     estimate = model.estimate_effect(
         identified_estimand,
-        treatment_value=treatment_val,
-        control_value=control_val,
-        confidence_intervals=True,
+        treatment_value=treatment_val[0],
+        control_value=control_val[0],
+        confidence_intervals=confidence_intervals,
         **kwargs,
     )
+
+    return estimate
+
+
+def run_dowhy(
+    data,
+    graph,
+    treatment_var,
+    outcome_var,
+    control_val,
+    treatment_val,
+    identification=True,
+    verbose=False,
+    confidence_intervals=True,
+    **kwargs,
+):
+    """
+    :param data: A dataframe representing the observational data.
+    :param graph: Filepath of the DOT file representing the causal DAG. Nodes here MUST have a 1:1 correspondence with
+                  columns in the data.
+    :param treatment_var: The name of the treatment variable (must be a column in the data).
+    :param outcome_var: The name of the outcome variable (must be a column in the data).
+    :param control_val: The control value of the treatment variable (i.e. the value for individuals who did NOT
+                        receive treatment).
+    :param treatment_val: The treated value of the treatment variable (i.e. the value for individuals who DID receive
+                          treatment.)
+    :param identification: Set to false to disable identification and make no adjustments, yielding purely associational
+                           estimates.
+    :param verbose: Set to True to print additional information to the console (defaults to False).
+    :param confidence_intervals: Boolean Whether or not to produce confidence_intervals.
+    :return: The causal estimate calculated by doWhy and the 95% confidence intervals [low, high].
+    """
+
+    estimate = estimate_effect(
+    data,
+    graph,
+    treatment_var,
+    outcome_var,
+    control_val,
+    treatment_val,
+    identification=identification,
+    verbose=verbose,
+    confidence_intervals=True,
+    **kwargs,)
 
     # TODO: there's a *potential* bug in doWhy such that ci_low and ci_high don't always correspond to the minimum and maximum respectively
     # This is why we need to sort
@@ -425,7 +479,6 @@ def run_dowhy(
         print("Total Effect Estimate:", estimate.value)
         print("95% Confidence Intervals: [{}, {}]".format(ci_low, ci_high))
     return estimate.value, (ci_low, ci_high)
-
 
 def to_snake_case(string):
     lowercase_string = string.lower()
