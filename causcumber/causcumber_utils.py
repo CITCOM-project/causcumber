@@ -442,6 +442,9 @@ def run_dowhy(
     **kwargs,
 ):
     """
+    Runs dowhy and returns the estimate value and 95% confidence intervals.
+    THIS METHOD IS DEPRECATED! Use calculate_estimate instead.
+
     :param data: A dataframe representing the observational data.
     :param graph: Filepath of the DOT file representing the causal DAG. Nodes here MUST have a 1:1 correspondence with
                   columns in the data.
