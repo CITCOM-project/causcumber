@@ -49,18 +49,24 @@ def before_feature(context, feature):
     context.feature_name = to_snake_case(context.feature.name)
     context.dag_path = f"dags/{context.feature_name}.dot"
     context.results_dir = f"results/{context.feature_name}"
-    context.constraints = set()
+    context.constraints = {}
     context.solver = z3.Solver()
     context.z3_variables = {}
     if not os.path.exists(context.results_dir):
         os.makedirs(context.results_dir, exist_ok=True)
 
 
+def before_scenario(context, scenario):
+    assert scenario.name not in context.constraints, f"Duplicate scenario name {scenario.name}"
+    context.constraints[scenario.name] = {'background': set(), 'tests': []}
+
+
 def after_feature(context, feature):
     print(f"Finished Feature `{feature.name}`")
     s = z3.Solver()
-    for i, constraint in enumerate(context.constraints):
-        s.assert_and_track(constraint, f"constraint_{i}")
+    for scenario, constraints in context.constraints.items():
+        for i, constraint in enumerate(constraints['background']):
+            s.assert_and_track(constraint, f"{scenario}_{i}")
     sat = s.check()
     if sat == z3.unsat:
         unsat_core = s.unsat_core()
