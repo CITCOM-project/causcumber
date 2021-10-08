@@ -52,26 +52,68 @@ def before_feature(context, feature):
     context.constraints = {}
     context.solver = z3.Solver()
     context.z3_variables = {}
+    context.concrete_tests = []
+
     if not os.path.exists(context.results_dir):
         os.makedirs(context.results_dir, exist_ok=True)
 
 
 def before_scenario(context, scenario):
-    assert scenario.name not in context.constraints, f"Duplicate scenario name {scenario.name}"
-    context.constraints[scenario.name] = {'background': set(), 'tests': []}
+    context.constraints[scenario.name] = set()
 
 
 def after_feature(context, feature):
     print(f"Finished Feature `{feature.name}`")
     s = z3.Solver()
+    assertions = {}
     for scenario, constraints in context.constraints.items():
-        for i, constraint in enumerate(constraints['background']):
-            s.assert_and_track(constraint, f"{scenario}_{i}")
+        for i, constraint in enumerate(constraints):
+            if constraint not in assertions.values():
+                assertions[f"{scenario}_{i}"] = constraint
+                s.assert_and_track(constraint, f"{scenario}_{i}")
     sat = s.check()
-    if sat == z3.unsat:
-        unsat_core = s.unsat_core()
-        print(unsat_core)
 
+    solvers = []
+    if sat == z3.sat:
+        solvers.append((s, context.concrete_tests))
+    else:
+        unsat_core = s.unsat_core()
+
+        s = z3.Solver()
+        a = unsat_core[0]
+        for name, constraint in assertions.items():
+            if str(name) != str(a):
+                s.assert_and_track(constraint, name)
+        assert s.check() == z3.sat, f"Unsatisfiable solver with core {s.unsat_core()}"
+
+        solvers.append((s, [t for t in context.concrete_tests if not str(a).startswith(t['scenario'])]))
+
+
+        for a in unsat_core[1:]:
+            s = z3.Solver()
+            for name, constraint in assertions.items():
+                if str(name) != str(a):
+                    s.assert_and_track(constraint, name)
+            assert s.check() == z3.sat, f"Unsatisfiable solver with core {s.unsat_core()}"
+
+            solvers.append((s, [t for t in context.concrete_tests if str(a).startswith(t['scenario'])]))
+
+    tests = []
+    for s, ts in solvers:
+        model = {str(k): s.model()[k] for k in s.model()}
+        for t in ts:
+            test = f"  Scenario: {t['scenario']}\n"
+            test += "    Given we run the model with the following configuration\n"
+            test += "    | variable | value |\n"
+            for k, v in model.items():
+                test += f"    | {k} | {v} |\n"
+            test += f"    When we run the model with {t['treatment_var']}={model[t['treatment_var']]}\n"
+            test += f"    Then the {t['outcome_var']} should {t['expected_change']}\n"
+            tests.append(test)
+    with open(f"features/{context.feature_name}_concrete.feature", 'w') as f:
+        print(f"Feature: {context.feature.name} concrete", file=f)
+        for test in tests:
+            print(test, file=f)
 
 def before_tag(context, tag):
     obs_match = obs_tag_re.match(tag)

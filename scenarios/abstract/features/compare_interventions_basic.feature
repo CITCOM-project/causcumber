@@ -38,6 +38,7 @@ Feature: Compare interventions basic
     And 0 <= simp_quar_prob <= 1
     And 0 <= asimp_quar_prob <= 1
     And 0 <= trace_probs <= 1
+    And 14 <= average_age <= 60
 
   # TODO: this is a bit clunky. It might not be  reasonable to assume that a
   # domain expert would be able to list all edges that wouldn’t be present
