@@ -7,3 +7,4 @@ __pycache__/
 results/
 *.pdf
 /scenarios/compare_vaccines/*.csv
+*.egg-info/
