@@ -12,6 +12,8 @@ sys.path.append("../../") # This one's for running `behave` in `compare-inverven
 from causcumber.causcumber_utils import to_snake_case
 from covasim_utils import interventions
 
+import z3
+
 obs_tag_re = re.compile('observational\(("|\')(.+)("|\')\)')
 
 @fixture
@@ -35,6 +37,7 @@ def print_head(filename):
 
 
 def before_all(context):
+    context.z3_types = {int: z3.Int, float: z3.Real, str: z3.String}
     if "estimates" in context.config.userdata:
         context.estimates_file = context.config.userdata["estimates"]
         print_head(context.estimates_file)
@@ -47,22 +50,21 @@ def before_feature(context, feature):
     context.dag_path = f"dags/{context.feature_name}.dot"
     context.results_dir = f"results/{context.feature_name}"
     context.constraints = set()
+    context.solver = z3.Solver()
+    context.z3_variables = {}
     if not os.path.exists(context.results_dir):
         os.makedirs(context.results_dir, exist_ok=True)
 
 
 def after_feature(context, feature):
     print(f"Finished Feature `{feature.name}`")
-    supported_types = {int: "Int", float: "Real", str: "String"}
-    with open(f"{context.feature_name}.smt2", 'w') as f:
-        print("(set-option :produce-unsat-cores true)", file=f)
-        for v, t in context.types.items():
-            print(f"(declare-const {v} {supported_types[t]})", file=f)
-        print("", file=f)
-        for i, constraint in enumerate(context.constraints):
-            print(f"(assert (! {constraint} :named constraint_{i}))", file=f)
-        print("(check-sat)", file=f)
-        print("(get-unsat-core)", file=f)
+    s = z3.Solver()
+    for i, constraint in enumerate(context.constraints):
+        s.assert_and_track(constraint, f"constraint_{i}")
+    sat = s.check()
+    if sat == z3.unsat:
+        unsat_core = s.unsat_core()
+        print(unsat_core)
 
 
 def before_tag(context, tag):

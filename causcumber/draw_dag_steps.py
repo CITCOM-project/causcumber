@@ -1,6 +1,8 @@
 from behave import given, when, then
 from pydoc import locate
 
+import re
+
 import sys
 sys.path.append("./")
 from causcumber.causcumber_utils import draw_connected_repeating_unit, iterate_repeating_unit, draw_connected_dag
@@ -13,8 +15,10 @@ def step_impl(context):
     """
     for row in context.table:
         cast_type = locate(row["type"])
-        context.params_dict[row["parameter"]] = cast_type(row["value"])
         context.types[row["parameter"]] = cast_type
+        context.z3_variables[row["parameter"]] = context.z3_types[cast_type](row["parameter"])
+        if "value" in row:
+            context.params_dict[row["parameter"]] = cast_type(row["value"])
 
 
 @given(u'the following variables are recorded every time step')
@@ -46,8 +50,13 @@ def step_impl(context):
 
 @when(u'we prune the following edges')
 def step_impl(context):
+    to_go = set()
     for row in context.table:
-        context.repeating_unit.delete_edge(row['s1'], row['s2'])
+        for s1, s2 in context.repeating_unit.edges():
+            if re.fullmatch("^"+row['s1']+"$", s1) and re.fullmatch("^"+row['s2']+"$", s2):
+                to_go.add((s1, s2))
+    for s1, s2 in to_go:
+        context.repeating_unit.delete_edge(s1, s2)
 
 
 @when(u'we add the following edges')

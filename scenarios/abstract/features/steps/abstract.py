@@ -2,36 +2,37 @@ import causcumber.draw_dag_steps
 from functools import reduce as fold
 import covasim
 from behave import use_step_matcher
+import z3
 
 
 @given(u'{v1} in covasim.data.country_age_data.data')
 def step_impl(context, v1):
     v2 = covasim.data.country_age_data.data
-    folded = fold(lambda x, acc: f"(or\n  {acc} {x})", [f'(= {v1} "{e}")' for e in list(v2)[:2]], "false")
-    context.constraints.add(f"{folded}")
+    folded = fold(lambda x, acc: z3.Or(acc, x), [context.z3_variables[v1] == e for e in v2], False)
+    context.constraints.add(folded)
 
 @given(u'{lower} <= {v} <= {upper}')
 def step_impl(context, lower, v, upper):
-    context.constraints.add(f"(<= {lower} {v})")
-    context.constraints.add(f"(<= {v} {upper})")
+    context.constraints.add(context.z3_variables.get(lower, lower) <= context.z3_variables.get(v, v))
+    context.constraints.add(context.z3_variables.get(v, v) <= context.z3_variables.get(upper, upper))
 
 @given(u'{lower} < {v} <= {upper}')
 def step_impl(context, lower, v, upper):
-    context.constraints.add(f"(< {lower} {v})")
-    context.constraints.add(f"(<= {v} {upper})")
+    context.constraints.add(context.z3_variables.get(lower, lower) < context.z3_variables.get(v, v))
+    context.constraints.add(context.z3_variables.get(v, v) <= context.z3_variables.get(upper, upper))
 
 @given(u'{lower} <= {v} < {upper}')
 def step_impl(context, lower, v, upper):
-    context.constraints.add(f"(<= {lower} {v})")
-    context.constraints.add(f"(< {v} {upper})")
+    context.constraints.add(context.z3_variables.get(lower, lower) <= context.z3_variables.get(v, v))
+    context.constraints.add(context.z3_variables.get(v, v) < context.z3_variables.get(upper, upper))
 
 @given(u'{v} < {upper}')
 def step_impl(context, v, upper):
-    context.constraints.add(f"(< {v} {upper})")
+    context.constraints.add(context.z3_variables.get(v, v) < context.z3_variables.get(upper, upper))
 
 @given(u'{v1} >= {v2}')
 def step_impl(context, v1, v2):
-    context.constraints.add(f"(>= {v1} {v2})")
+    context.constraints.add(context.z3_variables.get(v1, v1) >= context.z3_variables.get(v2, v2))
 
 @when(u'we increase the {parameter}')
 def step_impl(context, parameter):

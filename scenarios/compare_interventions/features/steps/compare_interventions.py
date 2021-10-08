@@ -24,8 +24,10 @@ def step_impl(context):
     """
     for row in context.table:
         cast_type = locate(row["type"])
-        context.params_dict[row["parameter"]] = cast_type(row["value"])
-        context.types[row["parameter"]] = cast_type
+        parameter = row["parameter"]
+        context.params_dict[parameter] = cast_type(row["value"])
+        context.types[parameter] = cast_type
+        context.z3_variables[parameter] = context.z3Types[cast_type](parameter)
 
 
 @given("the following variables are recorded {frequency}")
