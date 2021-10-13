@@ -62,8 +62,49 @@ def before_scenario(context, scenario):
     context.constraints[scenario.name] = set()
 
 
+def mk_solver(assertions):
+    s = z3.Solver()
+    for name, constraint in assertions.items():
+        s.assert_and_track(constraint, name)
+    assert s.check() == z3.sat, f"Unsatisfiable solver with core {s.unsat_core()}"
+    return s
+
+
+def tabulate(model, context):
+    rows = [(str(name), context.types[str(name)].__name__, str(val)) for name, val in model.items()]
+    max_name = max([len(name) for name,_,_ in rows])
+    max_type = max([len(type) for _,type,_ in rows])
+    max_val = max([len(val) for _,_,val in rows])
+    table = "    | " + "parameter".ljust(max_name) + " | " + "type".ljust(max_type) + " | " + "value".ljust(max_val) + " |\n"
+    for parameter, dt, val in rows:
+        table += "    | " + parameter.ljust(max_name) + " | " + dt.ljust(max_type) + " | " + val.ljust(max_val) + " |\n"
+    return table
+
+
+def cast(type, val):
+    """
+    Z3 is a menace and has String values be '"string"', i.e. with quotes as PART OF THE STRING so we need to strip those.
+    It also has Reals be "numerator/denominator", which python can't convert to floats.
+    """
+    if type == str:
+        return str(val)[1:-1]
+    elif type == float:
+        return float(str(val.numerator())) / float(str(val.denominator()))
+
+    return type(str(val))
+
+
+def mutate(solver, context, treatment_var):
+    solver.push()
+    treatment_val = context.z3_types[context.types[treatment_var]]("treatment__")
+    solver.assert_and_track(treatment_val > context.z3_variables[treatment_var], "mutate")
+    assert solver.check() == z3.sat, f"Cannot mutate {treatment_var} to get a treatment value"
+    treatment_value = cast(context.types[treatment_var], solver.model()[treatment_val])
+    solver.pop()
+    return treatment_value
+
+
 def after_feature(context, feature):
-    print(f"Finished Feature `{feature.name}`")
     s = z3.Solver()
     assertions = {}
     for scenario, constraints in context.constraints.items():
@@ -79,39 +120,35 @@ def after_feature(context, feature):
     else:
         unsat_core = s.unsat_core()
 
-        s = z3.Solver()
+        # If we have a minimum unsat core, we should be able to add in all but one element and have it be sat
         a = unsat_core[0]
-        for name, constraint in assertions.items():
-            if str(name) != str(a):
-                s.assert_and_track(constraint, name)
-        assert s.check() == z3.sat, f"Unsatisfiable solver with core {s.unsat_core()}"
-
+        s = mk_solver({name: assertions[name] for name in assertions if str(name) not in [str(n) for n in unsat_core[1:]]})
         solvers.append((s, [t for t in context.concrete_tests if not str(a).startswith(t['scenario'])]))
 
-
-        for a in unsat_core[1:]:
-            s = z3.Solver()
-            for name, constraint in assertions.items():
-                if str(name) != str(a):
-                    s.assert_and_track(constraint, name)
-            assert s.check() == z3.sat, f"Unsatisfiable solver with core {s.unsat_core()}"
-
-            solvers.append((s, [t for t in context.concrete_tests if str(a).startswith(t['scenario'])]))
+        s = mk_solver({name: assertions[name] for name in assertions if str(name) != str(a)})
+        solvers.append((s, [t for t in context.concrete_tests if str(a).startswith(t['scenario'])]))
 
     tests = []
+    background = {}
     for s, ts in solvers:
-        model = {str(k): s.model()[k] for k in s.model()}
+        model = {str(k): cast(context.types[str(k)], s.model()[k]) for k in s.model() if str(k) in context.z3_variables}
+        if background == {}:
+            background = model
         for t in ts:
+            # t['treatment_var'] = next(x for x in s.model() if str(x) == t['treatment_var'])
             test = f"  Scenario: {t['scenario']}\n"
-            test += "    Given we run the model with the following configuration\n"
-            test += "    | variable | value |\n"
+            test += f"    Given we run the model with {t['treatment_var']}={model[t['treatment_var']]}\n"
             for k, v in model.items():
-                test += f"    | {k} | {v} |\n"
-            test += f"    When we run the model with {t['treatment_var']}={model[t['treatment_var']]}\n"
+                if v != background[k] and k != t['treatment_var']:
+                    test += f"And {k}={v}\n"
+            test += f"    When we run the model with {t['treatment_var']}={mutate(s, context, t['treatment_var'])}\n"
             test += f"    Then the {t['outcome_var']} should {t['expected_change']}\n"
             tests.append(test)
+
     with open(f"features/{context.feature_name}_concrete.feature", 'w') as f:
         print(f"Feature: {context.feature.name} concrete", file=f)
+        print("  Background:", file=f)
+        print(tabulate(background, context), file=f)
         for test in tests:
             print(test, file=f)
 
