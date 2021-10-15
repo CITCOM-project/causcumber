@@ -1,6 +1,6 @@
 # Causcumber
 
-We use [cucumber](https://cucumber.io/) specifications to systematically produce causal graphs that can be used to test causal relationships in models and simulations.
+We use [cucumber](https://cucumber.io/)  specifications to describe and execute modelling scenarios, and systematically produce corresponding causal graphs that can be used to test causal relationships.
 
 This repository is currently in an experimental phase.
 
