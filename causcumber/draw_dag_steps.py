@@ -1,11 +1,11 @@
 from behave import given, when, then
 from pydoc import locate
 
+import re
+
 import sys
 sys.path.append("./")
-from causcumber_utils import draw_connected_repeating_unit, iterate_repeating_unit
-
-import re
+from causcumber.causcumber_utils import draw_connected_repeating_unit, iterate_repeating_unit, draw_connected_dag
 
 
 @given("a simulation with parameters")
@@ -15,11 +15,20 @@ def step_impl(context):
     """
     for row in context.table:
         cast_type = locate(row["type"])
-        context.params_dict[row["parameter"]] = cast_type(row["value"]) if "value" in row else None
         context.types[row["parameter"]] = cast_type
+        context.z3_variables[row["parameter"]] = context.z3_types[cast_type](row["parameter"])
+        if "value" in row:
+            context.params_dict[row["parameter"]] = cast_type(row["value"])
 
 
 @given(u'the following variables are recorded every time step')
+def step_impl(context):
+    context.desired_outputs = [row['variable'] for row in context.table]
+    for row in context.table:
+        context.types[row['variable']] = locate(row['type'])
+
+
+@given(u'the following variables are recorded at the end of the simulation')
 def step_impl(context):
     context.desired_outputs = [row['variable'] for row in context.table]
     for row in context.table:
@@ -31,6 +40,12 @@ def step_impl(context):
     inputs = list(context.params_dict.keys())
     context.repeating_unit = draw_connected_repeating_unit(inputs, context.desired_outputs)
     context.repeating_unit.write(f"dags/{context.feature_name}_repeating_unit.dot")
+
+
+@given(u'a connected DAG')
+def step_impl(context):
+    inputs = list(context.params_dict.keys())
+    context.repeating_unit = draw_connected_dag(inputs, context.desired_outputs)
 
 
 @when(u'we prune the following edges')
@@ -53,12 +68,9 @@ def step_impl(context):
 @then(u'we obtain the causal DAG for {n} {time_steps}')
 def step_impl(context, n, time_steps):
     dag = iterate_repeating_unit(context.repeating_unit, int(n), start=1)
-    assert dag.acyclic(copy=True) == dag, "Causal DAG cannot contain cycles"
     dag.write(context.dag_path)
 
 
 @then(u'we obtain the causal DAG')
 def step_impl(context):
-    dag = context.repeating_unit
-    assert dag.acyclic(copy=True) == dag, "Causal DAG cannot contain cycles"
-    dag.write(context.dag_path)
+    context.repeating_unit.write(context.dag_path)
