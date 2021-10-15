@@ -17,7 +17,7 @@ obs_tag_re = re.compile('observational\(("|\')(.+)("|\')\)')
 @fixture
 def set_desired_outputs(context):
     """ Add a results dataframe which stores simulation outputs to context. """
-    context.desired_outputs = []
+    context.outputs = []
 
 
 @fixture

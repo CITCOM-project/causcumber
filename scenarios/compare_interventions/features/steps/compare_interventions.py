@@ -37,7 +37,7 @@ def step_impl(context, frequency):
     """
     context.n_weeks = round(context.params_dict['n_days']/7)
     results_dict = table_to_dict(context.table)
-    context.desired_outputs = results_dict['variable']
+    context.outputs = results_dict['variable']
     for row in context.table:
         context.types[row['variable']] = locate(row['type'])
     context.frequency = frequency
@@ -75,7 +75,7 @@ def step_impl(context, treatment_var, control_val):
     params[treatment_var] = control_val
     context.control_val = context.types[treatment_var](control_val) if treatment_var in context.types else control_val
     if not hasattr(context, "data"):
-        run_covasim(context.frequency, control_val, params, context.desired_outputs, f"{context.results_dir}/{control_val}.csv")
+        run_covasim(context.frequency, control_val, params, context.outputs, f"{context.results_dir}/{control_val}.csv")
 
 
 @when(u'we run the model with {treatment_var}={treatment_val}')
@@ -86,7 +86,7 @@ def step_impl(context, treatment_var, treatment_val):
     params[treatment_var] = treatment_val
     context.treatment_val = context.types[treatment_var](treatment_val) if treatment_var in context.types else treatment_val
     if not hasattr(context, "data"):
-        run_covasim(context.frequency, treatment_val, params, context.desired_outputs, f"{context.results_dir}/{treatment_val}.csv")
+        run_covasim(context.frequency, treatment_val, params, context.outputs, f"{context.results_dir}/{treatment_val}.csv")
 
 
 @then(u'the {outcome} should be {relationship} {control}')
@@ -136,7 +136,7 @@ def step_impl(context, treatment_var, treatment_val):
 @given(u'a connected DAG')
 def step_impl(context):
     inputs = list(context.params_dict.keys())
-    context.repeating_unit = draw_connected_dag(inputs, context.desired_outputs)
+    context.repeating_unit = draw_connected_dag(inputs, context.outputs)
 
 
 @then(u'we obtain the causal DAG')

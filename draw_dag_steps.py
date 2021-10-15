@@ -21,7 +21,7 @@ def step_impl(context):
 
 @given(u'the following variables are recorded every time step')
 def step_impl(context):
-    context.desired_outputs = [row['variable'] for row in context.table]
+    context.outputs = [row['variable'] for row in context.table]
     for row in context.table:
         context.types[row['variable']] = locate(row['type'])
 
@@ -29,7 +29,7 @@ def step_impl(context):
 @given(u'a connected repeating unit')
 def step_impl(context):
     inputs = list(context.params_dict.keys())
-    context.repeating_unit = draw_connected_repeating_unit(inputs, context.desired_outputs)
+    context.repeating_unit = draw_connected_repeating_unit(inputs, context.outputs)
     context.repeating_unit.write(f"dags/{context.feature_name}_repeating_unit.dot")
 
 

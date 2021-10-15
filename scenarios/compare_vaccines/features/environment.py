@@ -13,7 +13,7 @@ from behave import fixture, use_fixture
 def set_results_df(context):
     """ Add a results dataframe which stores simulation outputs to context. """
     context.results_df = pd.DataFrame()
-    context.desired_outputs = []
+    context.outputs = []
 
 
 @fixture

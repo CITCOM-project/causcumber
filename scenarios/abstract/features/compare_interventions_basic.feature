@@ -9,12 +9,14 @@ Feature: Compare interventions basic
       | pop_size        | int   |
       | pop_infected    | int   |
       | location        | str   |
-      | average_age     | float |
       | simp_prob       | float |
       | asimp_prob      | float |
       | simp_quar_prob  | float |
       | asimp_quar_prob | float |
       | trace_probs     | float |
+    And the following meta variables
+      | variable        | type  |
+      | average_age     | float |
     And the following variables are recorded at the end of the simulation
       | variable        | type |
       | cum_tests       | int  |
@@ -38,7 +40,7 @@ Feature: Compare interventions basic
     And 0 <= simp_quar_prob <= 1
     And 0 <= asimp_quar_prob <= 1
     And 0 <= trace_probs <= 1
-    And 14 <= average_age <= 60
+    And average_age = average_ages(location)
 
   # TODO: this is a bit clunky. It might not be  reasonable to assume that a
   # domain expert would be able to list all edges that wouldn’t be present

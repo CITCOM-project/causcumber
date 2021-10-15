@@ -42,7 +42,7 @@ def step_impl(context):
     results_dict = table_to_dict(context.table)
     variables_dict = {variable: [] for variable in results_dict["variable"]}
     context.results_df = pd.DataFrame(variables_dict)
-    context.desired_outputs = list(context.results_df)
+    context.outputs = list(context.results_df)
 
 
 @given("no vaccine is available")
@@ -53,7 +53,7 @@ def step_impl(context):
     if not hasattr(context, "observational_df"):
         label = context.scenario.name
         params = context.params_df.to_dict("records")[0]
-        desired_outputs = context.desired_outputs
+        desired_outputs = context.outputs
         context.results_df = run_covasim_by_week(label, params, desired_outputs, n_runs=N_RUNS)
         context.results_df["interventions"] = "none"
         save_results_df(context.results_df, RESULTS_PATH, "no_vaccination_results")
@@ -77,7 +77,7 @@ def step_impl(context, vaccine_name):
     if not hasattr(context, "observational_df"):
         run_params = context.params_df.to_dict("records")[0]
         print(run_params)
-        desired_outputs = context.desired_outputs
+        desired_outputs = context.outputs
         label = run_params["interventions"]
         params = run_params
         print(params)

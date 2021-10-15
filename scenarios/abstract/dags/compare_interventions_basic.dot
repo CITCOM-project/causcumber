@@ -2,6 +2,20 @@ digraph "" {
 	graph [newrank=True,
 		rankdir=LR
 	];
+	subgraph cluster_inputs {
+		graph [label="Model inputs"];
+		pop_size;
+		quar_period;
+		simp_prob;
+		asimp_quar_prob;
+		n_days;
+		asimp_prob;
+		average_age;
+		simp_quar_prob;
+		location;
+		pop_infected;
+		trace_probs;
+	}
 	subgraph cluster_outputs {
 		graph [label="Model outputs"];
 		cum_tests;
@@ -9,16 +23,32 @@ digraph "" {
 		cum_infections;
 		cum_deaths;
 	}
-	subgraph cluster_inputs {
-		graph [label="Model inputs"];
-	}
+	pop_size -> cum_tests;
+	pop_size -> cum_quarantined;
+	pop_size -> cum_infections;
+	quar_period -> cum_tests;
+	quar_period -> cum_quarantined;
+	quar_period -> cum_infections;
+	simp_prob -> cum_tests;
+	asimp_quar_prob -> cum_tests;
+	n_days -> cum_tests;
+	n_days -> cum_quarantined;
+	n_days -> cum_infections;
+	n_days -> cum_deaths;
+	asimp_prob -> cum_tests;
+	average_age -> cum_tests;
+	average_age -> cum_quarantined;
+	average_age -> cum_infections;
+	average_age -> cum_deaths;
+	simp_quar_prob -> cum_tests;
+	location -> average_age;
+	pop_infected -> cum_tests;
+	pop_infected -> cum_quarantined;
+	pop_infected -> cum_infections;
+	trace_probs -> cum_tests;
+	trace_probs -> cum_quarantined;
 	cum_tests -> cum_quarantined;
 	cum_tests -> cum_infections;
 	cum_quarantined -> cum_infections;
 	cum_infections -> cum_deaths;
-	average_age -> cum_deaths;
-	trace_probs -> cum_tests;
-	trace_probs -> cum_quarantined;
-	n_days -> cum_deaths;
-	location -> average_age;
 }

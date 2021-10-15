@@ -5,21 +5,23 @@ import os
 import re
 
 import sys
-sys.path.append("../../../../") # This one's for native running from within steps
-sys.path.append("../../../") # This one's for running `behave` in `features`
-sys.path.append("../../") # This one's for running `behave` in `compare-inverventions`
+
+sys.path.append("../../../../")  # This one's for native running from within steps
+sys.path.append("../../../")  # This one's for running `behave` in `features`
+sys.path.append("../../")  # This one's for running `behave` in `compare-inverventions`
 
 from causcumber.causcumber_utils import to_snake_case
 from covasim_utils import interventions
 
 import z3
 
-obs_tag_re = re.compile('observational\(("|\')(.+)("|\')\)')
+obs_tag_re = re.compile("observational\((\"|')(.+)(\"|')\)")
+
 
 @fixture
 def set_desired_outputs(context):
     """ Add a results dataframe which stores simulation outputs to context. """
-    context.desired_outputs = []
+    context.outputs = []
 
 
 @fixture
@@ -32,8 +34,11 @@ def set_parameters_dict(context):
 def print_head(filename):
     if not os.path.exists(os.path.dirname(filename)):
         os.makedirs(os.path.dirname(filename), exist_ok=True)
-    with open(filename, 'w') as f:
-        print("feature_name,scenario_name,treatment_var,outcome_var,control_val,treatment_val,estimate,ci_low,ci_high,relationship,result", file=f)
+    with open(filename, "w") as f:
+        print(
+            "feature_name,scenario_name,treatment_var,outcome_var,control_val,treatment_val,estimate,ci_low,ci_high,relationship,result",
+            file=f,
+        )
 
 
 def before_all(context):
@@ -53,6 +58,8 @@ def before_feature(context, feature):
     context.solver = z3.Solver()
     context.z3_variables = {}
     context.concrete_tests = []
+    context.inputs = set()
+    context.meta_variables = set()
 
     if not os.path.exists(context.results_dir):
         os.makedirs(context.results_dir, exist_ok=True)
@@ -71,13 +78,32 @@ def mk_solver(assertions):
 
 
 def tabulate(model, context):
-    rows = [(str(name), context.types[str(name)].__name__, str(val)) for name, val in model.items()]
-    max_name = max([len(name) for name,_,_ in rows])
-    max_type = max([len(type) for _,type,_ in rows])
-    max_val = max([len(val) for _,_,val in rows])
-    table = "    | " + "parameter".ljust(max_name) + " | " + "type".ljust(max_type) + " | " + "value".ljust(max_val) + " |\n"
+    rows = [
+        (str(name), context.types[str(name)].__name__, str(val))
+        for name, val in model.items()
+    ]
+    max_name = max([len(name) for name, _, _ in rows])
+    max_type = max([len(type) for _, type, _ in rows])
+    max_val = max([len(val) for _, _, val in rows])
+    table = (
+        "    | "
+        + "parameter".ljust(max_name)
+        + " | "
+        + "type".ljust(max_type)
+        + " | "
+        + "value".ljust(max_val)
+        + " |\n"
+    )
     for parameter, dt, val in rows:
-        table += "    | " + parameter.ljust(max_name) + " | " + dt.ljust(max_type) + " | " + val.ljust(max_val) + " |\n"
+        table += (
+            "    | "
+            + parameter.ljust(max_name)
+            + " | "
+            + dt.ljust(max_type)
+            + " | "
+            + val.ljust(max_val)
+            + " |\n"
+        )
     return table
 
 
@@ -94,19 +120,27 @@ def cast(type, val):
     return type(str(val))
 
 
-def mutate(solver, context, treatment_var):
+def mutate(solver, context, treatment_var, control_val):
     solver.push()
-    treatment_val = context.z3_types[context.types[treatment_var]]("treatment__")
-    solver.assert_and_track(treatment_val > context.z3_variables[treatment_var], "mutate")
-    assert solver.check() == z3.sat, f"Cannot mutate {treatment_var} to get a treatment value"
-    treatment_value = cast(context.types[treatment_var], solver.model()[treatment_val])
+    solver.assert_and_track(
+        context.z3_variables[treatment_var] > control_val, "mutate"
+    )
+    assert (
+        solver.check() == z3.sat
+    ), f"Cannot mutate {treatment_var} to get a treatment value"
+    model = {
+        str(k): cast(context.types[str(k)], solver.model()[k])
+        for k in solver.model()
+        if str(k) in context.types
+    }
     solver.pop()
-    return treatment_value
+    return model
 
 
 def after_feature(context, feature):
     s = z3.Solver()
     assertions = {}
+
     for scenario, constraints in context.constraints.items():
         for i, constraint in enumerate(constraints):
             if constraint not in assertions.values():
@@ -122,16 +156,39 @@ def after_feature(context, feature):
 
         # If we have a minimum unsat core, we should be able to add in all but one element and have it be sat
         a = unsat_core[0]
-        s = mk_solver({name: assertions[name] for name in assertions if str(name) not in [str(n) for n in unsat_core[1:]]})
-        solvers.append((s, [t for t in context.concrete_tests if not str(a).startswith(t['scenario'])]))
+        s = mk_solver(
+            {
+                name: assertions[name]
+                for name in assertions
+                if str(name) not in [str(n) for n in unsat_core[1:]]
+            }
+        )
+        solvers.append(
+            (
+                s,
+                [
+                    t
+                    for t in context.concrete_tests
+                    if not str(a).startswith(t["scenario"])
+                ],
+            )
+        )
 
-        s = mk_solver({name: assertions[name] for name in assertions if str(name) != str(a)})
-        solvers.append((s, [t for t in context.concrete_tests if str(a).startswith(t['scenario'])]))
+        s = mk_solver(
+            {name: assertions[name] for name in assertions if str(name) != str(a)}
+        )
+        solvers.append(
+            (s, [t for t in context.concrete_tests if str(a).startswith(t["scenario"])])
+        )
 
     tests = []
     background = {}
     for s, ts in solvers:
-        model = {str(k): cast(context.types[str(k)], s.model()[k]) for k in s.model() if str(k) in context.z3_variables}
+        model = {
+            str(k): cast(context.types[str(k)], s.model()[k])
+            for k in s.model()
+            if str(k) in context.types
+        }
         if background == {}:
             background = model
         for t in ts:
@@ -139,27 +196,32 @@ def after_feature(context, feature):
             test = f"  Scenario: {t['scenario']}\n"
             test += f"    Given we run the model with {t['treatment_var']}={model[t['treatment_var']]}\n"
             for k, v in model.items():
-                if v != background[k] and k != t['treatment_var']:
-                    test += f"And {k}={v}\n"
-            test += f"    When we run the model with {t['treatment_var']}={mutate(s, context, t['treatment_var'])}\n"
+                if v != background[k] and k != t["treatment_var"]:
+                    test += f"    And {k}={v}\n"
+            treatment_model = mutate(s, context, t['treatment_var'], model[t['treatment_var']])
+            test += f"    When we run the model with {t['treatment_var']}={treatment_model[t['treatment_var']]}\n"
+            for k, v in treatment_model.items():
+                if v != model[k] and k != t["treatment_var"]:
+                    test += f"    And {k}={v}\n"
             test += f"    Then the {t['outcome_var']} should {t['expected_change']}\n"
             tests.append(test)
 
-    with open(f"features/{context.feature_name}_concrete.feature", 'w') as f:
+    with open(f"features/{context.feature_name}_concrete.feature", "w") as f:
         print(f"Feature: {context.feature.name} concrete", file=f)
         print("  Background:", file=f)
         print(tabulate(background, context), file=f)
         for test in tests:
             print(test, file=f)
 
+
 def before_tag(context, tag):
     obs_match = obs_tag_re.match(tag)
     if obs_match:
         context.data = pd.read_csv(obs_match.group(2))
-    if 'data' in context.config.userdata:
-        context.data = pd.read_csv(context.config.userdata['data'])
-    if 'sample' in context.config.userdata and hasattr(context, "data"):
+    if "data" in context.config.userdata:
+        context.data = pd.read_csv(context.config.userdata["data"])
+    if "sample" in context.config.userdata and hasattr(context, "data"):
         context.data = context.data.sample(
-            int(context.config.userdata['sample']),
-            random_state=int(context.config.userdata.get('seed', None))
+            int(context.config.userdata["sample"]),
+            random_state=int(context.config.userdata.get("seed", None)),
         )
