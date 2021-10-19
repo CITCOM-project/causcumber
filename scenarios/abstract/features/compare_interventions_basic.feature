@@ -1,7 +1,7 @@
 # This file MUST be run from inside ../compare_interventions, otherwise it won't
 # be able to find the causal DAG. Run as `behave features/compare_interventions.feature`
 Feature: Compare interventions basic
-  Background:
+  Background: IO spec
     Given a simulation with parameters
       | parameter       | type  |
       | n_days          | int   |
@@ -15,8 +15,8 @@ Feature: Compare interventions basic
       | asimp_quar_prob | float |
       | trace_probs     | float |
     And the following meta variables
-      | variable        | type  |
-      | average_age     | float |
+      | variable        | type |
+      | average_age     | int  |
     And the following variables are recorded at the end of the simulation
       | variable        | type |
       | cum_tests       | int  |
