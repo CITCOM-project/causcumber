@@ -71,6 +71,21 @@ Feature: Compare interventions basic
     | location        | average_age     |
     Then we obtain the causal DAG
 
+  # Scenario Outline: location # This is really just a proxy for age, but age isn't an input to the model
+
+  # This is controlled entirely by location, so we want to do at least two locations with different average ages
+  # Do we want to run it for every country?
+  Scenario Outline: average_age
+    When we increase the average_age
+    Then the <output> should increase
+    # Age does have a direct effect on the cum_deaths since older folks are more likely to die from the disease
+    Examples:
+    | output          |
+    | cum_tests       |
+    | cum_quarantined |
+    | cum_infections  |
+    | cum_deaths      |
+
   # Bare minimum two runs where 0 <= quar_period 14
   # Probably want to do 0-x1 and x1-14 by BVA
   Scenario Outline: quar_period
@@ -137,21 +152,6 @@ Feature: Compare interventions basic
     | cum_quarantined | increase        | More people to quarantine                 |
     | cum_infections  | increase        | More people to get the disease            |
     | cum_deaths      | remain the same | No direct effect, only via cum_infections |
-
-  # Scenario Outline: location # This is really just a proxy for age, but age isn't an input to the model
-
-  # This is controlled entirely by location, so we want to do at least two locations with different average ages
-  # Do we want to run it for every country?
-  Scenario Outline: average_age
-    When we increase the average_age
-    Then the <output> should increase
-    # Age does have a direct effect on the cum_deaths since older folks are more likely to die from the disease
-    Examples:
-    | output          |
-    | cum_tests       |
-    | cum_quarantined |
-    | cum_infections  |
-    | cum_deaths      |
 
   # For each prob, bare minimum two runs between 0 and 1
   # Probably want to do 0-x1 and x2-1 by BVA

@@ -15,6 +15,8 @@ from covasim_utils import interventions
 
 import z3
 
+import pandas as pd
+
 obs_tag_re = re.compile("observational\((\"|')(.+)(\"|')\)")
 
 
@@ -67,11 +69,7 @@ def before_feature(context, feature):
 
 
 def before_scenario(context, scenario):
-    context.scenario.constraints = set()
-
-
-def after_scenario(context, scenario):
-    context.constraints[scenario.name] = scenario.constraints
+    context.constraints[scenario.name] = set()
 
 
 def before_step(context, step):
@@ -135,126 +133,98 @@ def cast(type, val):
     return type(str(val))
 
 
-# TODO: Sandbox Z3 to each scenario so we don't get constraint leakage
-def mutate(solver, context, treatment_var, control_val):
-    """
-    Generates a treatment value for a given treatment var by adding the constraint "treatment_var > control_val"
-
-    :param z3.Solver solver: A Z3 solver instance.
-    :param behave.Context context: A Behave context which must have `z3_variables` and `types` attributes.
-    :param string treatment_var: The name of the treatment variable.
-    :param numeric control_val: The value of the treatment variable.
-    :return: A Z3 model satisfying the original constraints where the treatment variable has a value greater than the supplied control value.
-    :rtype: z3.model
-
-    """
-    # solver = z3.Solver()
-    solver.push()
-    solver.assert_and_track(context.z3_variables[treatment_var] > control_val, "mutate")
-    assert (
-        solver.check() == z3.sat
-    ), f"Cannot mutate {treatment_var} to get a treatment value"
-    model = {
-        str(k): cast(context.types[str(k)], solver.model()[k])
-        for k in solver.model()
-        if str(k) in context.types
-    }
-    solver.pop()
-    return model
+def fresh(context, treatment_var):
+    type = context.z3_types[context.types[treatment_var]]
+    name = treatment_var
+    while name in context.z3_variables:
+        name += "_prime"
+    return type(name)
 
 
 def after_feature(context, feature):
 
     # TODO: Come up with a way of getting all the variables in there so we can
     # get z3 to come up with values for them even if there's no constraints on them
-    s = z3.Solver()
+    solver = z3.Optimize()
+
+    treatment_vars = {
+        context.z3_variables[v]: fresh(context, v) for v in context.z3_variables
+    }
+    control_vars = {v: k for k, v in treatment_vars.items()}
 
     for b in context.background_constraints:
-        s.add(b)
-    assert s.check() == z3.sat, "Inconsistent background constraints"
+        solver.add(b)
+        solver.add(z3.substitute(b, *treatment_vars.items()))
+    assert solver.check() == z3.sat, "Inconsistent background constraints"
 
-    assertions = {}
+    for k, v in treatment_vars.items():
+        solver.add_soft(k == v)
 
-    for scenario, constraints in context.constraints.items():
-        print(scenario)
-        for i, constraint in enumerate(constraints):
-            print(" ", constraint)
-            # TODO: The bug lies here! We only add the constraint from the first
-            # concrete scenario in the outline. We want a hierachy of constraints!
-            if constraint not in assertions.values():
-                assertions[f"{scenario}_{i}"] = constraint
-                s.assert_and_track(constraint, f"{scenario}_{i}")
-    sat = s.check()
-
-    solvers = []
-    if sat == z3.sat:
-        solvers.append((s, context.concrete_tests))
-    else:
-        unsat_core = s.unsat_core()
-
-        # If we have a minimum unsat core, we should be able to add in all but one element and have it be sat
-        # TODO: the bug lies here! Unsat core returns only
-        # [Finite quar_period returns -- @1.1 _0, quar_period -- @1.1 _0] but it should be kicking off about the
-        # entire scenario outline, not just specific scenarios in it...
-        # Root cause is in the for loop above
-        a = unsat_core[0]
-        print("UNSAT CORE", unsat_core)
-        print("UNSAT WITH ", a)
-        s = mk_solver(
-            {
-                name: assertions[name]
-                for name in assertions
-                if str(name) not in [str(n) for n in unsat_core[1:]]
-            },
-            context.background_constraints,
-        )
-        solvers.append(
-            (
-                s,
-                [
-                    t
-                    for t in context.concrete_tests
-                    if not str(a).startswith(t["scenario"])
-                ],
-            )
-        )
-
-        s = mk_solver(
-            {name: assertions[name] for name in assertions if str(name) != str(a)},
-            context.background_constraints,
-        )
-        solvers.append(
-            (s, [t for t in context.concrete_tests if str(a).startswith(t["scenario"])])
-        )
-
-    tests = []
     background = {}
-    for s, ts in solvers:
-        print([t["scenario"] for t in ts])
-        print(s)
-        model = {
-            str(k): cast(context.types[str(k)], s.model()[k])
-            for k in s.model()
-            if str(k) in context.types
-        }
-        if background == {}:
-            background = model
-        for t in ts:
-            # t['treatment_var'] = next(x for x in s.model() if str(x) == t['treatment_var'])
-            test = f"  Scenario: {t['scenario']}\n"
-            test += f"    Given we run the model with {t['treatment_var']}={model[t['treatment_var']]}\n"
-            for k, v in model.items():
-                if v != background[k] and k != t["treatment_var"]:
-                    test += f"    And {k}={v}\n"
-            treatment_model = mutate(
-                s, context, t["treatment_var"], model[t["treatment_var"]]
+    tests = []
+    runs = []
+
+    for t in context.concrete_tests:
+        scenario = t["scenario"]
+        treatment_var = context.z3_variables[t["treatment_var"]]
+
+        solver.push()
+        for i, constraint in enumerate(context.constraints[scenario]):
+            solver.assert_and_track(constraint, f"{scenario}_{i}")
+            solver.assert_and_track(
+                z3.substitute(constraint, *treatment_vars.items()), f"{scenario}_{i}"
             )
-            test += f"    When we run the model with {t['treatment_var']}={treatment_model[t['treatment_var']]}\n"
-            for k, v in treatment_model.items():
-                if v != model[k] and k != t["treatment_var"]:
-                    test += f"    And {k}={v}\n"
-            test += f"    Then the {t['outcome_var']} should {t['expected_change']}\n"
-            tests.append(test)
+
+        treatment_val = context.z3_types[context.types[t["treatment_var"]]](
+            "treatment_val"
+        )
+
+        for k, v in background.items():
+            solver.add_soft(k == v)
+
+        # Get the treatment model
+        solver.assert_and_track(
+            treatment_vars[treatment_var] > treatment_var, "Treatment"
+        )
+        assert solver.check() == z3.sat, f"Unsatisfiable treatment {scenario}_{i}"
+
+        model = solver.model()
+
+        if background == {}:
+            background = {
+                context.z3_variables[str(k)]: model[k]
+                for k in model
+                if str(k) in context.types
+            }
+
+        control_run = {
+            param: cast(context.types[param], model[context.z3_variables[param]])
+            for param in context.inputs
+        }
+        if control_run not in runs:
+            runs.append(control_run)
+        treatment_run = {
+            param: cast(
+                context.types[param], model[treatment_vars[context.z3_variables[param]]]
+            )
+            for param in context.inputs
+        }
+        if treatment_run not in runs:
+            runs.append(treatment_run)
+
+        test = f"  Scenario: {t['scenario']}\n"
+        test += f"    Given we run the model with {treatment_var}={model[treatment_var].as_string()}\n"
+        for k, v in background.items():
+            # need to convert to strings to check equality since "==" doesn't return a bool
+            if str(v) != str(model[k]) and str(k) != str(treatment_var):
+                test += f"      And {k}={model[k].as_string()}\n"
+        test += f"    When we run the model with {t['treatment_var']}={model[treatment_vars[treatment_var]].as_string()}\n"
+        for k, v in background.items():
+            if str(v) != str(model[treatment_vars[k]]) and str(k) != str(treatment_var):
+                test += f"      And {k}={model[treatment_vars[k]].as_string()}\n"
+        test += f"    Then the {t['outcome_var']} should {t['expected_change']}\n"
+        tests.append(test)
+        solver.pop()
 
     with open(f"features/{context.feature_name}_concrete.feature", "w") as f:
         print(f"Feature: {context.feature.name} concrete", file=f)
@@ -262,6 +232,10 @@ def after_feature(context, feature):
         print(tabulate(background, context), file=f)
         for test in tests:
             print(test, file=f)
+
+    pd.DataFrame(runs).to_csv(
+        f"results/{context.feature_name}/runs.csv", columns=sorted(list(context.inputs))
+    )
 
 
 def before_tag(context, tag):

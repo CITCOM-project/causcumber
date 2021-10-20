@@ -14,11 +14,11 @@ def add_constraint(context, constraint):
     if context.background_step:
         context.background_constraints.add(constraint)
     else:
-        context.scenario.constraints.add(constraint)
+        context.constraints[context.scenario.name].add(constraint)
 
 
-@given(u"{v1} in covasim.data.country_age_data.data")
-def step_impl(context, v1):
+@given("{v1} in {set}")
+def step_impl(context, v1, set):
     v2 = covasim_age_data
     folded = fold(
         lambda acc, x: z3.Or(acc, x), [context.z3_variables[v1] == e for e in v2], False
@@ -40,7 +40,7 @@ def avg_age(location):
     return round(avg)
 
 
-@given(u"{average_age} = average_ages({location})")
+@given("{average_age} = average_ages({location})")
 def step_impl(context, average_age, location):
     avg_ages = {x: avg_age(x) for x in covasim_age_data}
 
@@ -52,7 +52,7 @@ def step_impl(context, average_age, location):
     add_constraint(context, age == folded)
 
 
-@given(u"{lower} <= {v} <= {upper}")
+@given("{lower} <= {v} <= {upper}")
 def step_impl(context, lower, v, upper):
     add_constraint(
         context,
@@ -64,7 +64,7 @@ def step_impl(context, lower, v, upper):
     )
 
 
-@given(u"{lower} < {v} <= {upper}")
+@given("{lower} < {v} <= {upper}")
 def step_impl(context, lower, v, upper):
     add_constraint(
         context, context.z3_variables.get(lower, lower) < context.z3_variables.get(v, v)
@@ -75,7 +75,7 @@ def step_impl(context, lower, v, upper):
     )
 
 
-@given(u"{lower} <= {v} < {upper}")
+@given("{lower} <= {v} < {upper}")
 def step_impl(context, lower, v, upper):
     add_constraint(
         context,
@@ -86,26 +86,26 @@ def step_impl(context, lower, v, upper):
     )
 
 
-@given(u"{v} < {upper}")
+@given("{v} < {upper}")
 def step_impl(context, v, upper):
     add_constraint(
         context, context.z3_variables.get(v, v) < context.z3_variables.get(upper, upper)
     )
 
 
-@given(u"{v1} >= {v2}")
+@given("{v1} >= {v2}")
 def step_impl(context, v1, v2):
     add_constraint(
         context, context.z3_variables.get(v1, v1) >= context.z3_variables.get(v2, v2)
     )
 
 
-@when(u"we increase the {parameter}")
+@when("we increase the {parameter}")
 def step_impl(context, parameter):
     context.treatment_var = parameter
 
 
-@then(u"the {output} should {change}")
+@then("the {output} should {change}")
 def step_impl(context, output, change):
     context.concrete_tests.append(
         {

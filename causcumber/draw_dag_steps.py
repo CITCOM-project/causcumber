@@ -25,7 +25,7 @@ def step_impl(context):
             row["parameter"]
         )
         context.inputs.add(row["parameter"])
-        if "value" in row:
+        if "value" in row.headings:
             context.params_dict[row["parameter"]] = cast_type(row["value"])
 
 
