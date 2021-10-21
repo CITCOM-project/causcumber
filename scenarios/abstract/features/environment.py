@@ -17,19 +17,21 @@ import z3
 
 import pandas as pd
 
+from tabulate import tabulate
+
 obs_tag_re = re.compile("observational\((\"|')(.+)(\"|')\)")
 
 
 @fixture
 def set_desired_outputs(context):
     """ Add a results dataframe which stores simulation outputs to context. """
-    context.outputs = []
+    context.outputs = set()
 
 
 @fixture
 def set_parameters_dict(context):
     """ Add a parameters dictionary which stores simulation parameters to context."""
-    context.params_dict = dict()
+    context.params_dict = {}
     context.types = {}
 
 
@@ -53,6 +55,7 @@ def before_all(context):
 def before_feature(context, feature):
     print(f"Running Feature `{feature.name}`")
     use_fixture(set_parameters_dict, context)
+    use_fixture(set_desired_outputs, context)
     context.feature_name = to_snake_case(context.feature.name)
     context.dag_path = f"dags/{context.feature_name}.dot"
     context.results_dir = f"results/{context.feature_name}"
@@ -86,51 +89,44 @@ def mk_solver(named_assertions, anon_assertions):
     return s
 
 
-def tabulate(model, context):
-    rows = [
-        (str(name), context.types[str(name)].__name__, str(val))
-        for name, val in model.items()
-    ]
-    max_name = max([len(name) for name, _, _ in rows])
-    max_type = max([len(type) for _, type, _ in rows])
-    max_val = max([len(val) for _, _, val in rows])
-    table = (
-        "    | "
-        + "parameter".ljust(max_name)
-        + " | "
-        + "type".ljust(max_type)
-        + " | "
-        + "value".ljust(max_val)
-        + " |\n"
-    )
-    for parameter, dt, val in rows:
-        table += (
-            "    | "
-            + parameter.ljust(max_name)
-            + " | "
-            + dt.ljust(max_type)
-            + " | "
-            + val.ljust(max_val)
-            + " |\n"
-        )
-    return table
+# def tabulate(model, context):
+#     rows = [
+#         (str(name), context.types[str(name)].__name__, str(val))
+#         for name, val in model.items()
+#     ]
+#     max_name = max([len(name) for name, _, _ in rows])
+#     max_type = max([len(type) for _, type, _ in rows])
+#     max_val = max([len(val) for _, _, val in rows])
+#     table = (
+#         "    | "
+#         + "parameter".ljust(max_name)
+#         + " | "
+#         + "type".ljust(max_type)
+#         + " | "
+#         + "value".ljust(max_val)
+#         + " |\n"
+#     )
+#     for parameter, dt, val in rows:
+#         table += (
+#             "    | "
+#             + parameter.ljust(max_name)
+#             + " | "
+#             + dt.ljust(max_type)
+#             + " | "
+#             + val.ljust(max_val)
+#             + " |\n"
+#         )
+#     return table
 
 
-def cast(type, val):
-    """
-    Z3 is a menace and has String values be '"string"', i.e. with quotes as PART OF THE STRING so we need to strip those.
-    It also has Reals be "numerator/denominator", which python can't convert to floats.
-
-    :param type fun: The type to cast to, e.g. int, str, etc.
-    :param type val: The value to cast, usually a string, but not necessarily.
-    :return: An instance of the supplied type.
-    """
-    if type == str:
-        return str(val)[1:-1]
-    elif type == float:
+def cast(val):
+    if isinstance(val, z3.IntNumRef):
+        return val.as_long()
+    elif isinstance(val, z3.RatNumRef):
         return float(str(val.numerator())) / float(str(val.denominator()))
-
-    return type(str(val))
+    elif isinstance(val, z3.SeqRef) and val.is_string_value():
+        return val.as_string()
+    raise ValueError(f"Could not cast {val} of type {type(val)} to a native type")
 
 
 def fresh(context, treatment_var):
@@ -142,7 +138,6 @@ def fresh(context, treatment_var):
 
 
 def after_feature(context, feature):
-
     # TODO: Come up with a way of getting all the variables in there so we can
     # get z3 to come up with values for them even if there's no constraints on them
     solver = z3.Optimize()
@@ -192,44 +187,72 @@ def after_feature(context, feature):
 
         if background == {}:
             background = {
-                context.z3_variables[str(k)]: model[k]
+                context.z3_variables[str(k)]: cast(model[k])
                 for k in model
                 if str(k) in context.types
             }
 
         control_run = {
-            param: cast(context.types[param], model[context.z3_variables[param]])
-            for param in context.inputs
+            param: cast(model[context.z3_variables[param]]) for param in context.inputs
         }
         if control_run not in runs:
             runs.append(control_run)
         treatment_run = {
-            param: cast(
-                context.types[param], model[treatment_vars[context.z3_variables[param]]]
-            )
+            param: cast(model[treatment_vars[context.z3_variables[param]]])
             for param in context.inputs
         }
         if treatment_run not in runs:
             runs.append(treatment_run)
 
         test = f"  Scenario: {t['scenario']}\n"
-        test += f"    Given we run the model with {treatment_var}={model[treatment_var].as_string()}\n"
+        test += f"    Given we run the model with {treatment_var}={cast(model[treatment_var])}\n"
         for k, v in background.items():
             # need to convert to strings to check equality since "==" doesn't return a bool
-            if str(v) != str(model[k]) and str(k) != str(treatment_var):
-                test += f"      And {k}={model[k].as_string()}\n"
-        test += f"    When we run the model with {t['treatment_var']}={model[treatment_vars[treatment_var]].as_string()}\n"
+            if v != cast(model[k]) and str(k) != str(treatment_var):
+                test += f"    And {k}={cast(model[k])}\n"
+        test += f"    When we run the model with {t['treatment_var']}={cast(model[treatment_vars[treatment_var]])}\n"
         for k, v in background.items():
-            if str(v) != str(model[treatment_vars[k]]) and str(k) != str(treatment_var):
-                test += f"      And {k}={model[treatment_vars[k]].as_string()}\n"
+            if v != cast(model[treatment_vars[k]]) and str(k) != str(treatment_var):
+                test += f"    And {k}={cast(model[treatment_vars[k]])}\n"
         test += f"    Then the {t['outcome_var']} should {t['expected_change']}\n"
         tests.append(test)
         solver.pop()
 
+    def indent(txt, spaces=4):
+        return "\n".join(" " * spaces + ln for ln in txt.splitlines())
+
     with open(f"features/{context.feature_name}_concrete.feature", "w") as f:
         print(f"Feature: {context.feature.name} concrete", file=f)
         print("  Background:", file=f)
-        print(tabulate(background, context), file=f)
+        print("      Given a simulation with parameters", file=f)
+        rows = [
+            (str(name), context.types[str(name)].__name__, str(val))
+            for name, val in background.items()
+        ]
+        print(
+            indent(
+                tabulate([("parameter", "type", "value")] + rows, tablefmt="orgtbl")
+            ),
+            file=f,
+        )
+        print(
+            "    And the following variables are recorded at the end of the simulation",
+            file=f,
+        )
+        print(
+            indent(
+                tabulate(
+                    [("output", "type")]
+                    + [
+                        (output, context.types[output].__name__)
+                        for output in context.outputs
+                    ],
+                    tablefmt="orgtbl",
+                )
+            ),
+            file=f,
+        )
+        print("", file=f)
         for test in tests:
             print(test, file=f)
 

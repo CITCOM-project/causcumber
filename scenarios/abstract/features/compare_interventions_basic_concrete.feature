@@ -1,40 +1,47 @@
 Feature: Compare interventions basic concrete
   Background:
-    | parameter       | type  | value         |
-    | quar_period     | int   | 0             |
-    | trace_probs     | float | 0             |
-    | location        | str   | "Afghanistan" |
-    | pop_infected    | int   | 0             |
-    | simp_quar_prob  | float | 0             |
-    | asimp_prob      | float | 0             |
-    | n_days          | int   | 60            |
-    | asimp_quar_prob | float | 0             |
-    | simp_prob       | float | 0             |
-    | pop_size        | int   | 1000          |
-    | average_age     | int   | 22            |
+      Given a simulation with parameters
+    | parameter       | type  | value       |
+    | quar_period     | int   | 0           |
+    | trace_probs     | float | 0.0         |
+    | location        | str   | Afghanistan |
+    | asymp_prob      | float | 0.0         |
+    | symp_prob       | float | 0.0         |
+    | n_days          | int   | 60          |
+    | pop_infected    | int   | 0           |
+    | asymp_quar_prob | float | 0.0         |
+    | symp_quar_prob  | float | 0.0         |
+    | pop_size        | int   | 1000        |
+    | average_age     | int   | 22          |
+    And the following variables are recorded at the end of the simulation
+    | output          | type |
+    | cum_tests       | int  |
+    | cum_deaths      | int  |
+    | cum_infections  | int  |
+    | cum_quarantined | int  |
 
   Scenario: average_age -- @1.1 
     Given we run the model with average_age=22
     When we run the model with average_age=30
-      And location=Algeria
+    And location=Algeria
     Then the cum_tests should increase
 
   Scenario: average_age -- @1.2 
     Given we run the model with average_age=22
-    When we run the model with average_age=30
-      And location=Algeria
+    When we run the model with average_age=38
+    And location=Albania
     Then the cum_quarantined should increase
 
   Scenario: average_age -- @1.3 
     Given we run the model with average_age=22
     When we run the model with average_age=30
-      And location=Algeria
+    And location=Algeria
     Then the cum_infections should increase
 
   Scenario: average_age -- @1.4 
     Given we run the model with average_age=22
-    When we run the model with average_age=30
-      And location=Algeria
+    When we run the model with average_age=38
+    And location=Albania
     Then the cum_deaths should increase
 
   Scenario: quar_period -- @1.1 
@@ -138,102 +145,102 @@ Feature: Compare interventions basic concrete
     Then the cum_deaths should remain the same
 
   Scenario: probs -- @1.1 
-    Given we run the model with simp_prob=0
-    When we run the model with simp_prob=1/2
+    Given we run the model with symp_prob=0.0
+    When we run the model with symp_prob=0.5
     Then the cum_tests should increase
 
   Scenario: probs -- @1.1 
-    Given we run the model with simp_prob=0
-    When we run the model with simp_prob=1/2
+    Given we run the model with symp_prob=0.0
+    When we run the model with symp_prob=0.5
     Then the cum_quarantined should increase
 
   Scenario: probs -- @1.1 
-    Given we run the model with simp_prob=0
-    When we run the model with simp_prob=1/2
+    Given we run the model with symp_prob=0.0
+    When we run the model with symp_prob=0.5
     Then the cum_infections should decrease
 
   Scenario: probs -- @1.1 
-    Given we run the model with simp_prob=0
-    When we run the model with simp_prob=1/2
+    Given we run the model with symp_prob=0.0
+    When we run the model with symp_prob=0.5
     Then the cum_deaths should remain the same
 
   Scenario: probs -- @1.2 
-    Given we run the model with asimp_prob=0
-    When we run the model with asimp_prob=1/2
+    Given we run the model with asymp_prob=0.0
+    When we run the model with asymp_prob=0.5
     Then the cum_tests should increase
 
   Scenario: probs -- @1.2 
-    Given we run the model with asimp_prob=0
-    When we run the model with asimp_prob=1/2
+    Given we run the model with asymp_prob=0.0
+    When we run the model with asymp_prob=0.5
     Then the cum_quarantined should increase
 
   Scenario: probs -- @1.2 
-    Given we run the model with asimp_prob=0
-    When we run the model with asimp_prob=1/2
+    Given we run the model with asymp_prob=0.0
+    When we run the model with asymp_prob=0.5
     Then the cum_infections should decrease
 
   Scenario: probs -- @1.2 
-    Given we run the model with asimp_prob=0
-    When we run the model with asimp_prob=1/2
+    Given we run the model with asymp_prob=0.0
+    When we run the model with asymp_prob=0.5
     Then the cum_deaths should remain the same
 
   Scenario: probs -- @1.3 
-    Given we run the model with simp_quar_prob=0
-    When we run the model with simp_quar_prob=1/2
+    Given we run the model with symp_quar_prob=0.0
+    When we run the model with symp_quar_prob=0.5
     Then the cum_tests should increase
 
   Scenario: probs -- @1.3 
-    Given we run the model with simp_quar_prob=0
-    When we run the model with simp_quar_prob=1/2
+    Given we run the model with symp_quar_prob=0.0
+    When we run the model with symp_quar_prob=0.5
     Then the cum_quarantined should increase
 
   Scenario: probs -- @1.3 
-    Given we run the model with simp_quar_prob=0
-    When we run the model with simp_quar_prob=1/2
+    Given we run the model with symp_quar_prob=0.0
+    When we run the model with symp_quar_prob=0.5
     Then the cum_infections should decrease
 
   Scenario: probs -- @1.3 
-    Given we run the model with simp_quar_prob=0
-    When we run the model with simp_quar_prob=1/2
+    Given we run the model with symp_quar_prob=0.0
+    When we run the model with symp_quar_prob=0.5
     Then the cum_deaths should remain the same
 
   Scenario: probs -- @1.4 
-    Given we run the model with asimp_quar_prob=0
-    When we run the model with asimp_quar_prob=1/2
+    Given we run the model with asymp_quar_prob=0.0
+    When we run the model with asymp_quar_prob=0.5
     Then the cum_tests should increase
 
   Scenario: probs -- @1.4 
-    Given we run the model with asimp_quar_prob=0
-    When we run the model with asimp_quar_prob=1/2
+    Given we run the model with asymp_quar_prob=0.0
+    When we run the model with asymp_quar_prob=0.5
     Then the cum_quarantined should increase
 
   Scenario: probs -- @1.4 
-    Given we run the model with asimp_quar_prob=0
-    When we run the model with asimp_quar_prob=1/2
+    Given we run the model with asymp_quar_prob=0.0
+    When we run the model with asymp_quar_prob=0.5
     Then the cum_infections should decrease
 
   Scenario: probs -- @1.4 
-    Given we run the model with asimp_quar_prob=0
-    When we run the model with asimp_quar_prob=1/2
+    Given we run the model with asymp_quar_prob=0.0
+    When we run the model with asymp_quar_prob=0.5
     Then the cum_deaths should remain the same
 
   Scenario: probs -- @1.5 
-    Given we run the model with trace_probs=0
-    When we run the model with trace_probs=1/2
+    Given we run the model with trace_probs=0.0
+    When we run the model with trace_probs=0.5
     Then the cum_tests should increase
 
   Scenario: probs -- @1.5 
-    Given we run the model with trace_probs=0
-    When we run the model with trace_probs=1/2
+    Given we run the model with trace_probs=0.0
+    When we run the model with trace_probs=0.5
     Then the cum_quarantined should increase
 
   Scenario: probs -- @1.5 
-    Given we run the model with trace_probs=0
-    When we run the model with trace_probs=1/2
+    Given we run the model with trace_probs=0.0
+    When we run the model with trace_probs=0.5
     Then the cum_infections should decrease
 
   Scenario: probs -- @1.5 
-    Given we run the model with trace_probs=0
-    When we run the model with trace_probs=1/2
+    Given we run the model with trace_probs=0.0
+    When we run the model with trace_probs=0.5
     Then the cum_deaths should remain the same
 

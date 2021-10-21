@@ -46,15 +46,15 @@ def step_impl(context):
 
 @given("the following variables are recorded every time step")
 def step_impl(context):
-    context.outputs = [row["variable"] for row in context.table]
     for row in context.table:
+        context.outputs.add(row["variable"])
         context.types[row["variable"]] = locate(row["type"])
 
 
 @given("the following variables are recorded at the end of the simulation")
 def step_impl(context):
-    context.outputs = [row["variable"] for row in context.table]
     for row in context.table:
+        context.outputs.add(row["variable"])
         context.types[row["variable"]] = locate(row["type"])
 
 

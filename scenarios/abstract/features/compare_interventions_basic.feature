@@ -9,10 +9,10 @@ Feature: Compare interventions basic
       | pop_size        | int   |
       | pop_infected    | int   |
       | location        | str   |
-      | simp_prob       | float |
-      | asimp_prob      | float |
-      | simp_quar_prob  | float |
-      | asimp_quar_prob | float |
+      | symp_prob       | float |
+      | asymp_prob      | float |
+      | symp_quar_prob  | float |
+      | asymp_quar_prob | float |
       | trace_probs     | float |
     And the following meta variables
       | variable        | type |
@@ -35,10 +35,10 @@ Feature: Compare interventions basic
     # Must be a valid country
     And location in covasim.data.country_age_data.data
     # Probabilities must be between zero and one
-    And 0 <= simp_prob <= 1
-    And 0 <= asimp_prob <= 1
-    And 0 <= simp_quar_prob <= 1
-    And 0 <= asimp_quar_prob <= 1
+    And 0 <= symp_prob <= 1
+    And 0 <= asymp_prob <= 1
+    And 0 <= symp_quar_prob <= 1
+    And 0 <= asymp_quar_prob <= 1
     And 0 <= trace_probs <= 1
     And average_age = average_ages(location)
 
@@ -168,8 +168,8 @@ Feature: Compare interventions basic
     And the cum_deaths should remain the same
     Examples:
     | prob            |
-    | simp_prob       |
-    | asimp_prob      |
-    | simp_quar_prob  |
-    | asimp_quar_prob |
+    | symp_prob       |
+    | asymp_prob      |
+    | symp_quar_prob  |
+    | asymp_quar_prob |
     | trace_probs     |
