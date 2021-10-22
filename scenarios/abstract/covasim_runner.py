@@ -14,8 +14,8 @@ for _, run in runs.iterrows():
         asymp_quar_prob=run["asymp_quar_prob"],
     )
     tracing = cv.contact_tracing(trace_probs=run["trace_probs"])
-    params = {k: run[k] for k in run.to_dict() if "_prob" not in k}
-    sim = cv.Sim(interventions=[testing, tracing], pop_type="hybrid", **params)
+    run_params = {k: run[k] for k in run.to_dict() if "_prob" not in k}
+    sim = cv.Sim(interventions=[testing, tracing], pop_type="hybrid", **run_params)
     msim = cv.MultiSim(sim)
     msim.run(n_runs=30, verbose=0)
     results = {k: [] for k in desired_outputs}
@@ -34,7 +34,7 @@ for _, run in runs.iterrows():
         results["quar_period"].append(quar_period)
 
     data = pd.DataFrame(results)
-    for k, v in params.items():
+    for k, v in run.items():
         data[k] = [v for _ in range(30)]
     all_runs.append(data)
 pd.concat(all_runs).to_csv("results/compare_interventions_basic/data.csv")

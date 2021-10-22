@@ -5,8 +5,18 @@ from behave import use_step_matcher
 import z3
 import numpy as np
 
+import sys
+
+sys.path.append("../../../../")  # This one's for native running from within steps
+sys.path.append("../../../")  # This one's for running `behave` in `features`
+sys.path.append("../../")  # This one's for running `behave` in `compare-inverventions`
+
+from covasim_utils import avg_age
+
 covasim_age_data = {
-    k: v for k, v in list(covasim.data.country_age_data.data.items())[:3]
+    k: v
+    for k, v in covasim.data.country_age_data.data.items()
+    if k in ["UK", "Rwanda", "Japan"]
 }
 
 
@@ -24,20 +34,6 @@ def step_impl(context, v1, set):
         lambda acc, x: z3.Or(acc, x), [context.z3_variables[v1] == e for e in v2], False
     )
     add_constraint(context, folded)
-
-
-def avg_age(location):
-    ages = covasim_age_data[location]
-    total_pop = sum(ages.values())
-    avg = 0
-    for age in ages:
-        prob = ages[age] / total_pop
-        if "-" in age:
-            midpoint = np.mean([int(x) for x in age.split("-")])
-        else:
-            midpoint = 80
-        avg += midpoint * prob
-    return round(avg)
 
 
 @given("{average_age} = average_ages({location})")
@@ -103,6 +99,11 @@ def step_impl(context, v1, v2):
 @when("we increase the {parameter}")
 def step_impl(context, parameter):
     context.treatment_var = parameter
+
+
+@when(u"have the effect modifiers")
+def step_impl(context):
+    context.effect_modifiers = [row["effect_modifier"] for row in context.table]
 
 
 @then("the {output} should {change}")

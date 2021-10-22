@@ -77,6 +77,13 @@ Feature: Compare interventions basic
   # Do we want to run it for every country?
   Scenario Outline: average_age
     When we increase the average_age
+    And have the effect modifiers
+    | effect_modifier |
+    | symp_prob       |
+    | asymp_prob      |
+    | symp_quar_prob  |
+    | asymp_quar_prob |
+    | trace_probs     |
     Then the <output> should increase
     # Age does have a direct effect on the cum_deaths since older folks are more likely to die from the disease
     Examples:

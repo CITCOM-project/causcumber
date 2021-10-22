@@ -285,6 +285,7 @@ def estimate_effect(
     identification=True,
     verbose=False,
     confidence_intervals=True,
+    method_name="backdoor.linear_regression",
     **kwargs,
 ):
     """
@@ -305,7 +306,7 @@ def estimate_effect(
     """
 
     if not isinstance(treatment_var, list):
-        treatment_var =[treatment_var]
+        treatment_var = [treatment_var]
     if not isinstance(outcome_var, list):
         outcome_var = [outcome_var]
     if not isinstance(control_val, list):
@@ -380,7 +381,10 @@ def estimate_effect(
 
     if verbose:
         print("  adjustment_set", adjustment_set)
-        print(f"Datatype of treatment {treatment_var}:", [data.dtypes[v] for v in treatment_var])
+        print(
+            f"Datatype of treatment {treatment_var}:",
+            [data.dtypes[v] for v in treatment_var],
+        )
         # print(data)
         print("control_val", control_val)
         print("treatment_val", treatment_val)
@@ -390,7 +394,7 @@ def estimate_effect(
         treatment=treatment_var,
         outcome=outcome_var,
         common_causes=adjustment_set,
-        effect_modifiers=effect_modifiers
+        effect_modifiers=effect_modifiers,
     )
 
     # Identify causal effect and return target estimand
@@ -423,6 +427,7 @@ def estimate_effect(
         treatment_value=treatment_val[0],
         control_value=control_val[0],
         confidence_intervals=confidence_intervals,
+        method_name=method_name,
         **kwargs,
     )
 
@@ -462,16 +467,17 @@ def run_dowhy(
     """
 
     estimate = estimate_effect(
-    data,
-    graph,
-    treatment_var,
-    outcome_var,
-    control_val,
-    treatment_val,
-    identification=identification,
-    verbose=verbose,
-    confidence_intervals=True,
-    **kwargs,)
+        data,
+        graph,
+        treatment_var,
+        outcome_var,
+        control_val,
+        treatment_val,
+        identification=identification,
+        verbose=verbose,
+        confidence_intervals=True,
+        **kwargs,
+    )
 
     # TODO: there's a *potential* bug in doWhy such that ci_low and ci_high don't always correspond to the minimum and maximum respectively
     # This is why we need to sort
@@ -482,6 +488,7 @@ def run_dowhy(
         print("Total Effect Estimate:", estimate.value)
         print("95% Confidence Intervals: [{}, {}]".format(ci_low, ci_high))
     return estimate.value, (ci_low, ci_high)
+
 
 def to_snake_case(string):
     lowercase_string = string.lower()

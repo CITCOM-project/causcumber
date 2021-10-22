@@ -5,29 +5,41 @@ import covasim as cv
 import pandas as pd
 import os
 
+
+def avg_age(location):
+    ages = cv.data.country_age_data.data[location]
+    total_pop = sum(ages.values())
+    avg = 0
+    for age in ages:
+        prob = ages[age] / total_pop
+        if "-" in age:
+            midpoint = np.mean([int(x) for x in age.split("-")])
+        else:
+            midpoint = 80
+        avg += midpoint * prob
+    return round(avg)
+
+
 # Instantiate named covasim interventions with parameters
 intervention = {
     "standardTest": cv.test_prob(
-        symp_prob=0.2,
-        asymp_prob=0.001,
-        symp_quar_prob=1,
-        asymp_quar_prob=1
+        symp_prob=0.2, asymp_prob=0.001, symp_quar_prob=1, asymp_quar_prob=1
     ),
     "noTest": cv.test_prob(
-        symp_prob=0,
-        asymp_prob=0,
-        symp_quar_prob=0,
-        asymp_quar_prob=0
+        symp_prob=0, asymp_prob=0, symp_quar_prob=0, asymp_quar_prob=0
     ),
     "optimalTest": cv.test_prob(
-        symp_prob=1,
-        asymp_prob=1,
-        symp_quar_prob=1,
-        asymp_quar_prob=1
+        symp_prob=1, asymp_prob=1, symp_quar_prob=1, asymp_quar_prob=1
     ),
-    "standardTrace": cv.contact_tracing(trace_probs={'h': 1, 'w': 0.5, 's': 0.5, 'c': 0.3}, quar_period=14),
-    "noTrace": cv.contact_tracing(trace_probs={'h': 0, 'w': 0, 's': 0, 'c': 0}, quar_period=14),
-    "optimalTrace": cv.contact_tracing(trace_probs={'h': 1, 'w': 1, 's': 1, 'c': 1}, quar_period=14)
+    "standardTrace": cv.contact_tracing(
+        trace_probs={"h": 1, "w": 0.5, "s": 0.5, "c": 0.3}, quar_period=14
+    ),
+    "noTrace": cv.contact_tracing(
+        trace_probs={"h": 0, "w": 0, "s": 0, "c": 0}, quar_period=14
+    ),
+    "optimalTrace": cv.contact_tracing(
+        trace_probs={"h": 1, "w": 1, "s": 1, "c": 1}, quar_period=14
+    ),
 }
 
 # Provide a list of interventions with which to run covasim
@@ -39,18 +51,18 @@ interventions = {
     "standardTrace": [intervention["standardTest"], intervention["standardTrace"]],
     "noTrace": [intervention["standardTest"], intervention["noTrace"]],
     "optimalTrace": [intervention["standardTest"], intervention["optimalTrace"]],
-    "traceNoTest": [intervention["standardTrace"]]
+    "traceNoTest": [intervention["standardTrace"]],
 }
 
 
 def preprocess_data(data):
     assert "intervention" not in data, "intervention is a column in data"
-    data['interventions'] = [str(x) for x in data['interventions']]
-    data['interventions'] = data['interventions'].astype("category")
-    data['pop_type'] = data['pop_type'].astype("category")
-    data['location'] = data['location'].astype("category")
+    data["interventions"] = [str(x) for x in data["interventions"]]
+    data["interventions"] = data["interventions"].astype("category")
+    data["pop_type"] = data["pop_type"].astype("category")
+    data["location"] = data["location"].astype("category")
     if "start_day" in data:
-        data['start_day'] = data['start_day'].astype("category")
+        data["start_day"] = data["start_day"].astype("category")
     return data
 
 
@@ -64,7 +76,7 @@ def dict_plus(dic1, dic2):
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
     for i in range(0, len(lst), n):
-        yield lst[i:i + n]
+        yield lst[i : i + n]
 
 
 def aggregate_by_week(data, desired_outputs=None):
@@ -73,9 +85,9 @@ def aggregate_by_week(data, desired_outputs=None):
     week_by_week = {k: [] for k in desired_outputs}
     for c in chunks(data, 7):
         for k in week_by_week:
-            if k.startswith('new_'):
+            if k.startswith("new_"):
                 week_by_week[k].append(c[k].sum())
-            elif k.startswith('n_'):
+            elif k.startswith("n_"):
                 week_by_week[k].append(c[k].iloc[-1])
             else:
                 week_by_week[k].append(c[k].iloc[0])
@@ -85,20 +97,24 @@ def aggregate_by_week(data, desired_outputs=None):
 def run_covasim_by_week(label, params, desired_outputs, n_runs=30):
     print("Params", params)
     print("Desired outputs", desired_outputs)
-    intervention_sim = cv.MultiSim(cv.Sim(pars=params, label=label, verbose=0), keep_people=True)
+    intervention_sim = cv.MultiSim(
+        cv.Sim(pars=params, label=label, verbose=0), keep_people=True
+    )
     intervention_sim.run(n_runs=n_runs, verbose=0)
     temporal = []
     for sim in intervention_sim.sims:
         df = sim.to_df()
         quar_period = 14
-        for i in sim['interventions']:
+        for i in sim["interventions"]:
             if hasattr(i, "quar_period"):
                 quar_period = i.quar_period
         df = df[desired_outputs]
         week_by_week = pd.DataFrame(aggregate_by_week(df, desired_outputs))
-        dic = week_by_week.to_dict(orient='list')
-        week_dic = {f"{k}_{w+1}": item for k in desired_outputs for w, item in enumerate(dic[k])}
-        week_dic['quar_period'] = quar_period
+        dic = week_by_week.to_dict(orient="list")
+        week_dic = {
+            f"{k}_{w+1}": item for k in desired_outputs for w, item in enumerate(dic[k])
+        }
+        week_dic["quar_period"] = quar_period
         params["interventions"] = label
         for k, v in params.items():
             week_dic[k] = v
@@ -116,11 +132,11 @@ def run_covasim_basic(label, params, desired_outputs, n_runs=30):
     intervention_sim = cv.MultiSim(cv.Sim(pars=params, label=label, verbose=0))
     intervention_sim.run(n_runs=n_runs, verbose=0)
     results = {k: [] for k in desired_outputs}
-    results['quar_period'] = []
+    results["quar_period"] = []
     for sim in intervention_sim.sims:
         df = sim.to_df()
         quar_period = 14
-        for i in sim['interventions']:
+        for i in sim["interventions"]:
             if hasattr(i, "quar_period"):
                 quar_period = i.quar_period
         df = df[desired_outputs]
@@ -128,7 +144,7 @@ def run_covasim_basic(label, params, desired_outputs, n_runs=30):
         for k in desired_outputs:
             results[k].append(df[k].iloc[-1])
 
-        results['quar_period'].append(quar_period)
+        results["quar_period"].append(quar_period)
 
     data = pd.DataFrame(results)
     params["interventions"] = label
@@ -155,7 +171,10 @@ def msims(default, investigate, include_baseline=True):
         A list of MultiSims with the specified parameters.
 
     """
-    sims = [cv.MultiSim(cv.Sim(pars= {**default, **d}, label=l, verbose=0)) for d, l in investigate]
+    sims = [
+        cv.MultiSim(cv.Sim(pars={**default, **d}, label=l, verbose=0))
+        for d, l in investigate
+    ]
     if include_baseline:
         sims += [cv.MultiSim(cv.Sim(pars=default, label="Baseline"))]
     return sims

@@ -21,9 +21,10 @@ def step_impl(context):
     for row in context.table:
         cast_type = locate(row["type"])
         context.types[row["parameter"]] = cast_type
-        context.z3_variables[row["parameter"]] = context.z3_types[cast_type](
-            row["parameter"]
-        )
+        if hasattr(context, "z3_types") and hasattr(context, "z3_variables"):
+            context.z3_variables[row["parameter"]] = context.z3_types[cast_type](
+                row["parameter"]
+            )
         context.inputs.add(row["parameter"])
         if "value" in row.headings:
             context.params_dict[row["parameter"]] = cast_type(row["value"])
