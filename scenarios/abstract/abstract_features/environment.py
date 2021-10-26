@@ -170,17 +170,19 @@ def mk_test_case(
     return control_run, treatment_run
 
 
-def format_scenario(test, treatment_var, control_run, treatment_run, background):
-    scenario = f"  Scenario: {test['scenario'].strip()}\n"
+def indent(txt, spaces=4):
+    return "\n".join(" " * spaces + ln for ln in txt.splitlines())
+
+
+def format_scenario(test, name, treatment_var, control_run, treatment_run, background):
+    scenario = f"  Scenario: {name}\n"
     scenario += f"    Given we run the model with {treatment_var}={control_run[treatment_var]}\n"
-    for k, v in background.items():
-        # need to convert to strings to check equality since "==" doesn't return a bool
-        if v != control_run[k] and str(k) != str(treatment_var):
-            scenario += f"    And {k}={control_run[k]}\n"
     scenario += f"    When we run the model with {test['treatment_var']}={treatment_run[treatment_var]}\n"
-    for k, v in background.items():
-        if v != treatment_run[k] and str(k) != str(treatment_var):
-            scenario += f"    And {k}={treatment_run[k]}\n"
+    if test["effect_modifiers"] != []:
+        scenario += "    And effect modifier values\n"
+        rows = [(k, control_run[k]) for k in test["effect_modifiers"]]
+        scenario += indent(tabulate([("modifier", "value")] + rows, tablefmt="orgtbl",))
+        scenario += "\n"
     scenario += f"    Then the {test['outcome_var']} should {test['expected_change']}"
     return scenario
 
@@ -188,13 +190,10 @@ def format_scenario(test, treatment_var, control_run, treatment_run, background)
 def output_feature_file(
     filename, feature_name, feature_background, feature_outputs, tests
 ):
-    def indent(txt, spaces=4):
-        return "\n".join(" " * spaces + ln for ln in txt.splitlines())
-
     with open(filename, "w") as f:
         print(f"Feature: {feature_name} concrete", file=f)
         print("  Background:", file=f)
-        print("      Given a simulation with parameters", file=f)
+        print("    Given a simulation with parameters", file=f)
         feature_background.sort()
         print(
             indent(
@@ -222,6 +221,10 @@ def output_feature_file(
 def after_feature(context, feature):
     # TODO: Come up with a way of getting all the variables in there so we can
     # get z3 to come up with values for them even if there's no constraints on them
+    # TODO: Possibly, we might want to add in soft constraints as we generate
+    # models which try to stop duplicate variable values. That'd give us a
+    # more diverse spread of values. We should look into this.
+    # TODO: How do we generate the "unexpected" values?
     solver = z3.Optimize()
 
     treatment_vars = {
@@ -240,30 +243,49 @@ def after_feature(context, feature):
     tests = []
     runs = []
 
+    scenarios = []
     for t in context.concrete_tests:
         scenario = t["scenario"]
         treatment_var = context.z3_variables[t["treatment_var"]]
 
-        control_run, treatment_run = mk_test_case(
-            solver,
-            context.constraints[scenario],
-            scenario,
-            treatment_vars,
-            background,
-            treatment_var,
-        )
+        # Cheekily add an extra element to imitate a `do while` loop with a for...in
+        # @Bob, is there a better way?
+        effect_modifiers = [None] + t["effect_modifiers"]
 
-        if background == {}:
-            background = control_run
+        for modifier in effect_modifiers:
+            constraints = context.constraints[scenario]
+            if modifier is not None:
+                constraints.add(modifier != background[modifier])
 
-        if control_run not in runs:
-            runs.append({str(k): v for k, v in control_run.items()})
-        if treatment_run not in runs:
-            runs.append({str(k): v for k, v in treatment_run.items()})
+            control_run, treatment_run = mk_test_case(
+                solver,
+                constraints,
+                scenario,
+                treatment_vars,
+                background,
+                treatment_var,
+            )
 
-        tests.append(
-            format_scenario(t, treatment_var, control_run, treatment_run, background)
-        )
+            if background == {}:
+                background = control_run
+
+            if control_run not in runs:
+                runs.append({str(k): v for k, v in control_run.items()})
+            if treatment_run not in runs:
+                runs.append({str(k): v for k, v in treatment_run.items()})
+
+            name = scenario.strip()
+            scenarios.append(name)
+            tests.append(
+                format_scenario(
+                    t,
+                    f"{name}.{scenarios.count(name)}",
+                    treatment_var,
+                    control_run,
+                    treatment_run,
+                    background,
+                )
+            )
 
     feature_background = [
         (str(name), context.types[str(name)].__name__, str(val))

@@ -29,9 +29,25 @@ Feature: Compare interventions basic
     And 60 <= n_days <= 365
     # There's no point in quarantining people for longer than the length of time the model is run
     And 0 <= quar_period < n_days
-    And 1000 <= pop_size <= 100000
+    And 10000 <= pop_size <= 100000
+
     # We can't have more initially infected people than the total population
-    And 0 <= pop_infected <= pop_size
+    # The theoretical limits is the following
+    # And 0 <= pop_infected <= pop_size
+    # But this is too vague. Z3 will just shove out 0 all the time, which is stupid
+    # and won't allow us to test in a realistic setting. A more realistic constraint
+    # is the following
+    And 100 <= pop_infected <= pop_size
+    # but this does mean the model operates more within its "comfort zone".
+    # We want to make sure we have at least some people infected
+    # We want to make sure we have enough so that the pandemic gets going most of the time
+    # I'm not really sure how/whether we can do this sort of thing automatically.
+    # This is the sort of thing that the category partition method was meant to
+    # deal with, but the categories are a bit more "fuzzy" here. There's not a
+    # cutoff value where the model behaves like this for values above and like
+    # that for values below. There's a sort of grey area in the middle where the
+    # two distributions overlap where the pandemic might get going or it might not.
+
     # Must be a valid country
     And location in covasim.data.country_age_data.data
     # Probabilities must be between zero and one
@@ -75,7 +91,15 @@ Feature: Compare interventions basic
 
   # This is controlled entirely by location, so we want to do at least two locations with different average ages
   # Do we want to run it for every country?
+  @skip
   Scenario Outline: average_age
+    # At the moment, these preconditions correspond to generators rather than filters for the data
+    # We might potentially want to filter the data going off into CI to where this holds
+    Given symp_prob > 0
+    And asymp_prob > 0
+    And symp_quar_prob > 0
+    And asymp_quar_prob > 0
+    And trace_probs > 0
     When we increase the average_age
     And have the effect modifiers
     | effect_modifier |
@@ -84,28 +108,51 @@ Feature: Compare interventions basic
     | symp_quar_prob  |
     | asymp_quar_prob |
     | trace_probs     |
-    Then the <output> should increase
+    Then the <output> should <change>
     # Age does have a direct effect on the cum_deaths since older folks are more likely to die from the disease
     Examples:
-    | output          |
-    | cum_tests       |
-    | cum_quarantined |
-    | cum_infections  |
-    | cum_deaths      |
+    | output          | change   |
+    | cum_tests       | increase |
+    | cum_quarantined | decrease |
+    | cum_infections  | decrease |
+    | cum_deaths      | increase |
 
-  # Bare minimum two runs where 0 <= quar_period 14
-  # Probably want to do 0-x1 and x1-14 by BVA
+  Bare minimum two runs where 0 <= quar_period 14
+  Probably want to do 0-x1 and x1-14 by BVA
+  @skip
   Scenario Outline: quar_period
-    Given quar_period < 14
+  # Again, these are generators not filters.
+    Given quar_period <= 14
+    And symp_prob > 0.5
+    And asymp_prob > 0.5
+    And symp_quar_prob > 0.5
+    And asymp_quar_prob > 0.5
+    And trace_probs > 0.5
     When we increase the quar_period
+    And have the effect modifiers
+    | effect_modifier |
+    | symp_prob       |
+    | asymp_prob      |
+    | symp_quar_prob  |
+    | asymp_quar_prob |
+    | trace_probs     |
     Then the <output> should <change>
     # I think the cum_tests one will probably change on the quarantine testing strategy.
     # By default, it's start and end, i.e. two tests per quarantine
     # If we tested everyone in quarantine every day, it might increase
     # Since test_strategy isn't a parameter we're testing here, we can leave it as is
+
+    # The cum_quarantined seems to be a lot more sensitive to the effect modifiers
+    # and a lot less monotonic than cum_tests. With the _prob variables at lower
+    # values, increasing the quar_period actually increases the cum_quarantined.
+    # It's only for the higher values (above 0.5) that we get less people quarantining.
+    # This makes sense as, if we have a higher chance of someone testing and getting
+    # quarantined early on, then the quar_period has much more chance of taking effect.
+    # If they have a lower chance of getting caught, they'll pass it on to more people,
+    # so the cumulative nature of the variable will have more of an effect
     Examples:
     | output          | change          | comment                                                                            |
-    | cum_tests       | decrease        | Longer quarantine means less regular testing for everyone                          |
+    | cum_tests       | decrease        | Longer quarantine means fewer cases means fewer tests                              |
     | cum_quarantined | decrease        | Longer quarantine means fewer cases means fewer quarantine                         |
     | cum_infections  | decrease        | Longer quarantine means less chance of infected individuals passing on the disease |
     | cum_deaths      | remain the same | No direct causal effect, only via cum_infections                                   |
@@ -113,19 +160,45 @@ Feature: Compare interventions basic
   # Bare minimum two runs where 14 <= quar_period
   # Probably just want to do 14-x1 by uniformity
   Scenario Outline: Finite quar_period returns
-    Given quar_period >= 14
+    Given quar_period > 14
+    And symp_prob > 0.5
+    And asymp_prob > 0.5
+    And symp_quar_prob > 0.5
+    And asymp_quar_prob > 0.5
+    And trace_probs > 0.5
     When we increase the quar_period
+    And have the effect modifiers
+    | effect_modifier |
+    | symp_prob       |
+    | asymp_prob      |
+    | symp_quar_prob  |
+    | asymp_quar_prob |
+    | trace_probs     |
     Then the <output> should remain about the same
     # Once we get beyond the runtime of the disease, we stop gaining benefit from increasing the quarantine period
     Examples:
     | output          |
-    | cum_tests       |
     | cum_quarantined |
     | cum_infections  |
     | cum_deaths      |
 
+  @skip
+  Scenario: Finite quar_period returns
+    Given quar_period > 14
+    When we increase the quar_period
+    And have the effect modifiers
+    | effect_modifier |
+    | symp_prob       |
+    | asymp_prob      |
+    | symp_quar_prob  |
+    | asymp_quar_prob |
+    | trace_probs     |
+    Then the cum_tests should decrease
+    # This is because people only test at beginning/end of quarantine
+
   # Bare minimum two runs where 60 <= n_days <= 365
   # Probably want to do min-x1 and x2-max by BVA
+  @skip
   Scenario Outline: n_days
     When we increase the n_days
     Then the <output> should increase
@@ -138,6 +211,7 @@ Feature: Compare interventions basic
 
   # Bare minimum two runs where 0 < pop_size
   # Probably want to do min-x1 and x2-max by BVA
+  @skip
   Scenario Outline: pop_size
     When we increase the pop_size
     Then the <output> should increase
@@ -150,6 +224,7 @@ Feature: Compare interventions basic
 
   # Bare minimum two runs where pop_infected <= pop_size
   # Probably want to do pop_infected=pop_size (by BVA) and pop_infected < pop_size
+  @skip
   Scenario Outline: pop_infected
     When we increase the pop_infected
     Then the <output> should <change>
@@ -163,6 +238,7 @@ Feature: Compare interventions basic
   # For each prob, bare minimum two runs between 0 and 1
   # Probably want to do 0-x1 and x2-1 by BVA
   # These probs are effect modifiers of each other
+  @skip
   Scenario Outline: probs
     When we increase the <prob>
     # increasing the probabilities means more people get tested (even trace_probs because traced people then get a test)

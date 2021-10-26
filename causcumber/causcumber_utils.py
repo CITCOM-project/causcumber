@@ -340,6 +340,7 @@ def estimate_effect(
     data = data.copy()
     for i, v in enumerate(treatment_var):
         if str(data.dtypes[v]) == "category":
+            print(f"CATEGORICAL TREATMENT {v}")
             assert isinstance(
                 control_val[i], Hashable
             ), f"Categorical control value {control_val[i]} must be hashable."
@@ -428,8 +429,11 @@ def estimate_effect(
         control_value=control_val[0],
         confidence_intervals=confidence_intervals,
         method_name=method_name,
+        effect_modifiers=effect_modifiers,
         **kwargs,
     )
+    print(estimate)
+    print(estimate.estimator.model.summary())
 
     return estimate
 

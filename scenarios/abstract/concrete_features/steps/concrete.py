@@ -31,9 +31,12 @@ def step_impl(context, treatment_var, treatment_val):
     context.treatment_val = treatment_val
 
 
-@when("{param}={val}")
-def step_impl(context, param, val):
-    pass
+@when("effect modifier values")
+def step_impl(context):
+    context.effect_modifiers = {
+        row["modifier"]: context.types[row["modifier"]](row["value"])
+        for row in context.table.rows
+    }
 
 
 @then("the {outcome_var} should {change}")
@@ -41,7 +44,12 @@ def step_impl(context, outcome_var, change):
     data = pd.read_csv(f"results/compare_interventions_basic/data.csv")
     data["average_age"] = [avg_age(c) for c in data["location"]]
 
-    causal_effect = estimate_effect(
+    # print(context.effect_modifiers)
+    # for d in context.effect_modifiers:
+    #     data = data.loc[data[d] == float(context.effect_modifiers[d])]
+    # print(data)
+
+    effect_estimate = estimate_effect(
         data,
         context.dag_path.replace("_concrete", ""),
         context.treatment_var,
@@ -49,19 +57,46 @@ def step_impl(context, outcome_var, change):
         context.control_val,
         context.treatment_val,
         identification=True,
-        verbose=False,
+        verbose=True,
         confidence_intervals=True,
+        effect_modifiers=list(context.effect_modifiers),
+        method_name="backdoor.linear_regression",
     )
+    print(effect_estimate)
 
-    ci_low, ci_high = sorted(causal_effect.get_confidence_intervals()[0])
+    # We need to make sure we look at the right conditional estimate
+    # (i.e. from the correct effect modifier bin)
+    value = effect_estimate.value
+    if effect_estimate.conditional_estimates is not None:
+        value = None
+        conditional_estimates = effect_estimate.conditional_estimates.to_dict()
+        for cat, estimate in conditional_estimates.items():
+            assert len(cat) == len(context.effect_modifiers)
+            print(context.effect_modifiers)
+            in_bin = all(
+                [
+                    context.effect_modifiers[name] in interval
+                    for name, interval in zip(context.effect_modifiers, cat)
+                ]
+            )
+            value = estimate
+        assert (
+            value is not None
+        ), f"Effect modifier values {context.effect_modifiers} do not fall in any of the bins\neffect_estimate.conditional_estimates"
+
+    # Confidence intervals not supported yet for effect modifiers
+    confidence_intervals = sorted(
+        effect_estimate.get_confidence_intervals(method="bootstrap")
+    )
+    ci_low = min(confidence_intervals)
+    ci_high = max(confidence_intervals)
+
+    print("effect_estimate:", value)
+    print(f"average {outcome_var}:", data[outcome_var].mean())
 
     if change == "increase":
-        assert (
-            0 < ci_low < causal_effect.value < ci_high
-        ), f"Expected 0 < {ci_low} < {causal_effect.value} < {ci_high}"
+        assert 0 < value, f"Expected an increase, i.e. 0 < {value}"
     elif change == "decrease":
-        assert (
-            0 > ci_high > causal_effect.value > ci_low
-        ), f"Expected 0 > {ci_high} > {causal_effect.value} > {ci_low}"
+        assert 0 > value, f"Expected a decrease 0 > {value}"
     elif change == "remain about the same":
         assert ci_low <= 0 <= ci_high, "Expected 0 to be in range [{ci_low}..{ci_high}]"

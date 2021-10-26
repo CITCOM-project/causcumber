@@ -27,3 +27,7 @@ def before_feature(context, feature):
     context.meta_variables = set()
     context.constraints = {}
     context.background_constraints = set()
+
+
+def before_scenario(context, scenario):
+    context.effect_modifiers = {}

@@ -89,6 +89,13 @@ def step_impl(context, v, upper):
     )
 
 
+@given("{v} > {upper}")
+def step_impl(context, v, upper):
+    add_constraint(
+        context, context.z3_variables.get(v, v) > context.z3_variables.get(upper, upper)
+    )
+
+
 @given("{v1} >= {v2}")
 def step_impl(context, v1, v2):
     add_constraint(
@@ -103,7 +110,9 @@ def step_impl(context, parameter):
 
 @when(u"have the effect modifiers")
 def step_impl(context):
-    context.effect_modifiers = [row["effect_modifier"] for row in context.table]
+    context.effect_modifiers = [
+        context.z3_variables[row["effect_modifier"]] for row in context.table
+    ]
 
 
 @then("the {output} should {change}")
@@ -114,5 +123,6 @@ def step_impl(context, output, change):
             "treatment_var": context.treatment_var,
             "outcome_var": output,
             "expected_change": change,
+            "effect_modifiers": context.effect_modifiers,
         }
     )
