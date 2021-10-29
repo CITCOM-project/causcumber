@@ -2,53 +2,53 @@ digraph "" {
 	graph [newrank=True,
 		rankdir=LR
 	];
-	subgraph cluster_inputs {
-		graph [label="Model inputs"];
-		asymp_prob;
-		pop_infected;
-		location;
-		asymp_quar_prob;
-		average_age;
-		pop_size;
-		symp_quar_prob;
-		quar_period;
-		trace_probs;
-		n_days;
-		symp_prob;
-	}
 	subgraph cluster_outputs {
 		graph [label="Model outputs"];
-		cum_quarantined;
 		cum_deaths;
-		cum_tests;
+		cum_quarantined;
 		cum_infections;
+		cum_tests;
 	}
-	asymp_prob -> cum_tests;
-	pop_infected -> cum_quarantined;
-	pop_infected -> cum_tests;
-	pop_infected -> cum_infections;
-	location -> average_age;
-	asymp_quar_prob -> cum_tests;
-	average_age -> cum_quarantined;
-	average_age -> cum_deaths;
-	average_age -> cum_tests;
-	average_age -> cum_infections;
-	pop_size -> cum_quarantined;
-	pop_size -> cum_tests;
-	pop_size -> cum_infections;
-	symp_quar_prob -> cum_tests;
-	quar_period -> cum_quarantined;
-	quar_period -> cum_tests;
-	quar_period -> cum_infections;
+	subgraph cluster_inputs {
+		graph [label="Model inputs"];
+		symp_prob;
+		trace_probs;
+		symp_quar_prob;
+		location;
+		asymp_quar_prob;
+		pop_size;
+		pop_infected;
+		quar_period;
+		n_days;
+		asymp_prob;
+		average_age;
+	}
+	symp_prob -> cum_tests;
 	trace_probs -> cum_quarantined;
 	trace_probs -> cum_tests;
-	n_days -> cum_quarantined;
+	symp_quar_prob -> cum_tests;
+	location -> average_age;
+	asymp_quar_prob -> cum_tests;
+	pop_size -> cum_quarantined;
+	pop_size -> cum_infections;
+	pop_size -> cum_tests;
+	pop_infected -> cum_quarantined;
+	pop_infected -> cum_infections;
+	pop_infected -> cum_tests;
+	quar_period -> cum_quarantined;
+	quar_period -> cum_infections;
+	quar_period -> cum_tests;
 	n_days -> cum_deaths;
-	n_days -> cum_tests;
+	n_days -> cum_quarantined;
 	n_days -> cum_infections;
-	symp_prob -> cum_tests;
+	n_days -> cum_tests;
+	asymp_prob -> cum_tests;
+	average_age -> cum_deaths;
+	average_age -> cum_quarantined;
+	average_age -> cum_infections;
+	average_age -> cum_tests;
 	cum_quarantined -> cum_infections;
+	cum_infections -> cum_deaths;
 	cum_tests -> cum_quarantined;
 	cum_tests -> cum_infections;
-	cum_infections -> cum_deaths;
 }

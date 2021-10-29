@@ -57,6 +57,10 @@ Feature: Compare interventions basic
     And 0 <= asymp_quar_prob <= 1
     And 0 <= trace_probs <= 1
     And average_age = average_ages(location)
+    And pop_size in [10000, 20000]
+    And quar_period in [5, 14, 20]
+    And n_days in [60, 120]
+    And asymp_prob in [0.01, 0.05]
 
   # TODO: this is a bit clunky. It might not be  reasonable to assume that a
   # domain expert would be able to list all edges that wouldn’t be present
@@ -91,7 +95,7 @@ Feature: Compare interventions basic
 
   # This is controlled entirely by location, so we want to do at least two locations with different average ages
   # Do we want to run it for every country?
-  @skip
+  @average_age
   Scenario Outline: average_age
     # At the moment, these preconditions correspond to generators rather than filters for the data
     # We might potentially want to filter the data going off into CI to where this holds
@@ -103,6 +107,10 @@ Feature: Compare interventions basic
     When we increase the average_age
     And have the effect modifiers
     | effect_modifier |
+    | n_days          |
+    | quar_period     |
+    | pop_size        |
+    | pop_infected    |
     | symp_prob       |
     | asymp_prob      |
     | symp_quar_prob  |
@@ -111,26 +119,24 @@ Feature: Compare interventions basic
     Then the <output> should <change>
     # Age does have a direct effect on the cum_deaths since older folks are more likely to die from the disease
     Examples:
+    # For some reason, the behaviour of cum_tests changes depending on asymp_prob
+    # For higher values (>0.5), it flips from decreasing to increasing the number of tests
     | output          | change   |
-    | cum_tests       | increase |
+    | cum_tests       | decrease |
     | cum_quarantined | decrease |
     | cum_infections  | decrease |
     | cum_deaths      | increase |
 
-  Bare minimum two runs where 0 <= quar_period 14
-  Probably want to do 0-x1 and x1-14 by BVA
-  @skip
+  # Bare minimum two runs where 0 <= quar_period 14
+  # Probably want to do 0-x1 and x1-14 by BVA
+  @quar_period_short
   Scenario Outline: quar_period
-  # Again, these are generators not filters.
-    Given quar_period <= 14
-    And symp_prob > 0.5
-    And asymp_prob > 0.5
-    And symp_quar_prob > 0.5
-    And asymp_quar_prob > 0.5
-    And trace_probs > 0.5
     When we increase the quar_period
     And have the effect modifiers
     | effect_modifier |
+    | n_days          |
+    | pop_size        |
+    | pop_infected    |
     | symp_prob       |
     | asymp_prob      |
     | symp_quar_prob  |
@@ -152,55 +158,160 @@ Feature: Compare interventions basic
     # so the cumulative nature of the variable will have more of an effect
     Examples:
     | output          | change          | comment                                                                            |
-    | cum_tests       | decrease        | Longer quarantine means fewer cases means fewer tests                              |
+    | cum_tests       | remain the same |                                                                                    |
     | cum_quarantined | decrease        | Longer quarantine means fewer cases means fewer quarantine                         |
     | cum_infections  | decrease        | Longer quarantine means less chance of infected individuals passing on the disease |
     | cum_deaths      | remain the same | No direct causal effect, only via cum_infections                                   |
 
-  # Bare minimum two runs where 14 <= quar_period
-  # Probably just want to do 14-x1 by uniformity
-  Scenario Outline: Finite quar_period returns
-    Given quar_period > 14
-    And symp_prob > 0.5
-    And asymp_prob > 0.5
-    And symp_quar_prob > 0.5
-    And asymp_quar_prob > 0.5
-    And trace_probs > 0.5
-    When we increase the quar_period
+  # For each prob, bare minimum two runs between 0 and 1
+  # Probably want to do 0-x1 and x2-1 by BVA
+  # These probs are effect modifiers of each other
+  @symp_prob
+  Scenario: symp_prob
+    Given symp_prob > 0
+    And asymp_prob > 0
+    And symp_quar_prob > 0
+    And asymp_quar_prob > 0
+    And trace_probs > 0
+    # We only actually need this for cum_quarantined since people are only quarantined when trace_probs > 0
+    When we increase the symp_prob
     And have the effect modifiers
     | effect_modifier |
-    | symp_prob       |
+    | n_days          |
+    | quar_period     |
+    | pop_size        |
+    | pop_infected    |
     | asymp_prob      |
     | symp_quar_prob  |
     | asymp_quar_prob |
     | trace_probs     |
-    Then the <output> should remain about the same
-    # Once we get beyond the runtime of the disease, we stop gaining benefit from increasing the quarantine period
-    Examples:
-    | output          |
-    | cum_quarantined |
-    | cum_infections  |
-    | cum_deaths      |
-
-  @skip
-  Scenario: Finite quar_period returns
-    Given quar_period > 14
-    When we increase the quar_period
-    And have the effect modifiers
-    | effect_modifier |
-    | symp_prob       |
-    | asymp_prob      |
-    | symp_quar_prob  |
-    | asymp_quar_prob |
-    | trace_probs     |
+    # increasing the probability means more infected people get tested -> fewer cases passed on -> fewer people get tested
     Then the cum_tests should decrease
-    # This is because people only test at beginning/end of quarantine
+    # Higher probability of testing means more infected people will be found so more people are quarantined
+    And the cum_quarantined should decrease
+    # More tests -> more quarantined -> fewer cases
+    And the cum_infections should decrease
+    # No direct effect, only via cum_infections
+    And the cum_deaths should remain the same
+
+  # For each prob, bare minimum two runs between 0 and 1
+  # Probably want to do 0-x1 and x2-1 by BVA
+  # These probs are effect modifiers of each other
+  @asymp_prob
+  Scenario: asymp_prob
+    Given trace_probs > 0
+    When we increase the asymp_prob
+    And have the effect modifiers
+    | effect_modifier |
+    | n_days          |
+    | quar_period     |
+    | pop_size        |
+    | pop_infected    |
+    | symp_prob       |
+    | symp_quar_prob  |
+    | asymp_quar_prob |
+    | trace_probs     |
+    # increasing the probability means more asymptomatic people get tested -> more tests
+    Then the cum_tests should increase
+    # Higher probability of testing means more infected people will be found so more people are quarantined
+    And the cum_quarantined should decrease
+    # More tests -> more quarantined -> fewer cases
+    And the cum_infections should decrease
+    # No direct effect, only via cum_infections
+    And the cum_deaths should remain the same
+
+  # For each prob, bare minimum two runs between 0 and 1
+  # Probably want to do 0-x1 and x2-1 by BVA
+  # These probs are effect modifiers of each other
+  @symp_quar_prob
+  Scenario: symp_quar_prob
+    Given trace_probs > 0
+    When we increase the symp_quar_prob
+    And have the effect modifiers
+    | effect_modifier |
+    | n_days          |
+    | quar_period     |
+    | pop_size        |
+    | pop_infected    |
+    | symp_prob       |
+    | asymp_prob      |
+    | asymp_quar_prob |
+    | trace_probs     |
+    # increasing the probably means more infected people get tested -> fewer cases passed on -> fewer people get tested
+    Then the cum_tests should decrease
+    # Higher probability of testing means more infected people will be found so more people are quarantined
+    And the cum_quarantined should decrease
+    # More tests -> more quarantined -> fewer cases
+    And the cum_infections should decrease
+    # No direct effect, only via cum_infections
+    And the cum_deaths should remain the same
+
+  # For each prob, bare minimum two runs between 0 and 1
+  # Probably want to do 0-x1 and x2-1 by BVA
+  # These probs are effect modifiers of each other
+  @asymp_quar_prob
+  Scenario: asymp_quar_prob
+    Given trace_probs > 0
+    When we increase the asymp_quar_prob
+    And have the effect modifiers
+    | effect_modifier |
+    | n_days          |
+    | quar_period     |
+    | pop_size        |
+    | pop_infected    |
+    | symp_prob       |
+    | asymp_prob      |
+    | symp_quar_prob  |
+    | trace_probs     |
+    # increasing the probably means more asymptomatic people get tested -> more tests
+    Then the cum_tests should increase
+    # Higher probability of testing means more infected people will be found so more people are quarantined
+    And the cum_quarantined should decrease
+    # More tests -> more quarantined -> fewer cases
+    And the cum_infections should decrease
+    # No direct effect, only via cum_infections
+    And the cum_deaths should remain the same
+
+  # For each prob, bare minimum two runs between 0 and 1
+  # Probably want to do 0-x1 and x2-1 by BVA
+  # These probs are effect modifiers of each other
+  @trace_probs
+  Scenario: trace_probs
+    When we increase the trace_probs
+    And have the effect modifiers
+    | effect_modifier |
+    | n_days          |
+    | quar_period     |
+    | pop_size        |
+    | pop_infected    |
+    | symp_prob       |
+    | asymp_prob      |
+    | symp_quar_prob  |
+    | asymp_quar_prob |
+    # increasing the probabilities means more people get tested -> fewer cases passed on -> fewer people get tested
+    Then the cum_tests should decrease
+    # Higher probability of testing means more infected people will be found less people need to quarantine
+    And the cum_quarantined should decrease
+    # More tests -> more quarantined -> fewer cases
+    And the cum_infections should decrease
+    # No direct effect, only via cum_infections
+    And the cum_deaths should remain the same
 
   # Bare minimum two runs where 60 <= n_days <= 365
   # Probably want to do min-x1 and x2-max by BVA
-  @skip
+  @n_days
   Scenario Outline: n_days
     When we increase the n_days
+    And have the effect modifiers
+    | effect_modifier |
+    | quar_period     |
+    | pop_size        |
+    | pop_infected    |
+    | symp_prob       |
+    | asymp_prob      |
+    | symp_quar_prob  |
+    | asymp_quar_prob |
+    | trace_probs     |
     Then the <output> should increase
     Examples:
     | output          |
@@ -211,9 +322,19 @@ Feature: Compare interventions basic
 
   # Bare minimum two runs where 0 < pop_size
   # Probably want to do min-x1 and x2-max by BVA
-  @skip
+  @pop_size
   Scenario Outline: pop_size
     When we increase the pop_size
+    And have the effect modifiers
+    | effect_modifier |
+    | n_days          |
+    | quar_period     |
+    | pop_infected    |
+    | symp_prob       |
+    | asymp_prob      |
+    | symp_quar_prob  |
+    | asymp_quar_prob |
+    | trace_probs     |
     Then the <output> should increase
     Examples:
     | output          |
@@ -224,9 +345,19 @@ Feature: Compare interventions basic
 
   # Bare minimum two runs where pop_infected <= pop_size
   # Probably want to do pop_infected=pop_size (by BVA) and pop_infected < pop_size
-  @skip
+  @pop_infected
   Scenario Outline: pop_infected
     When we increase the pop_infected
+    And have the effect modifiers
+    | effect_modifier |
+    | n_days          |
+    | quar_period     |
+    | pop_size        |
+    | symp_prob       |
+    | asymp_prob      |
+    | symp_quar_prob  |
+    | asymp_quar_prob |
+    | trace_probs     |
     Then the <output> should <change>
     Examples:
     | output          | change          | comment                                   |
@@ -234,25 +365,3 @@ Feature: Compare interventions basic
     | cum_quarantined | increase        | More people to quarantine                 |
     | cum_infections  | increase        | More people to get the disease            |
     | cum_deaths      | remain the same | No direct effect, only via cum_infections |
-
-  # For each prob, bare minimum two runs between 0 and 1
-  # Probably want to do 0-x1 and x2-1 by BVA
-  # These probs are effect modifiers of each other
-  @skip
-  Scenario Outline: probs
-    When we increase the <prob>
-    # increasing the probabilities means more people get tested (even trace_probs because traced people then get a test)
-    Then the cum_tests should increase
-    # Higher probability of testing means more infected people will be found so more people are quarantined
-    And the cum_quarantined should increase
-    # More tests -> more quarantined -> fewer cases
-    And the cum_infections should decrease
-    # No direct effect, only via cum_infections
-    And the cum_deaths should remain the same
-    Examples:
-    | prob            |
-    | symp_prob       |
-    | asymp_prob      |
-    | symp_quar_prob  |
-    | asymp_quar_prob |
-    | trace_probs     |

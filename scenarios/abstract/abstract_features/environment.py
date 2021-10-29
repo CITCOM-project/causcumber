@@ -80,16 +80,6 @@ def before_step(context, step):
     context.background_step = step in context.feature.background.steps
 
 
-def mk_solver(named_assertions, anon_assertions):
-    s = z3.Solver()
-    for constraint in anon_assertions:
-        s.add(constraint)
-    for name, constraint in named_assertions.items():
-        s.assert_and_track(constraint, name)
-    assert s.check() == z3.sat, f"Unsatisfiable solver with core {s.unsat_core()}"
-    return s
-
-
 def cast(val):
     if isinstance(val, z3.IntNumRef):
         return val.as_long()
@@ -109,56 +99,25 @@ def fresh(context, treatment_var):
 
 
 def mk_test_case(
-    solver, hard_constraints, soft_constraints, scenario, treatment_var, treatment_vars
-):
-    solver.push()
-    for i, constraint in enumerate(hard_constraints):
-        solver.assert_and_track(constraint, f"{scenario}_{i}")
-        solver.assert_and_track(
-            z3.substitute(constraint, *treatment_vars.items()), f"{scenario}_{i}"
-        )
-
-    for c in soft_constraints:
-        solver.add_soft(c)
-
-    # Get the treatment model
-    solver.assert_and_track(treatment_vars[treatment_var] > treatment_var, "Treatment")
-    assert solver.check() == z3.sat, f"Unsatisfiable treatment {scenario}_{i}"
-
-    model = solver.model()
-
-    # if background == {}:
-    #     background = {
-    #         context.z3_variables[str(k)]: cast(model[k])
-    #         for k in model
-    #         if str(k) in context.types
-    #     }
-
-    control_run = {param: cast(model[param]) for param in treatment_vars.keys()}
-    # if control_run not in runs:
-    #     runs.append(control_run)
-    treatment_run = {param: cast(model[param]) for param in treatment_vars.values()}
-    # if treatment_run not in runs:
-    #     runs.append(treatment_run)
-    return control_run, treatment_run
-
-
-def mk_test_case(
     solver, hard_constraints, scenario, treatment_vars, background, treatment_var
 ):
     solver.push()
     for i, constraint in enumerate(hard_constraints):
-        solver.assert_and_track(constraint, f"{scenario}_{i}")
-        solver.assert_and_track(
-            z3.substitute(constraint, *treatment_vars.items()), f"{scenario}_{i}"
-        )
+        solver.add(constraint)
+        solver.add(z3.substitute(constraint, *treatment_vars.items()))
+        assert (
+            solver.check() == z3.sat
+        ), f"Unsatisfiable treatment for {scenario}_{i}\n {solver}"
 
     for k, v in background.items():
-        solver.add_soft(k == v)
+        if str(k) != str(treatment_var):
+            solver.add_soft(k == v)
 
     # Get the treatment model
     solver.assert_and_track(treatment_vars[treatment_var] > treatment_var, "Treatment")
-    assert solver.check() == z3.sat, f"Unsatisfiable treatment {scenario}_{i}"
+    assert (
+        solver.check() == z3.sat
+    ), f"Satisfiability {solver.check()} for {scenario}_{i}\n{solver}\nJust added {treatment_vars[treatment_var] > treatment_var}"
 
     model = solver.model()
 
@@ -175,7 +134,8 @@ def indent(txt, spaces=4):
 
 
 def format_scenario(test, name, treatment_var, control_run, treatment_run, background):
-    scenario = f"  Scenario: {name}\n"
+    scenario = f"  @{to_snake_case(name.strip().replace('@', '').replace('--', '').replace('.', '_').replace('__', '_'))}\n"
+    scenario += f"  Scenario: {name}\n"
     scenario += f"    Given we run the model with {treatment_var}={control_run[treatment_var]}\n"
     scenario += f"    When we run the model with {test['treatment_var']}={treatment_run[treatment_var]}\n"
     if test["effect_modifiers"] != []:
@@ -237,25 +197,28 @@ def after_feature(context, feature):
     assert solver.check() == z3.sat, "Inconsistent background constraints"
 
     for k, v in treatment_vars.items():
-        solver.add_soft(k == v)
+        solver.add_soft(k == v, weight=2)
 
     background = {}
     tests = []
+    modifiers = []
     runs = []
 
-    scenarios = []
     for t in context.concrete_tests:
         scenario = t["scenario"]
         treatment_var = context.z3_variables[t["treatment_var"]]
+        constraints = context.constraints[scenario]
 
         # Cheekily add an extra element to imitate a `do while` loop with a for...in
         # @Bob, is there a better way?
         effect_modifiers = [None] + t["effect_modifiers"]
 
         for modifier in effect_modifiers:
-            constraints = context.constraints[scenario]
+            solver.push()
             if modifier is not None:
-                constraints.add(modifier != background[modifier])
+                solver.assert_and_track(
+                    modifier != background[modifier], f"modifier_{modifier}"
+                )
 
             control_run, treatment_run = mk_test_case(
                 solver,
@@ -265,6 +228,7 @@ def after_feature(context, feature):
                 background,
                 treatment_var,
             )
+            solver.pop()
 
             if background == {}:
                 background = control_run
@@ -274,18 +238,10 @@ def after_feature(context, feature):
             if treatment_run not in runs:
                 runs.append({str(k): v for k, v in treatment_run.items()})
 
-            name = scenario.strip()
-            scenarios.append(name)
-            tests.append(
-                format_scenario(
-                    t,
-                    f"{name}.{scenarios.count(name)}",
-                    treatment_var,
-                    control_run,
-                    treatment_run,
-                    background,
-                )
-            )
+            test = (t, treatment_var, control_run, treatment_run, background)
+            if test not in tests:
+                tests.append(test)
+                modifiers.append(modifier)
 
     feature_background = [
         (str(name), context.types[str(name)].__name__, str(val))
@@ -297,12 +253,29 @@ def after_feature(context, feature):
         for output in sorted(list(context.outputs))
     ]
 
+    assert len(modifiers) == len(tests)
     output_feature_file(
         f"concrete_features/{context.feature_name}_concrete_new.feature",
         feature.name,
         feature_background,
         feature_outputs,
-        tests,
+        [
+            format_scenario(
+                t,
+                f"{t['scenario'].strip()}.{modifier}",
+                treatment_var,
+                control_run,
+                treatment_run,
+                background,
+            )
+            for modifier, (
+                t,
+                treatment_var,
+                control_run,
+                treatment_run,
+                background,
+            ) in zip(modifiers, tests)
+        ],
     )
 
     pd.DataFrame(runs).to_csv(

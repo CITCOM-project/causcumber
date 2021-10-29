@@ -27,12 +27,21 @@ def add_constraint(context, constraint):
         context.constraints[context.scenario.name].add(constraint)
 
 
+def fold_in(var, lst):
+    return fold(lambda acc, x: z3.Or(acc, x), [var == e for e in lst], False)
+
+
+@given("{v1} in [{set}]")
+def step_impl(context, v1, set):
+    folded = fold_in(
+        context.z3_variables[v1], [context.types[v1](x) for x in set.split(",")]
+    )
+    add_constraint(context, folded)
+
+
 @given("{v1} in {set}")
 def step_impl(context, v1, set):
-    v2 = covasim_age_data
-    folded = fold(
-        lambda acc, x: z3.Or(acc, x), [context.z3_variables[v1] == e for e in v2], False
-    )
+    folded = fold_in(context.z3_variables[v1], covasim_age_data)
     add_constraint(context, folded)
 
 
@@ -79,6 +88,14 @@ def step_impl(context, lower, v, upper):
     )
     add_constraint(
         context, context.z3_variables.get(v, v) < context.z3_variables.get(upper, upper)
+    )
+
+
+@given("{lower} <= {v}")
+def step_impl(context, lower, v):
+    add_constraint(
+        context,
+        context.z3_variables.get(lower, lower) <= context.z3_variables.get(v, v),
     )
 
 

@@ -1,11 +1,22 @@
 import covasim as cv
 import pandas as pd
 
-runs = pd.read_csv("results/compare_interventions_basic/runs.csv", index_col=0)
+import sys
+
+runs = pd.read_csv("results/compare_interventions_basic/data.csv", index_col=0)
+outfile = "results/compare_interventions_basic/data.csv"
+if len(sys.argv) > 1:
+    runs = pd.read_csv(
+        f"results/compare_interventions_basic/{sys.argv[1]}.csv", index_col=0
+    )
+    outfile = f"results/compare_interventions_basic/{sys.argv[1]}.csv"
+
 
 desired_outputs = ["cum_tests", "cum_quarantined", "cum_infections", "cum_deaths"]
 
 all_runs = []
+n_runs = 1
+
 for _, run in runs.iterrows():
     testing = cv.test_prob(
         symp_prob=run["symp_prob"],
@@ -17,7 +28,7 @@ for _, run in runs.iterrows():
     run_params = {k: run[k] for k in run.to_dict() if "_prob" not in k}
     sim = cv.Sim(interventions=[testing, tracing], pop_type="hybrid", **run_params)
     msim = cv.MultiSim(sim)
-    msim.run(n_runs=30, verbose=0)
+    msim.run(n_runs=n_runs, verbose=0)
     results = {k: [] for k in desired_outputs}
     results["quar_period"] = []
     for sim in msim.sims:
@@ -35,6 +46,6 @@ for _, run in runs.iterrows():
 
     data = pd.DataFrame(results)
     for k, v in run.items():
-        data[k] = [v for _ in range(30)]
+        data[k] = [v for _ in range(n_runs)]
     all_runs.append(data)
-pd.concat(all_runs).to_csv("results/compare_interventions_basic/data.csv")
+pd.concat(all_runs).to_csv(outfile)
