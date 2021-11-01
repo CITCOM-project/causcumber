@@ -54,14 +54,6 @@ Builder.load_string('''
 class displayResult(ScrollView):
     text = StringProperty('')
 
-#class selectFile(BoxLayout):
-    #def open(self, path, filename):
-        #with open(os.path.join(path, filename[0])) as f:
-            #print (f.read())
-
-    #def selected(self, filename):
-        #print ("selected: %s" % filename[0])
-
 class LoadDialog(FloatLayout):
     load = ObjectProperty(None)
     cancel = ObjectProperty(None)
@@ -74,7 +66,6 @@ class main(App):
     def __init__(self,**kwargs):
         super(main,self).__init__(**kwargs)
         os.chdir('compare_interventions')
-        os.system('behave features/compare_interventions.feature --format json --outfile results.json')
 
     def build(self):
 
@@ -123,24 +114,26 @@ class main(App):
         return Layout
 
     def update(self, userInput):
-        json_file = open("results.json")
-        outputs = json.load(json_file)
-        json_file.close()      
-        
-        # Convert json to string
-        data = json.dumps(outputs)
-        result = data
-        split_data = data.split()
-        result = ""
-        word_count = 0
-        for split_data in split_data:
-            result += split_data + " "
-            word_count += 1
-            if word_count == 6 or "." in split_data:
-                result += "\n"
-                word_count = 0
+        if os.path.isfile("results.json") == True:
+            json_file = open("results.json")
+            outputs = json.load(json_file)
+            json_file.close()    
+            # Convert json to string
+            data = json.dumps(outputs)
+            result = data
+            split_data = data.split()
+            result = ""
+            word_count = 0
+            for split_data in split_data:
+                result += split_data + " "
+                word_count += 1
+                if word_count == 6 or "." in split_data:
+                    result += "\n"
+                    word_count = 0
 
-        self.display_result.text = result
+            self.display_result.text = result
+        else:
+            self.display_result.text = "Please select a feature file"      
 
     def save_file(self, instance):
         parameter_input1 = self.input1.text
