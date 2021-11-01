@@ -1,6 +1,7 @@
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
@@ -8,6 +9,9 @@ from kivy.uix.scrollview import ScrollView
 from kivy.lang import Builder
 from kivy.properties import StringProperty
 from kivy.core.window import Window
+from kivy.factory import Factory
+from kivy.properties import ObjectProperty
+from kivy.uix.popup import Popup
 
 import os
 import json
@@ -17,23 +21,55 @@ Config.set('graphics', 'height', '700')
 Config.write()
 
 Builder.load_string('''
-<ScrolllabelLabel>:
+<displayResult>:
     Label:
         text: root.text
         font_size: 15
         text_size: self.width, None
         size_hint_y: None
         height: self.texture_size[1]
+<LoadDialog>:
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserListView:
+            id: filechooser
+            path: "C:/dissertation/causcumber/scenarios/compare_interventions/features"
 
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Load"
+                on_release: root.load(filechooser.path, filechooser.selection)
+        
 ''')
 
 
-class ScrolllabelLabel(ScrollView):
+class displayResult(ScrollView):
     text = StringProperty('')
+
+#class selectFile(BoxLayout):
+    #def open(self, path, filename):
+        #with open(os.path.join(path, filename[0])) as f:
+            #print (f.read())
+
+    #def selected(self, filename):
+        #print ("selected: %s" % filename[0])
+
+class LoadDialog(FloatLayout):
+    load = ObjectProperty(None)
+    cancel = ObjectProperty(None)
 
 class main(App):
 
     created_file = []
+    loadfile = ObjectProperty(None)
 
     def __init__(self,**kwargs):
         super(main,self).__init__(**kwargs)
@@ -51,11 +87,13 @@ class main(App):
         displayLayout = GridLayout(cols=2,  width="600dp")
 
         resultLayout = GridLayout(cols=1,  width="600dp")
-        self.placeholder = Label(text='placeholder', size_hint=(1, 0.1)) # Choose feature file to run
-        resultLayout.add_widget(self.placeholder) 
+        self.select_feature_file = Button(text='Select feature file', size_hint=(1, 0.1)) # Choose feature file to run
+        self.select_feature_file.bind(on_press=self.show_load)
+        #self.select_feature_file = selectFile()
+        resultLayout.add_widget(self.select_feature_file) 
         self.Result = Label(text='Result', size_hint=(1, 0.1)) # Title
         resultLayout.add_widget(self.Result)
-        self.display_result = ScrolllabelLabel(text='') # Display result
+        self.display_result = displayResult(text='') # Display result
         resultLayout.add_widget(self.display_result)    
         displayLayout.add_widget(resultLayout) 
 
@@ -114,6 +152,24 @@ class main(App):
         f.write(parameter_input1 + parameter_input2)
         f.close()
         os.chdir('..')
+
+    def dismiss_popup(self):
+        self._popup.dismiss()
+
+    def show_load(self, instance):
+        content = LoadDialog(load=self.load, cancel=self.dismiss_popup)
+        self._popup = Popup(title="Load file", content=content,
+                            size_hint=(0.9, 0.9))
+        self._popup.open()
+
+    def load(self, path, filename):
+        filename = filename[0].replace('C:\\dissertation\\causcumber\\scenarios\\compare_interventions\\features\\', '')
+        file = open("results.json","w")
+        file.close()
+        print("File cleaned")
+        behave_cmd = "behave features/"+ filename + " --format json --outfile results.json"
+        os.system(behave_cmd)       
+        self.dismiss_popup()
     
     def on_request_close(self, instance):  #remove results.json and other feature file created when closing the program
         os.remove("results.json")
@@ -123,4 +179,5 @@ class main(App):
         os.chdir('..')
         print("Closing")
 
+Factory.register('LoadDialog', cls=LoadDialog)
 main().run()
