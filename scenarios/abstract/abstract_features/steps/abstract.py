@@ -141,5 +141,6 @@ def step_impl(context, output, change):
             "outcome_var": output,
             "expected_change": change,
             "effect_modifiers": context.effect_modifiers,
+            "tags": context.scenario.tags,
         }
     )

@@ -135,6 +135,7 @@ def indent(txt, spaces=4):
 
 def format_scenario(test, name, treatment_var, control_run, treatment_run, background):
     scenario = f"  @{to_snake_case(name.strip().replace('@', '').replace('--', '').replace('.', '_').replace('__', '_'))}\n"
+    scenario += "  @" + "\n  @".join(test["tags"]) + "\n"
     scenario += f"  Scenario: {name}\n"
     scenario += f"    Given we run the model with {treatment_var}={control_run[treatment_var]}\n"
     scenario += f"    When we run the model with {test['treatment_var']}={treatment_run[treatment_var]}\n"
@@ -203,6 +204,9 @@ def after_feature(context, feature):
     tests = []
     modifiers = []
     runs = []
+
+    with open("background.smt2", "w") as f:
+        print(solver.sexpr(), file=f)
 
     for t in context.concrete_tests:
         scenario = t["scenario"]

@@ -12,6 +12,7 @@ sys.path.append("../../../")  # This one's for running `behave` in `features`
 sys.path.append("../../")  # This one's for running `behave` in `compare-inverventions`
 
 from covasim_utils import avg_age
+import numpy as np
 
 
 use_step_matcher("parse")
@@ -39,9 +40,18 @@ def step_impl(context):
     }
 
 
+def choose_bin(bins, b, types):
+    b = [t(x) for t, x in zip(types, b.split(","))]
+    bins = [[t(x) for t, x in zip(types, bb.split(","))] for bb in bins]
+    distances = [np.linalg.norm(np.array(a) - np.array(b)) for a in bins]
+    best_bin = min(zip(bins, distances), key=lambda x: x[1])[0]
+    print("Best bin", best_bin)
+    return ",".join([str(x) for x in best_bin])
+
+
 @then("the {outcome_var} should {change}")
 def step_impl(context, outcome_var, change):
-    data = pd.read_csv(f"results/compare_interventions_basic/combinations.csv")
+    data = pd.read_csv(f"results/compare_interventions_basic/all_combinations.csv")
     data["average_age"] = [avg_age(c) for c in data["location"]]
 
     assert (
@@ -72,7 +82,8 @@ def step_impl(context, outcome_var, change):
                 for x in data[context.effect_modifiers].columns
             ]
         )
-        assert bin_of_interest in bins, "Bin of interest not in bins"
+        # assert bin_of_interest in bins, "Bin of interest not in bins"
+
         effect_estimate = estimate_effect(
             data,
             context.dag_path.replace("_concrete", ""),
@@ -88,7 +99,21 @@ def step_impl(context, outcome_var, change):
         )
         print(effect_estimate)
 
-        value = effect_estimate.conditional_estimates[bin_of_interest]
+        value = effect_estimate.conditional_estimates[
+            choose_bin(
+                bins,
+                bin_of_interest,
+                [context.types[t] for t in data[context.effect_modifiers].columns],
+            )
+        ]
+        print("\n")
+        print(f"treatment_var = '{context.treatment_var}'")
+        print(f"outcome_var = '{outcome_var}'")
+        print(f"control_value = {context.control_val}")
+        print(f"treatment_value = {context.treatment_val}")
+        print("effect_modifiers =", context.effect_modifiers)
+        print("\n")
+
     else:
         effect_estimate = estimate_effect(
             data,

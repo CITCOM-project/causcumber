@@ -15,15 +15,16 @@ if len(sys.argv) > 1:
 desired_outputs = ["cum_tests", "cum_quarantined", "cum_infections", "cum_deaths"]
 
 all_runs = []
-n_runs = 1
+n_runs = 30
 
-for _, run in runs.iterrows():
+for i, run in runs.iterrows():
     testing = cv.test_prob(
         symp_prob=run["symp_prob"],
         asymp_prob=run["asymp_prob"],
         symp_quar_prob=run["symp_quar_prob"],
         asymp_quar_prob=run["asymp_quar_prob"],
     )
+    print(f"RUN: {i}/{len(runs)}")
     tracing = cv.contact_tracing(trace_probs=run["trace_probs"])
     run_params = {k: run[k] for k in run.to_dict() if "_prob" not in k}
     sim = cv.Sim(interventions=[testing, tracing], pop_type="hybrid", **run_params)
