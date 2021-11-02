@@ -16,7 +16,7 @@ from covasim_utils import avg_age
 covasim_age_data = {
     k: v
     for k, v in covasim.data.country_age_data.data.items()
-    if k in ["UK", "Rwanda", "Japan"]
+    if k in ["Poland", "Niger", "Japan"]
 }
 
 

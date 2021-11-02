@@ -49,9 +49,24 @@ def choose_bin(bins, b, types):
     return ",".join([str(x) for x in best_bin])
 
 
+def bin_data(data, effect_modifiers, num_bins):
+    return pd.DataFrame(
+        {k: pd.cut(data[k], num_bins, include_lowest=True) for k in effect_modifiers}
+    )
+
+
+def assign(datum, assignments):
+    for b, label in assignments.items():
+        if all([di in bi for di, bi in zip(datum, b)]):
+            return label
+    raise ValueError(f"Unable to assign a bin for {datum}")
+
+
 @then("the {outcome_var} should {change}")
 def step_impl(context, outcome_var, change):
-    data = pd.read_csv(f"results/compare_interventions_basic/all_combinations.csv")
+    data = pd.read_csv(
+        f"results/compare_interventions_basic/data/all_combinations_fuzzed_corrected.csv"
+    )
     data["average_age"] = [avg_age(c) for c in data["location"]]
 
     assert (
@@ -68,20 +83,33 @@ def step_impl(context, outcome_var, change):
     # print(data)
 
     if len(context.effect_modifiers) > 0:
-        bins = (
-            data[context.effect_modifiers]
-            .to_csv(header=False, index=False)
-            .strip()
-            .split("\n")
-        )
-        data["bins"] = bins
+        # bins = (
+        #     data[context.effect_modifiers]
+        #     .to_csv(header=False, index=False)
+        #     .strip()
+        #     .split("\n")
+        # )
+        # data["bins"] = bins
+        # bin_of_interest = ",".join(
+        #     [
+        #         str(context.effect_modifiers[x])
+        #         for x in data[context.effect_modifiers].columns
+        #     ]
+        # )
+
+        bins = bin_data(data, context.effect_modifiers, 2)
+        labels, levels = pd.factorize(bins.to_records(index=False))
+        assignments = {level: label for label, level in enumerate(levels)}
+        data["bins"] = labels
+
         data["bins"] = data["bins"].astype("category")
-        bin_of_interest = ",".join(
-            [
-                str(context.effect_modifiers[x])
-                for x in data[context.effect_modifiers].columns
-            ]
-        )
+
+        datum = [
+            context.effect_modifiers[x] for x in data[context.effect_modifiers].columns
+        ]
+        tests = [(bi, [di in bi for di, bi in zip(datum, bi)]) for bi in assignments]
+        bin_of_interest = assignments[max(tests, key=lambda x: sum(x[1]))[0]]
+
         # assert bin_of_interest in bins, "Bin of interest not in bins"
 
         effect_estimate = estimate_effect(
@@ -99,13 +127,15 @@ def step_impl(context, outcome_var, change):
         )
         print(effect_estimate)
 
-        value = effect_estimate.conditional_estimates[
-            choose_bin(
-                bins,
-                bin_of_interest,
-                [context.types[t] for t in data[context.effect_modifiers].columns],
-            )
-        ]
+        value = effect_estimate.conditional_estimates[bin_of_interest]
+
+        # value = effect_estimate.conditional_estimates[
+        #     choose_bin(
+        #         bins,
+        #         bin_of_interest,
+        #         [context.types[t] for t in data[context.effect_modifiers].columns],
+        #     )
+        # ]
         print("\n")
         print(f"treatment_var = '{context.treatment_var}'")
         print(f"outcome_var = '{outcome_var}'")

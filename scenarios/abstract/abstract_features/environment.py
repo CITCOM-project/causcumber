@@ -103,8 +103,11 @@ def mk_test_case(
 ):
     solver.push()
     for i, constraint in enumerate(hard_constraints):
-        solver.add(constraint)
-        solver.add(z3.substitute(constraint, *treatment_vars.items()))
+        solver.assert_and_track(constraint, str(constraint))
+        solver.assert_and_track(
+            z3.substitute(constraint, *treatment_vars.items()),
+            str(z3.substitute(constraint, *treatment_vars.items())),
+        )
         assert (
             solver.check() == z3.sat
         ), f"Unsatisfiable treatment for {scenario}_{i}\n {solver}"
@@ -112,12 +115,18 @@ def mk_test_case(
     for k, v in background.items():
         if str(k) != str(treatment_var):
             solver.add_soft(k == v)
+        assert (
+            solver.check() == z3.sat
+        ), f"Satisfiability {solver.check()} for {scenario}\n{solver}\nJust added {k == v}\nUNSAT core: {solver.unsat_core()}"
 
     # Get the treatment model
-    solver.assert_and_track(treatment_vars[treatment_var] > treatment_var, "Treatment")
+    solver.assert_and_track(
+        treatment_vars[treatment_var] > treatment_var,
+        str(treatment_vars[treatment_var] > treatment_var),
+    )
     assert (
         solver.check() == z3.sat
-    ), f"Satisfiability {solver.check()} for {scenario}_{i}\n{solver}\nJust added {treatment_vars[treatment_var] > treatment_var}"
+    ), f"Satisfiability {solver.check()} for {scenario}\n{solver}\nJust added treatment {treatment_vars[treatment_var] > treatment_var}\nUNSAT core: {solver.unsat_core()}"
 
     model = solver.model()
 
@@ -193,8 +202,11 @@ def after_feature(context, feature):
     }
 
     for b in context.background_constraints:
-        solver.add(b)
-        solver.add(z3.substitute(b, *treatment_vars.items()))
+        solver.assert_and_track(b, str(b))
+        solver.assert_and_track(
+            z3.substitute(b, *treatment_vars.items()),
+            str(z3.substitute(b, *treatment_vars.items())),
+        )
     assert solver.check() == z3.sat, "Inconsistent background constraints"
 
     for k, v in treatment_vars.items():

@@ -49,7 +49,7 @@ Feature: Compare interventions basic
     # two distributions overlap where the pandemic might get going or it might not.
 
     # Must be a valid country
-    And location in covasim.data.country_age_data.data
+    # And location in covasim.data.country_age_data.data
     # Probabilities must be between zero and one
     And 0 <= symp_prob <= 1
     And 0 <= asymp_prob <= 1
@@ -57,10 +57,13 @@ Feature: Compare interventions basic
     And 0 <= asymp_quar_prob <= 1
     And 0 <= trace_probs <= 1
     And average_age = average_ages(location)
+    And average_age > 0
 
-    # And pop_size in [10000, 20000]
+    # Sampling constraints
+    And location in [Niger,Japan]
+    And pop_size in [10000, 20000]
     And quar_period in [5, 14, 20]
-    # And n_days in [60, 120]
+    And n_days in [60, 120]
     And symp_prob in [0.5, 1]
     And asymp_prob in [0.01, 0.05]
     And symp_quar_prob in [0.5, 1]
@@ -104,7 +107,7 @@ Feature: Compare interventions basic
   Scenario Outline: average_age
     # At the moment, these preconditions correspond to generators rather than filters for the data
     # We might potentially want to filter the data going off into CI to where this holds
-    Given pop_size <= 12000
+    # Given pop_size <= 12000
     When we increase the average_age
     And have the effect modifiers
     | effect_modifier |
@@ -122,8 +125,8 @@ Feature: Compare interventions basic
     Examples:
     # For some reason, the behaviour of cum_tests changes depending on asymp_prob
     # For higher values (>0.5), it flips from decreasing to increasing the number of tests
+    # | cum_tests       | decrease |
     | output          | change   |
-    | cum_tests       | decrease |
     | cum_quarantined | decrease |
     | cum_infections  | decrease |
     | cum_deaths      | increase |
