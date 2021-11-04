@@ -1,3 +1,4 @@
+from re import template
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
@@ -93,13 +94,43 @@ class main(App):
         inputLayout.add_widget(self.choose_input_title) 
         self.paremeter1 = Label(text='Parameter 1', size_hint=(1, 0.1)) #modify parameter 1
         inputLayout.add_widget(self.paremeter1) 
-        self.input1 = TextInput(text='', size_hint=(1, 1.0), multiline=False) 
+        self.input1 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
         inputLayout.add_widget(self.input1)
         self.paremeter2 = Label(text='Parameter 2', size_hint=(1, 0.1)) #modify parameter 2
         inputLayout.add_widget(self.paremeter2) 
-        self.input2 = TextInput(text='', size_hint=(1, 1.0), multiline=False) 
-        inputLayout.add_widget(self.input2)   
+        self.input2 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input2)  
+
+        self.paremeter2 = Label(text='quar_period', size_hint=(1, 0.1)) #modify parameter 2
+        inputLayout.add_widget(self.paremeter2) 
+        self.input3 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input3)  
+        self.paremeter2 = Label(text='n_days', size_hint=(1, 0.1)) #modify parameter 2
+        inputLayout.add_widget(self.paremeter2) 
+        self.input4 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input4)  
+        self.paremeter2 = Label(text='pop_type', size_hint=(1, 0.1)) #modify parameter 2
+        inputLayout.add_widget(self.paremeter2) 
+        self.input5 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input5)  
+        self.paremeter2 = Label(text='pop_size', size_hint=(1, 0.1)) #modify parameter 2
+        inputLayout.add_widget(self.paremeter2) 
+        self.input6 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input6)  
+        self.paremeter2 = Label(text='pop_infected', size_hint=(1, 0.1)) #modify parameter 2
+        inputLayout.add_widget(self.paremeter2) 
+        self.input7 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input7)  
+        self.paremeter2 = Label(text='location', size_hint=(1, 0.1)) #modify parameter 2
+        inputLayout.add_widget(self.paremeter2) 
+        self.input8 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input8)  
+        self.paremeter2 = Label(text='interventions', size_hint=(1, 0.1)) #modify parameter 2
+        inputLayout.add_widget(self.paremeter2) 
+        self.input9 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input9)   
         displayLayout.add_widget(inputLayout)
+        
 
         runBehave = Button(text='Run behave', size_hint=(1, 0.1)) # Run update function 
         runBehave.bind(on_press=self.update)
@@ -138,11 +169,31 @@ class main(App):
     def save_file(self, instance):
         parameter_input1 = self.input1.text
         parameter_input2 = self.input2.text
+        parameter_input3 = self.input3.text
+        parameter_input4 = self.input4.text
+        parameter_input5 = self.input5.text
+        parameter_input6 = self.input6.text
+        parameter_input7 = self.input7.text
+        parameter_input8 = self.input8.text
+        parameter_input9 = self.input9.text
         feature_file_name = "compare_" + parameter_input1 + "_" + parameter_input2 + ".feature"    #generate file name based on input
         self.created_file.append(feature_file_name)
         os.chdir('features')
+        file = open("feature_template.txt",encoding="utf-8")
+        template = file.read()
+
+        template = template.replace("[quar_period_place_holder]", parameter_input3)
+        template = template.replace("[n_days_place_holder]", parameter_input4)
+        template = template.replace("[pop_type_place_holder]", "hybrid")
+        template = template.replace("[pop_size_place_holder]", parameter_input6)
+        template = template.replace("[pop_infected_place_holder]", parameter_input7)
+        template = template.replace("[location_place_holder]", "UK")
+        template = template.replace("[interventions_place_holder]", "baseline")
+
+        file.close()
         f = open(feature_file_name, "a")                                                           #generate feature file with input file name
-        f.write(parameter_input1 + parameter_input2)
+        #f.write(parameter_input1 + parameter_input2)       
+        f.write(template)
         f.close()
         os.chdir('..')
 
