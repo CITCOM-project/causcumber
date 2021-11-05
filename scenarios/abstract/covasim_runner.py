@@ -17,8 +17,8 @@ all_runs = []
 n_runs = 2
 
 
-def fuzz(param):
-    if random.choice([True, False]):
+def fuzz(param, prob=0.8):
+    if random.random() > prob:
         return param
     if isinstance(param, str):
         return param

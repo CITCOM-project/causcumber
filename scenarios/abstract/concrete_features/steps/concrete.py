@@ -64,9 +64,7 @@ def assign(datum, assignments):
 
 @then("the {outcome_var} should {change}")
 def step_impl(context, outcome_var, change):
-    data = pd.read_csv(
-        f"results/compare_interventions_basic/data/all_combinations_fuzzed_corrected.csv"
-    )
+    data = pd.read_csv(f"results/compare_interventions_basic/data/fuzzy.csv")
     data["average_age"] = [avg_age(c) for c in data["location"]]
 
     assert (
