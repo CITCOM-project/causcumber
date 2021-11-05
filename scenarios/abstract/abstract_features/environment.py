@@ -295,7 +295,8 @@ def after_feature(context, feature):
     )
 
     pd.DataFrame(runs).to_csv(
-        f"results/{context.feature_name}/runs.csv", columns=sorted(list(context.inputs))
+        f"results/{context.feature_name}/runs/runs.csv",
+        columns=sorted(list(context.inputs)),
     )
 
 
