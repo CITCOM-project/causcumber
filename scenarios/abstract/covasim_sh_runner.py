@@ -12,7 +12,7 @@ import covasim as cv
 import pandas as pd
 
 
-def run_covasim(run_params, n_runs, desired_outputs):
+def run_covasim(run_params, n_runs, desired_outputs, results_file=None):
     all_runs = []
     for i in range(n_runs):
         testing = cv.test_prob(
@@ -49,7 +49,8 @@ def run_covasim(run_params, n_runs, desired_outputs):
             data[k] = [v for _ in range(1)]
         all_runs.append(data)
     data = pd.concat(all_runs).reset_index()
-    data.to_csv(args.results_file[0])
+    if results_file is not None:
+        data.to_csv(results_file)
     return data
 
 
@@ -144,4 +145,4 @@ if __name__ == "__main__":
         if k not in ["desired_outputs", "n_runs", "results_file"]
     }
 
-run_covasim(run_params, args.n_runs[0], args.desired_outputs)
+    run_covasim(run_params, args.n_runs[0], args.desired_outputs, results_file=args.results_file[0])

@@ -10,8 +10,10 @@ import pandas as pd
 import random
 import os
 
+runfile = "runs"
+
 data = pd.read_csv(
-    "results/compare_interventions_basic/runs/latin_hypercube.csv", index_col=0
+    f"results/compare_interventions_basic/runs/{runfile}.csv", index_col=0
 )
 
 
@@ -44,19 +46,19 @@ columns = data.columns
 runs = []
 for i, run in enumerate(
     data.to_records(index=False),
-    start=len(os.listdir("results/compare_interventions_basic/data/hypercube")),
+    start=len(os.listdir(f"results/compare_interventions_basic/data/{runfile}")),
 ):
     assert len(run) == len(columns), "Num args does not match num values"
     args = [f"--{k} {v}" for k, v in zip(columns, run)]
     runs.append(
-        f"python covasim_sh_runner.py --results_file results/compare_interventions_basic/data/hypercube/run_{i}.csv "
+        f"python covasim_sh_runner.py --results_file results/compare_interventions_basic/data/{runfile}/run_{i}.csv "
         + " ".join(args),
     )
 
 
 maxjobs = 6
 
-with open("results/compare_interventions_basic/runs/runs.sh", "w") as f:
+with open(f"results/compare_interventions_basic/runs/{runfile}.sh", "w") as f:
     for i, run in enumerate(runs):
         if i > 0 and i % maxjobs == 0:
             print("wait", file=f)

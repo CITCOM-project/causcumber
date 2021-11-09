@@ -432,8 +432,9 @@ def estimate_effect(
         effect_modifiers=effect_modifiers,
         **kwargs,
     )
-    print(estimate)
-    print(estimate.estimator.model.summary())
+    if verbose:
+        print(estimate)
+        print(estimate.estimator.model.summary())
 
     return estimate
 
