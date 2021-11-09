@@ -1,3 +1,5 @@
+from re import template
+import re
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
@@ -14,7 +16,10 @@ from kivy.properties import ObjectProperty
 from kivy.uix.popup import Popup
 
 import os
-import json
+import io
+#import json
+import xml.etree.ElementTree as ET
+import xml.dom.minidom  
 from kivy.config import Config
 Config.set('graphics', 'width', '1200')
 Config.set('graphics', 'height', '700')
@@ -60,12 +65,15 @@ class LoadDialog(FloatLayout):
 
 class main(App):
 
-    created_file = []
+    created_file_feature = []
+    created_file_xml = []
+    current_file = ""
     loadfile = ObjectProperty(None)
 
     def __init__(self,**kwargs):
         super(main,self).__init__(**kwargs)
         os.chdir('compare_interventions')
+        self.current_File = ""
 
     def build(self):
 
@@ -80,7 +88,6 @@ class main(App):
         resultLayout = GridLayout(cols=1,  width="600dp")
         self.select_feature_file = Button(text='Select feature file', size_hint=(1, 0.1)) # Choose feature file to run
         self.select_feature_file.bind(on_press=self.show_load)
-        #self.select_feature_file = selectFile()
         resultLayout.add_widget(self.select_feature_file) 
         self.Result = Label(text='Result', size_hint=(1, 0.1)) # Title
         resultLayout.add_widget(self.Result)
@@ -93,13 +100,43 @@ class main(App):
         inputLayout.add_widget(self.choose_input_title) 
         self.paremeter1 = Label(text='Parameter 1', size_hint=(1, 0.1)) #modify parameter 1
         inputLayout.add_widget(self.paremeter1) 
-        self.input1 = TextInput(text='', size_hint=(1, 1.0), multiline=False) 
+        self.input1 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
         inputLayout.add_widget(self.input1)
         self.paremeter2 = Label(text='Parameter 2', size_hint=(1, 0.1)) #modify parameter 2
         inputLayout.add_widget(self.paremeter2) 
-        self.input2 = TextInput(text='', size_hint=(1, 1.0), multiline=False) 
-        inputLayout.add_widget(self.input2)   
+        self.input2 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input2)  
+
+        self.paremeter2 = Label(text='quar_period(int)', size_hint=(1, 0.1)) #modify parameter 
+        inputLayout.add_widget(self.paremeter2) 
+        self.input3 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input3)  
+        self.paremeter2 = Label(text='n_days(int)', size_hint=(1, 0.1)) #modify parameter 
+        inputLayout.add_widget(self.paremeter2) 
+        self.input4 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input4)  
+        self.paremeter2 = Label(text='pop_type(str)', size_hint=(1, 0.1)) #modify parameter
+        inputLayout.add_widget(self.paremeter2) 
+        self.input5 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input5)  
+        self.paremeter2 = Label(text='pop_size(int)', size_hint=(1, 0.1)) #modify parameter 
+        inputLayout.add_widget(self.paremeter2) 
+        self.input6 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input6)  
+        self.paremeter2 = Label(text='pop_infected(int)', size_hint=(1, 0.1)) #modify parameter 
+        inputLayout.add_widget(self.paremeter2) 
+        self.input7 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input7)  
+        self.paremeter2 = Label(text='location(str)', size_hint=(1, 0.1)) #modify parameter 
+        inputLayout.add_widget(self.paremeter2) 
+        self.input8 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input8)  
+        self.paremeter2 = Label(text='interventions(str)', size_hint=(1, 0.1)) #modify parameter 
+        inputLayout.add_widget(self.paremeter2) 
+        self.input9 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        inputLayout.add_widget(self.input9)   
         displayLayout.add_widget(inputLayout)
+        
 
         runBehave = Button(text='Run behave', size_hint=(1, 0.1)) # Run update function 
         runBehave.bind(on_press=self.update)
@@ -114,35 +151,73 @@ class main(App):
         return Layout
 
     def update(self, userInput):
-        if os.path.isfile("results.json") == True:
-            json_file = open("results.json")
-            outputs = json.load(json_file)
-            json_file.close()    
-            # Convert json to string
-            data = json.dumps(outputs)
-            result = data
-            split_data = data.split()
+        os.chdir('reports')
+        if bool(self.current_File) == True:
+            tree = ET.parse(self.current_File)
+            root = tree.getroot()
             result = ""
-            word_count = 0
-            for split_data in split_data:
-                result += split_data + " "
-                word_count += 1
-                if word_count == 6 or "." in split_data:
+            for child in root:
+                if child.tag == "testcase":
+                    ertag = child.find("system-out")
+                    cdatatext = ertag.text
+                    printable = False
+                    for item in cdatatext.split("\n"):                       
+                        if item.find("Given a simulation with parameters") != -1:
+                            printable = True
+                        elif item.find("And") != -1:
+                            printable = False
+                        if printable  == True :
+                            result += str(item.strip()) 
+                            result += "\n"
+                        if "Confidence" in item:
+                            result += str(item.strip())
+                            result += "\n"                 
+
+
+                if child.find("error") is not None:
+                    ertag = child.find("error")
+                    cdatatext = ertag.text
+                    result += str(cdatatext)
                     result += "\n"
-                    word_count = 0
+                
+                result += "\n"
+                result += "\n"
+                result += str(child.attrib)
+                result += "\n"
 
             self.display_result.text = result
         else:
-            self.display_result.text = "Please select a feature file"      
+            self.display_result.text = "Please select a feature file"  
+        os.chdir('..')   
+    
 
     def save_file(self, instance):
         parameter_input1 = self.input1.text
         parameter_input2 = self.input2.text
+        parameter_input3 = self.input3.text
+        parameter_input4 = self.input4.text
+        parameter_input5 = self.input5.text
+        parameter_input6 = self.input6.text
+        parameter_input7 = self.input7.text
+        parameter_input8 = self.input8.text
+        parameter_input9 = self.input9.text
         feature_file_name = "compare_" + parameter_input1 + "_" + parameter_input2 + ".feature"    #generate file name based on input
-        self.created_file.append(feature_file_name)
+        self.created_file_feature.append(feature_file_name)
         os.chdir('features')
-        f = open(feature_file_name, "a")                                                           #generate feature file with input file name
-        f.write(parameter_input1 + parameter_input2)
+        file = open("feature_template.txt",encoding="utf-8")
+        template = file.read()
+
+        template = template.replace("[quar_period_place_holder]", parameter_input3)
+        template = template.replace("[n_days_place_holder]", parameter_input4)
+        template = template.replace("[pop_type_place_holder]", "hybrid")
+        template = template.replace("[pop_size_place_holder]", parameter_input6)
+        template = template.replace("[pop_infected_place_holder]", parameter_input7)
+        template = template.replace("[location_place_holder]", "UK")
+        template = template.replace("[interventions_place_holder]", "baseline")
+
+        file.close()
+        f = open(feature_file_name, "a")                                                           #generate feature file with input file name   
+        f.write(template)
         f.close()
         os.chdir('..')
 
@@ -157,19 +232,22 @@ class main(App):
 
     def load(self, path, filename):
         filename = filename[0].replace('C:\\dissertation\\causcumber\\scenarios\\compare_interventions\\features\\', '')
-        file = open("results.json","w")
-        file.close()
-        print("File cleaned")
-        behave_cmd = "behave features/"+ filename + " --format json --outfile results.json"
-        #behave_cmd = "behave features/"+ filename + " --format json --junit"
+        filename_xml = filename.replace('.feature', '')
+        behave_cmd = "behave features/"+ filename + " --format json --junit"
+        self.current_File = ("TESTS-"+filename_xml+".xml")
+        self.created_file_xml.append("TESTS-"+filename_xml+".xml")
         os.system(behave_cmd)       
         self.dismiss_popup()
     
     def on_request_close(self, instance):  #remove results.json and other feature file created when closing the program
-        os.remove("results.json")
+        os.chdir('reports')
+        for self.created_file_xml in self.created_file_xml:
+            os.remove(self.created_file_xml)
+        os.chdir('..')
+        #os.remove("results.json")
         os.chdir('features')
-        for self.created_file in self.created_file:
-            os.remove(self.created_file)
+        for self.created_file_feature in self.created_file_feature:
+            os.remove(self.created_file_feature)
         os.chdir('..')
         print("Closing")
 
