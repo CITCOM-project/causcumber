@@ -3,6 +3,9 @@ import pandas as pd
 from behave import fixture, use_fixture
 import os
 import re
+import covasim
+import lhsmdu
+import numpy as np
 
 import sys
 
@@ -18,6 +21,18 @@ import z3
 import pandas as pd
 
 from tabulate import tabulate
+
+from scipy import stats
+
+
+class countries_gen(stats.rv_discrete):
+    countries = dict(enumerate(sorted(list(covasim.data.country_age_data.data))))
+
+    def ppf(self, q, *args, **kwds):
+        return np.vectorize(self.countries.get)(np.round(len(self.countries) * q))
+
+
+countries = countries_gen()
 
 obs_tag_re = re.compile("observational\((\"|')(.+)(\"|')\)")
 
@@ -66,6 +81,7 @@ def before_feature(context, feature):
     context.meta_variables = set()
     context.constraints = {}
     context.background_constraints = set()
+    context.ranges = {}
 
     if not os.path.exists(context.results_dir):
         os.makedirs(context.results_dir, exist_ok=True)
@@ -195,6 +211,16 @@ def after_feature(context, feature):
     # models which try to stop duplicate variable values. That'd give us a
     # more diverse spread of values. We should look into this.
     # TODO: How do we generate the "unexpected" values?
+
+    distributions = {
+        row["parameter"]: eval(row["distribution"])
+        for row in feature.background.steps[0].table
+    }
+    lhs = lhsmdu.sample(len(context.inputs), 20).T
+    lhs = pd.DataFrame(lhs, columns=sorted(list(context.inputs)))
+    for col in lhs:
+        lhs[col] = lhsmdu.inverseTransformSample(distributions[col], lhs[col])
+
     solver = z3.Optimize()
 
     treatment_vars = {
@@ -214,50 +240,30 @@ def after_feature(context, feature):
 
     background = {}
     tests = []
-    modifiers = []
     runs = []
-
-    with open("background.smt2", "w") as f:
-        print(solver.sexpr(), file=f)
 
     for t in context.concrete_tests:
         scenario = t["scenario"]
         treatment_var = context.z3_variables[t["treatment_var"]]
         constraints = context.constraints[scenario]
 
-        # Cheekily add an extra element to imitate a `do while` loop with a for...in
-        # @Bob, is there a better way?
-        effect_modifiers = [None] + t["effect_modifiers"]
+        solver.push()
+        control_run, treatment_run = mk_test_case(
+            solver, constraints, scenario, treatment_vars, background, treatment_var,
+        )
+        solver.pop()
 
-        for modifier in effect_modifiers:
-            solver.push()
-            if modifier is not None:
-                solver.assert_and_track(
-                    modifier != background[modifier], f"modifier_{modifier}"
-                )
+        if background == {}:
+            background = control_run
 
-            control_run, treatment_run = mk_test_case(
-                solver,
-                constraints,
-                scenario,
-                treatment_vars,
-                background,
-                treatment_var,
-            )
-            solver.pop()
+        if control_run not in runs:
+            runs.append({str(k): v for k, v in control_run.items()})
+        if treatment_run not in runs:
+            runs.append({str(k): v for k, v in treatment_run.items()})
 
-            if background == {}:
-                background = control_run
-
-            if control_run not in runs:
-                runs.append({str(k): v for k, v in control_run.items()})
-            if treatment_run not in runs:
-                runs.append({str(k): v for k, v in treatment_run.items()})
-
-            test = (t, treatment_var, control_run, treatment_run, background)
-            if test not in tests:
-                tests.append(test)
-                modifiers.append(modifier)
+        test = (t, treatment_var, control_run, treatment_run, background)
+        if test not in tests:
+            tests.append(test)
 
     feature_background = [
         (str(name), context.types[str(name)].__name__, str(val))
@@ -269,7 +275,6 @@ def after_feature(context, feature):
         for output in sorted(list(context.outputs))
     ]
 
-    assert len(modifiers) == len(tests)
     output_feature_file(
         f"concrete_features/{context.feature_name}_concrete_new.feature",
         feature.name,
@@ -278,19 +283,13 @@ def after_feature(context, feature):
         [
             format_scenario(
                 t,
-                f"{t['scenario'].strip()}.{modifier}",
+                f"{t['scenario'].strip()}",
                 treatment_var,
                 control_run,
                 treatment_run,
                 background,
             )
-            for modifier, (
-                t,
-                treatment_var,
-                control_run,
-                treatment_run,
-                background,
-            ) in zip(modifiers, tests)
+            for t, treatment_var, control_run, treatment_run, background, in tests
         ],
     )
 

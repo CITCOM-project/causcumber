@@ -2,18 +2,19 @@
 # be able to find the causal DAG. Run as `behave features/compare_interventions.feature`
 Feature: Compare interventions basic
   Background: IO spec
+  # Really we want to make the pop_infected parametric on the pop_size...
     Given a simulation with parameters
-      | parameter       | type  |
-      | n_days          | int   |
-      | quar_period     | int   |
-      | pop_size        | int   |
-      | pop_infected    | int   |
-      | location        | str   |
-      | symp_prob       | float |
-      | asymp_prob      | float |
-      | symp_quar_prob  | float |
-      | asymp_quar_prob | float |
-      | trace_probs     | float |
+      | parameter       | type  | distribution                         |
+      | n_days          | int   | stats.betabinom(60, 2, 3, loc=60)    |
+      | quar_period     | int   | stats.binom(n=25, p=0.5)             |
+      | pop_size        | int   | stats.betabinom(100000, 15, 100)     |
+      | pop_infected    | int   | stats.betabinom(1000, 1, 5, loc=100) |
+      | location        | str   | countries                            |
+      | symp_prob       | float | stats.beta(a=1.5, b=2)               |
+      | asymp_prob      | float | stats.beta(a=1.5, b=2)               |
+      | symp_quar_prob  | float | stats.beta(a=0.8, b=5)               |
+      | asymp_quar_prob | float | stats.beta(a=1.5, b=2)               |
+      | trace_probs     | float | stats.beta(a=1.5, b=2)               |
     And the following meta variables
       | variable        | type |
       | average_age     | int  |
@@ -33,11 +34,10 @@ Feature: Compare interventions basic
 
     # We can't have more initially infected people than the total population
     # The theoretical limits is the following
-    # And 0 <= pop_infected <= pop_size
     # But this is too vague. Z3 will just shove out 0 all the time, which is stupid
     # and won't allow us to test in a realistic setting. A more realistic constraint
     # is the following
-    And 100 <= pop_infected <= pop_size
+    And 0 <= pop_infected <= pop_size
     # but this does mean the model operates more within its "comfort zone".
     # We want to make sure we have at least some people infected
     # We want to make sure we have enough so that the pandemic gets going most of the time
@@ -49,26 +49,14 @@ Feature: Compare interventions basic
     # two distributions overlap where the pandemic might get going or it might not.
 
     # Must be a valid country
-    # And location in covasim.data.country_age_data.data
+    And location in covasim.data.country_age_data.data
+    And average_age = average_ages(location)
     # Probabilities must be between zero and one
     And 0 <= symp_prob <= 1
     And 0 <= asymp_prob <= 1
     And 0 <= symp_quar_prob <= 1
     And 0 <= asymp_quar_prob <= 1
     And 0 <= trace_probs <= 1
-    And average_age = average_ages(location)
-    And average_age > 0
-
-    # Sampling constraints
-    And location in [Niger,Japan]
-    And pop_size in [10000, 20000]
-    And quar_period in [5, 14, 20]
-    And n_days in [60, 120]
-    And symp_prob in [0.5, 1]
-    And asymp_prob in [0.01, 0.05]
-    And symp_quar_prob in [0.5, 1]
-    And asymp_quar_prob in [0.5, 1]
-    And trace_probs in [0.5, 1]
 
   # TODO: this is a bit clunky. It might not be  reasonable to assume that a
   # domain expert would be able to list all edges that wouldn’t be present
@@ -105,9 +93,6 @@ Feature: Compare interventions basic
   # Do we want to run it for every country?
   @average_age
   Scenario Outline: average_age
-    # At the moment, these preconditions correspond to generators rather than filters for the data
-    # We might potentially want to filter the data going off into CI to where this holds
-    # Given pop_size <= 12000
     When we increase the average_age
     And have the effect modifiers
     | effect_modifier |
@@ -123,7 +108,7 @@ Feature: Compare interventions basic
     Then the <output> should <change>
     # Age does have a direct effect on the cum_deaths since older folks are more likely to die from the disease
     Examples:
-    # For some reason, the behaviour of cum_tests changes depending on asymp_prob
+    # The behaviour of cum_tests seems to change depending on asymp_prob
     # For higher values (>0.5), it flips from decreasing to increasing the number of tests
     # | cum_tests       | decrease |
     | output          | change   |
