@@ -121,9 +121,16 @@ def step_impl(context, v1, v2):
     )
 
 
-@when("we increase the {parameter}")
-def step_impl(context, parameter):
+mutations = {
+    "increase": lambda x, x_prime: x_prime > x,
+    "decrease": lambda x, x_prime: x_prime < x,
+}
+
+
+@when("we {mutate} the {parameter}")
+def step_impl(context, mutate, parameter):
     context.treatment_var = parameter
+    context.mutation = mutations[mutate]
 
 
 @when(u"have the effect modifiers")
@@ -139,6 +146,7 @@ def step_impl(context, output, change):
         {
             "scenario": context.scenario.name,
             "treatment_var": context.treatment_var,
+            "mutation": context.mutation,
             "outcome_var": output,
             "expected_change": change,
             "effect_modifiers": context.effect_modifiers,

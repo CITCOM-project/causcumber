@@ -6,6 +6,9 @@ import re
 import covasim
 import lhsmdu
 import numpy as np
+from allpairspy import AllPairs
+
+from itertools import product
 
 import sys
 
@@ -14,7 +17,7 @@ sys.path.append("../../../")  # This one's for running `behave` in `features`
 sys.path.append("../../")  # This one's for running `behave` in `compare-inverventions`
 
 from causcumber.causcumber_utils import to_snake_case
-from covasim_utils import interventions
+from covasim_utils import interventions, avg_age
 
 import z3
 
@@ -216,10 +219,14 @@ def after_feature(context, feature):
         row["parameter"]: eval(row["distribution"])
         for row in feature.background.steps[0].table
     }
-    lhs = lhsmdu.sample(len(context.inputs), 20).T
+    # TODO: Make the number of samples a configurable parameter
+    lhs = lhsmdu.sample(len(context.inputs), 4).T
     lhs = pd.DataFrame(lhs, columns=sorted(list(context.inputs)))
     for col in lhs:
         lhs[col] = lhsmdu.inverseTransformSample(distributions[col], lhs[col])
+
+    # Meta variables
+    lhs["average_age"] = [avg_age(country) for country in lhs["location"]]
 
     solver = z3.Optimize()
 
@@ -246,24 +253,49 @@ def after_feature(context, feature):
         scenario = t["scenario"]
         treatment_var = context.z3_variables[t["treatment_var"]]
         constraints = context.constraints[scenario]
+        effect_modifiers = lhs[[str(m) for m in t["effect_modifiers"]]]
 
-        solver.push()
-        control_run, treatment_run = mk_test_case(
-            solver, constraints, scenario, treatment_vars, background, treatment_var,
+        mutations = [
+            (x, x_prime)
+            for x, x_prime in product(lhs[t["treatment_var"]], lhs[t["treatment_var"]])
+            if t["mutation"](x, x_prime)
+        ]
+
+        effect_modifier_values = effect_modifiers.values.T.tolist()
+        effect_modifier_values.append(mutations)
+        pairwise_tests = pd.DataFrame(
+            AllPairs(effect_modifier_values),
+            columns=effect_modifiers.columns.tolist() + [str(treatment_var)],
         )
-        solver.pop()
 
-        if background == {}:
-            background = control_run
+        for inx, row in pairwise_tests.iterrows():
+            solver.push()
+            for col in effect_modifiers.columns:
+                solver.add_soft(context.z3_variables[col] == row[col])
+            control, treatment = row[str(treatment_var)]
+            solver.add_soft(treatment_var == control)
+            solver.add_soft(treatment_vars[treatment_var] == treatment)
+            control_run, treatment_run = mk_test_case(
+                solver,
+                constraints,
+                scenario,
+                treatment_vars,
+                background,
+                treatment_var,
+            )
+            solver.pop()
 
-        if control_run not in runs:
-            runs.append({str(k): v for k, v in control_run.items()})
-        if treatment_run not in runs:
-            runs.append({str(k): v for k, v in treatment_run.items()})
+            if background == {}:
+                background = control_run
 
-        test = (t, treatment_var, control_run, treatment_run, background)
-        if test not in tests:
-            tests.append(test)
+            if control_run not in runs:
+                runs.append({str(k): v for k, v in control_run.items()})
+            if treatment_run not in runs:
+                runs.append({str(k): v for k, v in treatment_run.items()})
+
+            test = (inx, t, treatment_var, control_run, treatment_run, background)
+            if test not in tests:
+                tests.append(test)
 
     feature_background = [
         (str(name), context.types[str(name)].__name__, str(val))
@@ -275,6 +307,8 @@ def after_feature(context, feature):
         for output in sorted(list(context.outputs))
     ]
 
+    print(f"{len(tests)} tests")
+
     output_feature_file(
         f"concrete_features/{context.feature_name}_concrete_new.feature",
         feature.name,
@@ -283,13 +317,13 @@ def after_feature(context, feature):
         [
             format_scenario(
                 t,
-                f"{t['scenario'].strip()}",
+                f"{t['scenario'].strip()}_{inx}",
                 treatment_var,
                 control_run,
                 treatment_run,
                 background,
             )
-            for t, treatment_var, control_run, treatment_run, background, in tests
+            for inx, t, treatment_var, control_run, treatment_run, background, in tests
         ],
     )
 
