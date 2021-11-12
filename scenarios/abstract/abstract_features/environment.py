@@ -228,12 +228,13 @@ def after_feature(context, feature):
     # Meta variables
     lhs["average_age"] = [avg_age(country) for country in lhs["location"]]
 
-    solver = z3.Optimize()
-
     treatment_vars = {
         context.z3_variables[v]: fresh(context, v) for v in context.z3_variables
     }
+    for v in treatment_vars.values():
+        context.z3_variables[str(v)] = v
 
+    solver = z3.Optimize()
     for b in context.background_constraints:
         solver.assert_and_track(b, str(b))
         solver.assert_and_track(
@@ -253,28 +254,27 @@ def after_feature(context, feature):
         scenario = t["scenario"]
         treatment_var = context.z3_variables[t["treatment_var"]]
         constraints = context.constraints[scenario]
-        effect_modifiers = lhs[[str(m) for m in t["effect_modifiers"]]]
 
-        mutations = [
-            (x, x_prime)
-            for x, x_prime in product(lhs[t["treatment_var"]], lhs[t["treatment_var"]])
-            if t["mutation"](x, x_prime)
-        ]
+        parameters = lhs[[str(m) for m in t["effect_modifiers"]]]
+        parameters.insert(0, str(treatment_var), lhs[str(treatment_var)])
+        parameters.insert(
+            1, str(treatment_vars[treatment_var]), lhs[str(treatment_var)]
+        )
 
-        effect_modifier_values = effect_modifiers.values.T.tolist()
-        effect_modifier_values.append(mutations)
+        def filter_func(row):
+            if len(row) >= 2:
+                return t["mutation"](row[0], row[1])
+            return True
+
         pairwise_tests = pd.DataFrame(
-            AllPairs(effect_modifier_values),
-            columns=effect_modifiers.columns.tolist() + [str(treatment_var)],
+            AllPairs(parameters.values.T.tolist(), filter_func=filter_func),
+            columns=parameters.columns,
         )
 
         for inx, row in pairwise_tests.iterrows():
             solver.push()
-            for col in effect_modifiers.columns:
+            for col in parameters.columns:
                 solver.add_soft(context.z3_variables[col] == row[col])
-            control, treatment = row[str(treatment_var)]
-            solver.add_soft(treatment_var == control)
-            solver.add_soft(treatment_vars[treatment_var] == treatment)
             control_run, treatment_run = mk_test_case(
                 solver,
                 constraints,
@@ -307,7 +307,9 @@ def after_feature(context, feature):
         for output in sorted(list(context.outputs))
     ]
 
-    print(f"{len(tests)} tests")
+    print(
+        f"Feature generated {len(tests)} tests, corresponding to {len(runs)} run configurations"
+    )
 
     output_feature_file(
         f"concrete_features/{context.feature_name}_concrete_new.feature",
