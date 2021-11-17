@@ -18,6 +18,7 @@ def avg_age(location):
             midpoint = 80
         avg += midpoint * prob
     return round(avg)
+    # return avg
 
 
 # Instantiate named covasim interventions with parameters

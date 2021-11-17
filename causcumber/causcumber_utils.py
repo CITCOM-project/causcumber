@@ -434,7 +434,7 @@ def estimate_effect(
     )
     if verbose:
         print(estimate)
-        print(estimate.estimator.model.summary())
+        # print(estimate.estimator.model.summary())
 
     return estimate
 

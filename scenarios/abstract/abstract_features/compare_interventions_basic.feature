@@ -20,7 +20,6 @@ Feature: Compare interventions basic
       | average_age     | int  |
     And the following variables are recorded at the end of the simulation
       | variable        | type |
-      | cum_tests       | int  |
       | cum_quarantined | int  |
       | cum_infections  | int  |
       | cum_deaths      | int  |
@@ -67,7 +66,6 @@ Feature: Compare interventions basic
     When we prune the following edges
     | s1              | s2              |
     | cum_deaths      | .*              |
-    | cum_infections  | cum_tests       |
     | cum_quarantined | .*              |
     | .*              | cum_deaths      |
     | cum_infections  | cum_quarantined |
@@ -82,7 +80,6 @@ Feature: Compare interventions basic
     | average_age     | cum_deaths      |
     | cum_quarantined | cum_infections  |
     | trace_probs     | cum_quarantined |
-    | trace_probs     | cum_tests       |
     | n_days          | cum_deaths      |
     | location        | average_age     |
     Then we obtain the causal DAG
@@ -108,9 +105,6 @@ Feature: Compare interventions basic
     Then the <output> should <change>
     # Age does have a direct effect on the cum_deaths since older folks are more likely to die from the disease
     Examples:
-    # The behaviour of cum_tests seems to change depending on asymp_prob
-    # For higher values (>0.5), it flips from decreasing to increasing the number of tests
-    # | cum_tests       | decrease |
     | output          | change   |
     | cum_quarantined | decrease |
     | cum_infections  | decrease |
@@ -132,22 +126,8 @@ Feature: Compare interventions basic
     | asymp_quar_prob |
     | trace_probs     |
     Then the <output> should <change>
-    # I think the cum_tests one will probably change on the quarantine testing strategy.
-    # By default, it's start and end, i.e. two tests per quarantine
-    # If we tested everyone in quarantine every day, it might increase
-    # Since test_strategy isn't a parameter we're testing here, we can leave it as is
-
-    # The cum_quarantined seems to be a lot more sensitive to the effect modifiers
-    # and a lot less monotonic than cum_tests. With the _prob variables at lower
-    # values, increasing the quar_period actually increases the cum_quarantined.
-    # It's only for the higher values (above 0.5) that we get less people quarantining.
-    # This makes sense as, if we have a higher chance of someone testing and getting
-    # quarantined early on, then the quar_period has much more chance of taking effect.
-    # If they have a lower chance of getting caught, they'll pass it on to more people,
-    # so the cumulative nature of the variable will have more of an effect
     Examples:
     | output          | change          | comment                                                                            |
-    | cum_tests       | remain the same |                                                                                    |
     | cum_quarantined | decrease        | Longer quarantine means fewer cases means fewer quarantine                         |
     | cum_infections  | decrease        | Longer quarantine means less chance of infected individuals passing on the disease |
     | cum_deaths      | remain the same | No direct causal effect, only via cum_infections                                   |
@@ -174,10 +154,8 @@ Feature: Compare interventions basic
     | symp_quar_prob  |
     | asymp_quar_prob |
     | trace_probs     |
-    # increasing the probability means more infected people get tested -> fewer cases passed on -> fewer people get tested
-    Then the cum_tests should decrease
     # Higher probability of testing means more infected people will be found so more people are quarantined
-    And the cum_quarantined should decrease
+    Then the cum_quarantined should decrease
     # More tests -> more quarantined -> fewer cases
     And the cum_infections should decrease
     # No direct effect, only via cum_infections
@@ -200,10 +178,8 @@ Feature: Compare interventions basic
     | symp_quar_prob  |
     | asymp_quar_prob |
     | trace_probs     |
-    # increasing the probability means more asymptomatic people get tested -> more tests
-    Then the cum_tests should increase
     # Higher probability of testing means more infected people will be found so more people are quarantined
-    And the cum_quarantined should decrease
+    Then the cum_quarantined should decrease
     # More tests -> more quarantined -> fewer cases
     And the cum_infections should decrease
     # No direct effect, only via cum_infections
@@ -226,10 +202,8 @@ Feature: Compare interventions basic
     | asymp_prob      |
     | asymp_quar_prob |
     | trace_probs     |
-    # increasing the probably means more infected people get tested -> fewer cases passed on -> fewer people get tested
-    Then the cum_tests should decrease
     # Higher probability of testing means more infected people will be found so more people are quarantined
-    And the cum_quarantined should remain the same
+    Then the cum_quarantined should remain the same
     # More tests -> more quarantined -> fewer cases
     And the cum_infections should decrease
     # No direct effect, only via cum_infections
@@ -252,10 +226,8 @@ Feature: Compare interventions basic
     | asymp_prob      |
     | symp_quar_prob  |
     | trace_probs     |
-    # I have no idea why...
-    Then the cum_tests should decrease
     # Higher probability of testing means more infected people will be found so more people are quarantined
-    And the cum_quarantined should decrease
+    Then the cum_quarantined should decrease
     # More tests -> more quarantined -> fewer cases
     And the cum_infections should decrease
     # No direct effect, only via cum_infections
@@ -277,10 +249,8 @@ Feature: Compare interventions basic
     | asymp_prob      |
     | symp_quar_prob  |
     | asymp_quar_prob |
-    # increasing the probabilities means more people get tested -> fewer cases passed on -> fewer people get tested
-    Then the cum_tests should decrease
     # Higher probability of testing means more infected people will be found less people need to quarantine
-    And the cum_quarantined should decrease
+    Then the cum_quarantined should increase
     # More tests -> more quarantined -> fewer cases
     And the cum_infections should decrease
     # No direct effect, only via cum_infections
@@ -304,7 +274,6 @@ Feature: Compare interventions basic
     Then the <output> should increase
     Examples:
     | output          |
-    | cum_tests       |
     | cum_quarantined |
     | cum_infections  |
     | cum_deaths      |
@@ -327,7 +296,6 @@ Feature: Compare interventions basic
     Then the <output> should increase
     Examples:
     | output          |
-    | cum_tests       |
     | cum_quarantined |
     | cum_infections  |
     | cum_deaths      |
@@ -350,7 +318,6 @@ Feature: Compare interventions basic
     Then the <output> should <change>
     Examples:
     | output          | change          | comment                                   |
-    | cum_tests       | increase        | More people to test                       |
     | cum_quarantined | increase        | More people to quarantine                 |
     | cum_infections  | increase        | More people to get the disease            |
     | cum_deaths      | remain the same | No direct effect, only via cum_infections |

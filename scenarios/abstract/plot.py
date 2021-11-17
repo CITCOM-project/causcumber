@@ -57,20 +57,23 @@ data["average_age"] = [avg_age(c) for c in data["location"]]
 
 dag_path = "dags/compare_interventions_basic.dot"
 
-treatment_var = "symp_prob"
-outcome_var = "cum_tests"
-control_value = 0.5
-treatment_value = 1.0
+treatment_var = "average_age"
+outcome_var = "cum_quarantined"
+control_value = 20
+treatment_value = 46
 effect_modifiers = {
-    "n_days": 120,
-    "quar_period": 20,
-    "pop_size": 20000,
-    "pop_infected": 100,
-    "asymp_prob": 0.01,
-    "symp_quar_prob": 1.0,
-    "asymp_quar_prob": 0.5,
-    "trace_probs": 1.0,
+    "n_days": 66,
+    "quar_period": 11,
+    "pop_size": 11593,
+    "pop_infected": 217,
+    "symp_prob": 0.3946267859089032,
+    "asymp_prob": 0.5320606162934023,
+    "symp_quar_prob": 0.02312927617193368,
+    "asymp_quar_prob": 0.5362647235083882,
+    "trace_probs": 0.7734426077281416,
 }
+
+
 model_inputs = [
     "n_days",
     "quar_period",

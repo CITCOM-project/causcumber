@@ -319,7 +319,7 @@ def after_feature(context, feature):
         [
             format_scenario(
                 t,
-                f"{t['scenario'].strip()}_{inx}",
+                f"{t['treatment_var'].strip()}_{t['outcome_var']}_{inx}",
                 treatment_var,
                 control_run,
                 treatment_run,

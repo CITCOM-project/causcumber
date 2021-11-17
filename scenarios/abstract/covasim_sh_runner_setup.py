@@ -10,14 +10,16 @@ import pandas as pd
 import random
 import os
 
-runfile = "runs"
+runfile = "all_countries"
+n_runs = 3
+fuzz = False
 
 data = pd.read_csv(
     f"results/compare_interventions_basic/runs/{runfile}.csv", index_col=0
 )
 
 
-def fuzz(param, prob=0.8, is_prob=False):
+def fuzz_param(param, prob=0.8, is_prob=False):
     if random.random() > prob:
         return param
     if isinstance(param, str):
@@ -36,10 +38,11 @@ def fuzz(param, prob=0.8, is_prob=False):
 
 
 for column in data:
-    is_prob = "_prob" in column
-    data[column] = [fuzz(x, is_prob=is_prob) for x in data[column]]
-    if is_prob:
-        assert all([x in pd.Interval(0, 1) for x in data[column]])
+    if fuzz:
+        is_prob = "_prob" in column
+        data[column] = [fuzz_param(x, is_prob=is_prob) for x in data[column]]
+        if is_prob:
+            assert all([x in pd.Interval(0, 1) for x in data[column]])
 
 columns = data.columns
 
@@ -51,7 +54,7 @@ for i, run in enumerate(
     assert len(run) == len(columns), "Num args does not match num values"
     args = [f"--{k} {v}" for k, v in zip(columns, run)]
     runs.append(
-        f"python covasim_sh_runner.py --results_file results/compare_interventions_basic/data/{runfile}/run_{i}.csv "
+        f"python covasim_sh_runner.py --results_file results/compare_interventions_basic/data/{runfile}/run_{i}.csv --n_runs {n_runs} "
         + " ".join(args),
     )
 
