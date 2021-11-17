@@ -16,8 +16,9 @@ Feature: Compare interventions basic
       | asymp_quar_prob | float | stats.beta(a=1.5, b=2)               |
       | trace_probs     | float | stats.beta(a=1.5, b=2)               |
     And the following meta variables
-      | variable        | type |
-      | average_age     | int  |
+      | variable        | type  |
+      | average_age     | int   |
+      | household_size  | float |
     And the following variables are recorded at the end of the simulation
       | variable        | type |
       | cum_quarantined | int  |
@@ -50,6 +51,7 @@ Feature: Compare interventions basic
     # Must be a valid country
     And location in covasim.data.country_age_data.data
     And average_age = average_ages(location)
+    And household_size = household_sizes(location)
     # Probabilities must be between zero and one
     And 0 <= symp_prob <= 1
     And 0 <= asymp_prob <= 1
@@ -102,12 +104,13 @@ Feature: Compare interventions basic
     | symp_quar_prob  |
     | asymp_quar_prob |
     | trace_probs     |
+    | household_size  |
     Then the <output> should <change>
     # Age does have a direct effect on the cum_deaths since older folks are more likely to die from the disease
     Examples:
     | output          | change   |
-    | cum_quarantined | decrease |
-    | cum_infections  | decrease |
+    | cum_quarantined | increase |
+    | cum_infections  | increase |
     | cum_deaths      | increase |
 
   # Bare minimum two runs where 0 <= quar_period 14
@@ -125,6 +128,7 @@ Feature: Compare interventions basic
     | symp_quar_prob  |
     | asymp_quar_prob |
     | trace_probs     |
+    | household_size  |
     Then the <output> should <change>
     Examples:
     | output          | change          | comment                                                                            |
@@ -154,6 +158,7 @@ Feature: Compare interventions basic
     | symp_quar_prob  |
     | asymp_quar_prob |
     | trace_probs     |
+    | household_size  |
     # Higher probability of testing means more infected people will be found so more people are quarantined
     Then the cum_quarantined should decrease
     # More tests -> more quarantined -> fewer cases
@@ -178,6 +183,7 @@ Feature: Compare interventions basic
     | symp_quar_prob  |
     | asymp_quar_prob |
     | trace_probs     |
+    | household_size  |
     # Higher probability of testing means more infected people will be found so more people are quarantined
     Then the cum_quarantined should decrease
     # More tests -> more quarantined -> fewer cases
@@ -202,6 +208,7 @@ Feature: Compare interventions basic
     | asymp_prob      |
     | asymp_quar_prob |
     | trace_probs     |
+    | household_size  |
     # Higher probability of testing means more infected people will be found so more people are quarantined
     Then the cum_quarantined should remain the same
     # More tests -> more quarantined -> fewer cases
@@ -226,6 +233,7 @@ Feature: Compare interventions basic
     | asymp_prob      |
     | symp_quar_prob  |
     | trace_probs     |
+    | household_size  |
     # Higher probability of testing means more infected people will be found so more people are quarantined
     Then the cum_quarantined should decrease
     # More tests -> more quarantined -> fewer cases
@@ -249,6 +257,7 @@ Feature: Compare interventions basic
     | asymp_prob      |
     | symp_quar_prob  |
     | asymp_quar_prob |
+    | household_size  |
     # Higher probability of testing means more infected people will be found less people need to quarantine
     Then the cum_quarantined should increase
     # More tests -> more quarantined -> fewer cases
@@ -271,6 +280,7 @@ Feature: Compare interventions basic
     | symp_quar_prob  |
     | asymp_quar_prob |
     | trace_probs     |
+    | household_size  |
     Then the <output> should increase
     Examples:
     | output          |
@@ -293,6 +303,7 @@ Feature: Compare interventions basic
     | symp_quar_prob  |
     | asymp_quar_prob |
     | trace_probs     |
+    | household_size  |
     Then the <output> should increase
     Examples:
     | output          |
@@ -315,6 +326,7 @@ Feature: Compare interventions basic
     | symp_quar_prob  |
     | asymp_quar_prob |
     | trace_probs     |
+    | household_size  |
     Then the <output> should <change>
     Examples:
     | output          | change          | comment                                   |

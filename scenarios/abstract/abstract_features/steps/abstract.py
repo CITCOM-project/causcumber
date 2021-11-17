@@ -1,9 +1,9 @@
 import causcumber.draw_dag_steps
 from functools import reduce as fold
-import covasim
 from behave import use_step_matcher
 import z3
 import numpy as np
+import covasim
 
 
 import sys
@@ -12,13 +12,7 @@ sys.path.append("../../../../")  # This one's for native running from within ste
 sys.path.append("../../../")  # This one's for running `behave` in `features`
 sys.path.append("../../")  # This one's for running `behave` in `compare-inverventions`
 
-from covasim_utils import avg_age
-
-covasim_age_data = {
-    k: v
-    for k, v in covasim.data.country_age_data.data.items()
-    if k in ["Poland", "Niger", "Japan"]
-}
+from covasim_utils import avg_age, household_size
 
 
 def add_constraint(context, constraint):
@@ -32,30 +26,34 @@ def fold_in(var, lst):
     return fold(lambda acc, x: z3.Or(acc, x), [var == e for e in lst], False)
 
 
-@given("{v1} in [{set}]")
-def step_impl(context, v1, set):
-    folded = fold_in(
-        context.z3_variables[v1], [context.types[v1](x) for x in set.split(",")]
-    )
-    add_constraint(context, folded)
-
-
 @given("{v1} in {set}")
 def step_impl(context, v1, set):
-    folded = fold_in(context.z3_variables[v1], covasim_age_data)
+    folded = fold_in(context.z3_variables[v1], eval(set))
     add_constraint(context, folded)
 
 
-@given("{average_age} = average_ages({location})")
-def step_impl(context, average_age, location):
-    avg_ages = {x: avg_age(x) for x in covasim_age_data}
+@given("average_age = average_ages(location)")
+def step_impl(context):
+    avg_ages = {x: avg_age(x) for x in context.supported_countries}
 
-    age = context.z3_variables[average_age]
-    loc = context.z3_variables[location]
+    age = context.z3_variables["average_age"]
+    loc = context.z3_variables["location"]
     folded = fold(
         lambda acc, x: z3.If(loc == x[0], x[1], acc), list(avg_ages.items()), 0
     )
     add_constraint(context, age == folded)
+
+
+@given("household_size = household_sizes(location)")
+def step_impl(context):
+    size = context.z3_variables["household_size"]
+    loc = context.z3_variables["location"]
+    folded = fold(
+        lambda acc, x: z3.If(loc == x, household_size(x), acc),
+        context.supported_countries,
+        0,
+    )
+    add_constraint(context, size == folded)
 
 
 @given("{lower} <= {v} <= {upper}")

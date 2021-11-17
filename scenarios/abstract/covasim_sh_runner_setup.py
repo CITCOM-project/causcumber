@@ -9,10 +9,14 @@ Created on Wed Nov  3 07:21:59 2021
 import pandas as pd
 import random
 import os
+import sys
 
-runfile = "all_countries"
+runfile = "runs"
 n_runs = 3
 fuzz = False
+
+if len(sys.argv) > 1:
+    runfile = sys.argv[1]
 
 data = pd.read_csv(
     f"results/compare_interventions_basic/runs/{runfile}.csv", index_col=0
@@ -66,3 +70,6 @@ with open(f"results/compare_interventions_basic/runs/{runfile}.sh", "w") as f:
         if i > 0 and i % maxjobs == 0:
             print("wait", file=f)
         print(run, "&", file=f)
+
+print(len(runs), "runs")
+print(f"run with\nbash results/compare_interventions_basic/runs/{runfile}.sh")

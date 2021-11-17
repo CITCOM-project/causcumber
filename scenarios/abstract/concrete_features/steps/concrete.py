@@ -11,7 +11,7 @@ sys.path.append("../../../../")  # This one's for native running from within ste
 sys.path.append("../../../")  # This one's for running `behave` in `features`
 sys.path.append("../../")  # This one's for running `behave` in `compare-inverventions`
 
-from covasim_utils import avg_age
+from covasim_utils import avg_age, household_size
 import numpy as np
 
 
@@ -66,6 +66,7 @@ def assign(datum, assignments):
 def step_impl(context, outcome_var, change):
     data = pd.read_csv(f"results/compare_interventions_basic/data/runs.csv")
     data["average_age"] = [avg_age(c) for c in data["location"]]
+    data["household_size"] = [household_size(c) for c in data["location"]]
 
     assert (
         context.treatment_var not in context.effect_modifiers

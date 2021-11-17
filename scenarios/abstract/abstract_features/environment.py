@@ -17,7 +17,7 @@ sys.path.append("../../../")  # This one's for running `behave` in `features`
 sys.path.append("../../")  # This one's for running `behave` in `compare-inverventions`
 
 from causcumber.causcumber_utils import to_snake_case
-from covasim_utils import interventions, avg_age
+from covasim_utils import interventions, avg_age, household_size
 
 import z3
 
@@ -29,7 +29,14 @@ from scipy import stats
 
 
 class countries_gen(stats.rv_discrete):
-    countries = dict(enumerate(sorted(list(covasim.data.country_age_data.data))))
+    both = [
+        h
+        for h in covasim.data.country_age_data.data
+        if h in covasim.data.household_size_data.data
+    ]
+    both = sorted(both, key=lambda x: avg_age(x))
+
+    countries = dict(enumerate(both))
 
     def ppf(self, q, *args, **kwds):
         return np.vectorize(self.countries.get)(np.round(len(self.countries) * q))
@@ -88,6 +95,23 @@ def before_feature(context, feature):
 
     if not os.path.exists(context.results_dir):
         os.makedirs(context.results_dir, exist_ok=True)
+
+    distributions = {
+        row["parameter"]: eval(row["distribution"])
+        for row in feature.background.steps[0].table
+    }
+    # TODO: Make the number of samples a configurable parameter
+
+    lhs = lhsmdu.sample(len(distributions), 4).T
+    lhs = pd.DataFrame(lhs, columns=sorted(list(distributions)))
+    for col in lhs:
+        lhs[col] = lhsmdu.inverseTransformSample(distributions[col], lhs[col])
+
+    # Meta variables
+    lhs["average_age"] = [avg_age(country) for country in lhs["location"]]
+    lhs["household_size"] = [household_size(country) for country in lhs["location"]]
+    context.lhs = lhs
+    context.supported_countries = set(lhs["location"].tolist())
 
 
 def before_scenario(context, scenario):
@@ -215,19 +239,6 @@ def after_feature(context, feature):
     # more diverse spread of values. We should look into this.
     # TODO: How do we generate the "unexpected" values?
 
-    distributions = {
-        row["parameter"]: eval(row["distribution"])
-        for row in feature.background.steps[0].table
-    }
-    # TODO: Make the number of samples a configurable parameter
-    lhs = lhsmdu.sample(len(context.inputs), 4).T
-    lhs = pd.DataFrame(lhs, columns=sorted(list(context.inputs)))
-    for col in lhs:
-        lhs[col] = lhsmdu.inverseTransformSample(distributions[col], lhs[col])
-
-    # Meta variables
-    lhs["average_age"] = [avg_age(country) for country in lhs["location"]]
-
     treatment_vars = {
         context.z3_variables[v]: fresh(context, v) for v in context.z3_variables
     }
@@ -255,10 +266,10 @@ def after_feature(context, feature):
         treatment_var = context.z3_variables[t["treatment_var"]]
         constraints = context.constraints[scenario]
 
-        parameters = lhs[[str(m) for m in t["effect_modifiers"]]]
-        parameters.insert(0, str(treatment_var), lhs[str(treatment_var)])
+        parameters = context.lhs[[str(m) for m in t["effect_modifiers"]]]
+        parameters.insert(0, str(treatment_var), context.lhs[str(treatment_var)])
         parameters.insert(
-            1, str(treatment_vars[treatment_var]), lhs[str(treatment_var)]
+            1, str(treatment_vars[treatment_var]), context.lhs[str(treatment_var)]
         )
 
         def filter_func(row):

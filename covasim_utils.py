@@ -21,6 +21,10 @@ def avg_age(location):
     # return avg
 
 
+def household_size(location):
+    return cv.data.household_size_data.data[location]
+
+
 # Instantiate named covasim interventions with parameters
 intervention = {
     "standardTest": cv.test_prob(
