@@ -2343,7 +2343,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_1
   @quar_period_short
@@ -2361,7 +2361,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_2
   @quar_period_short
@@ -2379,7 +2379,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.7734426077281416  |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_3
   @quar_period_short
@@ -2397,7 +2397,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.27025117739698024 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_4
   @quar_period_short
@@ -2415,7 +2415,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_5
   @quar_period_short
@@ -2433,7 +2433,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_6
   @quar_period_short
@@ -2451,7 +2451,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_7
   @quar_period_short
@@ -2469,7 +2469,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_8
   @quar_period_short
@@ -2487,7 +2487,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_9
   @quar_period_short
@@ -2505,7 +2505,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_10
   @quar_period_short
@@ -2523,7 +2523,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_11
   @quar_period_short
@@ -2541,7 +2541,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_12
   @quar_period_short
@@ -2559,7 +2559,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_13
   @quar_period_short
@@ -2577,7 +2577,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_14
   @quar_period_short
@@ -2595,7 +2595,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_15
   @quar_period_short
@@ -2613,7 +2613,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_16
   @quar_period_short
@@ -2631,7 +2631,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_17
   @quar_period_short
@@ -2649,7 +2649,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.2404924383007006  |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_18
   @quar_period_short
@@ -2667,7 +2667,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_19
   @quar_period_short
@@ -2685,7 +2685,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_20
   @quar_period_short
@@ -2703,7 +2703,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_21
   @quar_period_short
@@ -2721,7 +2721,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_22
   @quar_period_short
@@ -2739,7 +2739,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_23
   @quar_period_short
@@ -2757,7 +2757,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_24
   @quar_period_short
@@ -2775,7 +2775,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_25
   @quar_period_short
@@ -2793,7 +2793,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_26
   @quar_period_short
@@ -2811,7 +2811,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_27
   @quar_period_short
@@ -2829,7 +2829,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_28
   @quar_period_short
@@ -2847,7 +2847,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_infections_29
   @quar_period_short
@@ -2865,7 +2865,7 @@ Feature: Compare interventions basic concrete
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
     | household_size  | 5.916               |
-    Then the cum_infections should decrease
+    Then the cum_infections should increase
 
   @quar_period_cum_deaths_0
   @quar_period_short

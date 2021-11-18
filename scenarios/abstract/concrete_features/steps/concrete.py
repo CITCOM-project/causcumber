@@ -108,11 +108,12 @@ def step_impl(context, outcome_var, change):
         ]
         tests = [(bi, [di in bi for di, bi in zip(datum, bi)]) for bi in assignments]
         bin_of_interest = assignments[max(tests, key=lambda x: sum(x[1]))[0]]
+        binteresting_data = data.where(data["bins"] == bin_of_interest).dropna()
 
         # assert bin_of_interest in bins, "Bin of interest not in bins"
 
         effect_estimate = estimate_effect(
-            data,
+            binteresting_data,
             context.dag_path.replace("_concrete", ""),
             context.treatment_var,
             outcome_var,
@@ -121,12 +122,13 @@ def step_impl(context, outcome_var, change):
             identification=True,
             verbose=True,
             confidence_intervals=True,
-            effect_modifiers=["bins"],
+            # effect_modifiers=["bins"],
             method_name="backdoor.linear_regression",
         )
         print(effect_estimate)
 
-        value = effect_estimate.conditional_estimates[bin_of_interest]
+        # value = effect_estimate.conditional_estimates[bin_of_interest]
+        value = effect_estimate.value
 
         # value = effect_estimate.conditional_estimates[
         #     choose_bin(
@@ -158,7 +160,7 @@ def step_impl(context, outcome_var, change):
             method_name="backdoor.linear_regression",
         )
         print(effect_estimate)
-        value = estimate.value
+        value = effect_estimate.value
     # if effect_estimate.conditional_estimates is not None:
     #     value = None
     #     conditional_estimates = effect_estimate.conditional_estimates.to_dict()

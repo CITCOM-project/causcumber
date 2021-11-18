@@ -109,8 +109,8 @@ Feature: Compare interventions basic
     # Age does have a direct effect on the cum_deaths since older folks are more likely to die from the disease
     Examples:
     | output          | change   |
-    | cum_quarantined | increase |
-    | cum_infections  | increase |
+    | cum_quarantined | decrease |
+    | cum_infections  | decrease |
     | cum_deaths      | increase |
 
   # Bare minimum two runs where 0 <= quar_period 14

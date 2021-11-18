@@ -50,6 +50,9 @@ for column in data:
 
 columns = data.columns
 
+if not os.path.exists(f"results/compare_interventions_basic/data/{runfile}"):
+    os.mkdir(f"results/compare_interventions_basic/data/{runfile}")
+
 runs = []
 for i, run in enumerate(
     data.to_records(index=False),
