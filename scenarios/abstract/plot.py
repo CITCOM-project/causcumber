@@ -19,8 +19,6 @@ sys.path.append(".")  # This one's for running `behave` in `compare-invervention
 from covasim_utils import avg_age, household_size
 from causcumber.causcumber_utils import estimate_effect
 
-import covasim_sh_runner
-
 
 def choose_bin(bins, b, types):
     b = [t(x) for t, x in zip(types, b.split(","))]
@@ -51,29 +49,30 @@ def sample(interval, post=lambda x: x):
     return post(r)
 
 
-data = pd.read_csv("results/compare_interventions_basic/data/runs.csv", index_col=0)
+data = pd.read_csv("results/compare_interventions_basic/data/runs30.csv", index_col=0)
 data["average_age"] = [avg_age(c) for c in data["location"]]
 data["household_size"] = [household_size(c) for c in data["location"]]
 
 dag_path = "dags/compare_interventions_basic.dot"
 
-treatment_var = "quar_period"
+treatment_var = "average_age"
 outcome_var = "cum_quarantined"
-control_value = 11
-treatment_value = 15
+control_value = 20
+treatment_value = 30
 effect_modifiers = {
-    "n_days": 90,
+    "n_days": 80,
+    "quar_period": 11,
     "pop_size": 10000,
-    "pop_infected": 295,
-    "symp_prob": 0.20143639198171964,
-    "asymp_prob": 0.06566236367037942,
-    "symp_quar_prob": 0.0456075960115124,
-    "asymp_quar_prob": 0.6280014380485361,
-    "trace_probs": 0.7734426077281416,
+    "pop_infected": 400,
+    "symp_prob": 0.3946267859089032,
+    "asymp_prob": 0.5320606162934023,
+    "symp_quar_prob": 0.32012755679683896,
+    "asymp_quar_prob": 0.16550077992524106,
+    "trace_probs": 0.09610948155767196,
     "household_size": 5.916,
 }
 
-bins = bin_data(data, effect_modifiers, 2)
+bins = bin_data(data, effect_modifiers, 4)
 labels, levels = pd.factorize(bins.to_records(index=False))
 assignments = {level: label for label, level in enumerate(levels)}
 data["bins"] = labels
@@ -129,9 +128,20 @@ print(f"{len(assignments)} bins")
 print(f"{len(data)} data points")
 
 #%%
+data = pd.read_csv("results/compare_interventions_basic/data/runs30.csv", index_col=0)
+data["average_age"] = [avg_age(c) for c in data["location"]]
+data["household_size"] = [household_size(c) for c in data["location"]]
 
+for v in ['asymp_prob', 'pop_size', 'trace_probs']:
+    data = data.where(data[v] == effect_modifiers[v])
+
+
+plt.scatter(data[treatment_var], data[outcome_var])
+
+
+#%%
 new_effect_estimate = estimate_effect(
-    binteresting_data,
+    data,
     dag_path.replace("_concrete", ""),
     treatment_var,
     outcome_var,

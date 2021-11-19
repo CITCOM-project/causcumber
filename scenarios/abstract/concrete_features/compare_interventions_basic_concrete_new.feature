@@ -1,19 +1,19 @@
 Feature: Compare interventions basic concrete
   Background:
     Given a simulation with parameters
-    | parameter       | type  | value               |
-    | asymp_prob      | float | 0.5320606162934023  |
-    | asymp_quar_prob | float | 0.16550077992524106 |
-    | average_age     | int   | 20                  |
-    | household_size  | float | 5.916               |
-    | location        | str   | Niger               |
-    | n_days          | int   | 80                  |
-    | pop_infected    | int   | 400                 |
-    | pop_size        | int   | 10000               |
-    | quar_period     | int   | 11                  |
-    | symp_prob       | float | 0.3946267859089032  |
-    | symp_quar_prob  | float | 0.32012755679683896 |
-    | trace_probs     | float | 0.09610948155767196 |
+    | parameter       | type  | value               | bins                                                          |
+    | asymp_prob      | float | 0.5320606162934023  | [0.         0.23884523 0.41362749 0.60552278 1.        ]      |
+    | asymp_quar_prob | float | 0.16550077992524106 | [0.         0.23884523 0.41362749 0.60552278 1.        ]      |
+    | average_age     | int   | 30                  |                                                               |
+    | household_size  | float | 4.469               |                                                               |
+    | location        | str   | Bangladesh          | ['Niger' 'Mayotte' 'Myanmar' 'Thailand' 'None']               |
+    | n_days          | int   | 80                  | [ 59.  74.  83.  93. 120.]                                    |
+    | pop_infected    | int   | 400                 | [  99.  156.  229.  342. 1100.]                               |
+    | pop_size        | int   | 10000               | [-1.0000e+00  1.0822e+04  1.2829e+04  1.5033e+04  1.0000e+05] |
+    | quar_period     | int   | 11                  | [-1. 11. 12. 14. 25.]                                         |
+    | symp_prob       | float | 0.3946267859089032  | [0.         0.23884523 0.41362749 0.60552278 1.        ]      |
+    | symp_quar_prob  | float | 0.32012755679683896 | [0.         0.03570487 0.09718293 0.20185406 1.        ]      |
+    | trace_probs     | float | 0.09610948155767196 | [0.         0.23884523 0.41362749 0.60552278 1.        ]      |
     And the following variables are recorded at the end of the simulation
     | variable        | type |
     | cum_deaths      | int  |
@@ -23,8 +23,8 @@ Feature: Compare interventions basic concrete
   @average_age_cum_quarantined_0
   @average_age
   Scenario: average_age_cum_quarantined_0
-    Given we run the model with average_age=20
-    When we run the model with average_age=30
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
@@ -36,13 +36,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_1
   @average_age
   Scenario: average_age_cum_quarantined_1
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -55,13 +55,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.2404924383007006  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_2
   @average_age
   Scenario: average_age_cum_quarantined_2
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -73,37 +73,37 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_3
   @average_age
   Scenario: average_age_cum_quarantined_3
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_4
   @average_age
   Scenario: average_age_cum_quarantined_4
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 15                  |
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
@@ -112,32 +112,32 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_5
   @average_age
   Scenario: average_age_cum_quarantined_5
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_6
   @average_age
   Scenario: average_age_cum_quarantined_6
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -149,19 +149,19 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_7
   @average_age
   Scenario: average_age_cum_quarantined_7
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
     | n_days          | 96                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.7292420114738518  |
@@ -169,13 +169,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.2404924383007006  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_8
   @average_age
   Scenario: average_age_cum_quarantined_8
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -188,13 +188,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_9
   @average_age
   Scenario: average_age_cum_quarantined_9
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -205,15 +205,15 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_10
   @average_age
   Scenario: average_age_cum_quarantined_10
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -221,303 +221,303 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_11
   @average_age
   Scenario: average_age_cum_quarantined_11
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
     | n_days          | 90                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.2404924383007006  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_12
   @average_age
   Scenario: average_age_cum_quarantined_12
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 66                  |
-    | quar_period     | 13                  |
-    | pop_size        | 13013               |
-    | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
-    | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.2404924383007006  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
-
-  @average_age_cum_quarantined_13
-  @average_age
-  Scenario: average_age_cum_quarantined_13
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 96                  |
-    | quar_period     | 11                  |
-    | pop_size        | 13013               |
-    | pop_infected    | 400                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.39576785318565705 |
-    | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
-
-  @average_age_cum_quarantined_14
-  @average_age
-  Scenario: average_age_cum_quarantined_14
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 66                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.06566236367037942 |
-    | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
-
-  @average_age_cum_quarantined_15
-  @average_age
-  Scenario: average_age_cum_quarantined_15
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 11                  |
-    | pop_size        | 17019               |
-    | pop_infected    | 295                 |
-    | symp_prob       | 0.7292420114738518  |
-    | asymp_prob      | 0.6240963641577594  |
-    | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
-
-  @average_age_cum_quarantined_16
-  @average_age
-  Scenario: average_age_cum_quarantined_16
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 15                  |
-    | pop_size        | 17019               |
-    | pop_infected    | 217                 |
-    | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.39576785318565705 |
-    | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
-
-  @average_age_cum_quarantined_17
-  @average_age
-  Scenario: average_age_cum_quarantined_17
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 96                  |
-    | quar_period     | 11                  |
-    | pop_size        | 11593               |
-    | pop_infected    | 400                 |
-    | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.06566236367037942 |
-    | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.2404924383007006  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
-
-  @average_age_cum_quarantined_18
-  @average_age
-  Scenario: average_age_cum_quarantined_18
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.06566236367037942 |
-    | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
-
-  @average_age_cum_quarantined_19
-  @average_age
-  Scenario: average_age_cum_quarantined_19
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 11                  |
-    | pop_size        | 13013               |
-    | pop_infected    | 140                 |
-    | symp_prob       | 0.7292420114738518  |
-    | asymp_prob      | 0.6240963641577594  |
-    | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
-
-  @average_age_cum_quarantined_20
-  @average_age
-  Scenario: average_age_cum_quarantined_20
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 66                  |
-    | quar_period     | 13                  |
-    | pop_size        | 17019               |
-    | pop_infected    | 400                 |
-    | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.5320606162934023  |
-    | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
-
-  @average_age_cum_quarantined_21
-  @average_age
-  Scenario: average_age_cum_quarantined_21
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 96                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.39576785318565705 |
-    | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
-
-  @average_age_cum_quarantined_22
-  @average_age
-  Scenario: average_age_cum_quarantined_22
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 11                  |
-    | pop_size        | 11593               |
-    | pop_infected    | 400                 |
-    | symp_prob       | 0.7292420114738518  |
-    | asymp_prob      | 0.6240963641577594  |
-    | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
-
-  @average_age_cum_quarantined_23
-  @average_age
-  Scenario: average_age_cum_quarantined_23
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 66                  |
-    | quar_period     | 13                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 295                 |
-    | symp_prob       | 0.7292420114738518  |
-    | asymp_prob      | 0.5320606162934023  |
-    | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
-
-  @average_age_cum_quarantined_24
-  @average_age
-  Scenario: average_age_cum_quarantined_24
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 140                 |
-    | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.6240963641577594  |
-    | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.2404924383007006  |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
-
-  @average_age_cum_quarantined_25
-  @average_age
-  Scenario: average_age_cum_quarantined_25
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value              |
-    | n_days          | 90                 |
-    | quar_period     | 15                 |
+    | n_days          | 66                 |
+    | quar_period     | 11                 |
     | pop_size        | 13013              |
     | pop_infected    | 217                |
     | symp_prob       | 0.3946267859089032 |
     | asymp_prob      | 0.5320606162934023 |
     | symp_quar_prob  | 0.0456075960115124 |
-    | asymp_quar_prob | 0.5362647235083882 |
-    | trace_probs     | 0.4179307148516287 |
-    | household_size  | 5.916              |
-    Then the cum_quarantined should increase
+    | asymp_quar_prob | 0.2404924383007006 |
+    | trace_probs     | 0.7734426077281416 |
+    | household_size  | 4.469              |
+    Then the cum_quarantined should decrease
+
+  @average_age_cum_quarantined_13
+  @average_age
+  Scenario: average_age_cum_quarantined_13
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 96                  |
+    | quar_period     | 11                  |
+    | pop_size        | 13013               |
+    | pop_infected    | 400                 |
+    | symp_prob       | 0.5299357265511195  |
+    | asymp_prob      | 0.39576785318565705 |
+    | symp_quar_prob  | 0.02312927617193368 |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
+
+  @average_age_cum_quarantined_14
+  @average_age
+  Scenario: average_age_cum_quarantined_14
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 66                  |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 140                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.06566236367037942 |
+    | symp_quar_prob  | 0.02312927617193368 |
+    | asymp_quar_prob | 0.2404924383007006  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
+
+  @average_age_cum_quarantined_15
+  @average_age
+  Scenario: average_age_cum_quarantined_15
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 90                  |
+    | quar_period     | 11                  |
+    | pop_size        | 17019               |
+    | pop_infected    | 295                 |
+    | symp_prob       | 0.7292420114738518  |
+    | asymp_prob      | 0.5320606162934023  |
+    | symp_quar_prob  | 0.32012755679683896 |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
+
+  @average_age_cum_quarantined_16
+  @average_age
+  Scenario: average_age_cum_quarantined_16
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 15                  |
+    | pop_size        | 17019               |
+    | pop_infected    | 217                 |
+    | symp_prob       | 0.20143639198171964 |
+    | asymp_prob      | 0.39576785318565705 |
+    | symp_quar_prob  | 0.14055901473290044 |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
+
+  @average_age_cum_quarantined_17
+  @average_age
+  Scenario: average_age_cum_quarantined_17
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 96                  |
+    | quar_period     | 11                  |
+    | pop_size        | 11593               |
+    | pop_infected    | 400                 |
+    | symp_prob       | 0.20143639198171964 |
+    | asymp_prob      | 0.06566236367037942 |
+    | symp_quar_prob  | 0.32012755679683896 |
+    | asymp_quar_prob | 0.2404924383007006  |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
+
+  @average_age_cum_quarantined_18
+  @average_age
+  Scenario: average_age_cum_quarantined_18
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 90                  |
+    | quar_period     | 13                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 140                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.06566236367037942 |
+    | symp_quar_prob  | 0.02312927617193368 |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
+
+  @average_age_cum_quarantined_19
+  @average_age
+  Scenario: average_age_cum_quarantined_19
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 15                  |
+    | pop_size        | 13013               |
+    | pop_infected    | 140                 |
+    | symp_prob       | 0.7292420114738518  |
+    | asymp_prob      | 0.6240963641577594  |
+    | symp_quar_prob  | 0.32012755679683896 |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
+
+  @average_age_cum_quarantined_20
+  @average_age
+  Scenario: average_age_cum_quarantined_20
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 66                  |
+    | quar_period     | 13                  |
+    | pop_size        | 17019               |
+    | pop_infected    | 400                 |
+    | symp_prob       | 0.20143639198171964 |
+    | asymp_prob      | 0.5320606162934023  |
+    | symp_quar_prob  | 0.02312927617193368 |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
+
+  @average_age_cum_quarantined_21
+  @average_age
+  Scenario: average_age_cum_quarantined_21
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 96                  |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 295                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.39576785318565705 |
+    | symp_quar_prob  | 0.14055901473290044 |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
+
+  @average_age_cum_quarantined_22
+  @average_age
+  Scenario: average_age_cum_quarantined_22
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
+    | pop_size        | 11593               |
+    | pop_infected    | 400                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.6240963641577594  |
+    | symp_quar_prob  | 0.0456075960115124  |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
+
+  @average_age_cum_quarantined_23
+  @average_age
+  Scenario: average_age_cum_quarantined_23
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 66                  |
+    | quar_period     | 13                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 295                 |
+    | symp_prob       | 0.7292420114738518  |
+    | asymp_prob      | 0.5320606162934023  |
+    | symp_quar_prob  | 0.14055901473290044 |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
+
+  @average_age_cum_quarantined_24
+  @average_age
+  Scenario: average_age_cum_quarantined_24
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 140                 |
+    | symp_prob       | 0.20143639198171964 |
+    | asymp_prob      | 0.6240963641577594  |
+    | symp_quar_prob  | 0.02312927617193368 |
+    | asymp_quar_prob | 0.2404924383007006  |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
+
+  @average_age_cum_quarantined_25
+  @average_age
+  Scenario: average_age_cum_quarantined_25
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 90                  |
+    | quar_period     | 15                  |
+    | pop_size        | 13013               |
+    | pop_infected    | 217                 |
+    | symp_prob       | 0.5299357265511195  |
+    | asymp_prob      | 0.5320606162934023  |
+    | symp_quar_prob  | 0.0456075960115124  |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_26
   @average_age
   Scenario: average_age_cum_quarantined_26
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -530,13 +530,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_27
   @average_age
   Scenario: average_age_cum_quarantined_27
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -549,17 +549,17 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_28
   @average_age
   Scenario: average_age_cum_quarantined_28
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
@@ -568,13 +568,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_29
   @average_age
   Scenario: average_age_cum_quarantined_29
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -587,32 +587,32 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_quarantined_30
   @average_age
   Scenario: average_age_cum_quarantined_30
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 13013               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_quarantined should increase
+    | household_size  | 4.469               |
+    Then the cum_quarantined should decrease
 
   @average_age_cum_infections_0
   @average_age
   Scenario: average_age_cum_infections_0
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -625,13 +625,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @average_age_cum_infections_1
   @average_age
   Scenario: average_age_cum_infections_1
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -644,13 +644,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.2404924383007006  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @average_age_cum_infections_2
   @average_age
   Scenario: average_age_cum_infections_2
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -663,18 +663,18 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @average_age_cum_infections_3
   @average_age
   Scenario: average_age_cum_infections_3
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
@@ -682,18 +682,18 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @average_age_cum_infections_4
   @average_age
   Scenario: average_age_cum_infections_4
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 11                  |
+    | n_days          | 80                  |
+    | quar_period     | 15                  |
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.7292420114738518  |
@@ -701,13 +701,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @average_age_cum_infections_5
   @average_age
   Scenario: average_age_cum_infections_5
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -719,14 +719,14 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @average_age_cum_infections_6
   @average_age
   Scenario: average_age_cum_infections_6
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -739,13 +739,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @average_age_cum_infections_7
   @average_age
   Scenario: average_age_cum_infections_7
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -758,13 +758,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.2404924383007006  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @average_age_cum_infections_8
   @average_age
   Scenario: average_age_cum_infections_8
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -775,15 +775,15 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @average_age_cum_infections_9
   @average_age
   Scenario: average_age_cum_infections_9
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -796,13 +796,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @average_age_cum_infections_10
   @average_age
   Scenario: average_age_cum_infections_10
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -810,23 +810,23 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @average_age_cum_infections_11
   @average_age
   Scenario: average_age_cum_infections_11
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
     | n_days          | 90                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
@@ -834,602 +834,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.2404924383007006  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @average_age_cum_infections_12
   @average_age
   Scenario: average_age_cum_infections_12
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 66                  |
-    | quar_period     | 13                  |
-    | pop_size        | 13013               |
-    | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
-    | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.2404924383007006  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_13
-  @average_age
-  Scenario: average_age_cum_infections_13
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 96                  |
-    | quar_period     | 11                  |
-    | pop_size        | 13013               |
-    | pop_infected    | 400                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.39576785318565705 |
-    | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_14
-  @average_age
-  Scenario: average_age_cum_infections_14
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 66                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.06566236367037942 |
-    | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_15
-  @average_age
-  Scenario: average_age_cum_infections_15
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 295                 |
-    | symp_prob       | 0.7292420114738518  |
-    | asymp_prob      | 0.6240963641577594  |
-    | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_16
-  @average_age
-  Scenario: average_age_cum_infections_16
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 15                  |
-    | pop_size        | 17019               |
-    | pop_infected    | 217                 |
-    | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.39576785318565705 |
-    | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_17
-  @average_age
-  Scenario: average_age_cum_infections_17
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 96                  |
-    | quar_period     | 11                  |
-    | pop_size        | 11593               |
-    | pop_infected    | 400                 |
-    | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.06566236367037942 |
-    | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.2404924383007006  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_18
-  @average_age
-  Scenario: average_age_cum_infections_18
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.06566236367037942 |
-    | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_19
-  @average_age
-  Scenario: average_age_cum_infections_19
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 15                  |
-    | pop_size        | 13013               |
-    | pop_infected    | 140                 |
-    | symp_prob       | 0.7292420114738518  |
-    | asymp_prob      | 0.6240963641577594  |
-    | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_20
-  @average_age
-  Scenario: average_age_cum_infections_20
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 66                  |
-    | quar_period     | 13                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 400                 |
-    | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.5320606162934023  |
-    | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_21
-  @average_age
-  Scenario: average_age_cum_infections_21
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 96                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.39576785318565705 |
-    | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_22
-  @average_age
-  Scenario: average_age_cum_infections_22
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 11                  |
-    | pop_size        | 11593               |
-    | pop_infected    | 400                 |
-    | symp_prob       | 0.7292420114738518  |
-    | asymp_prob      | 0.6240963641577594  |
-    | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_23
-  @average_age
-  Scenario: average_age_cum_infections_23
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 66                  |
-    | quar_period     | 13                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 295                 |
-    | symp_prob       | 0.7292420114738518  |
-    | asymp_prob      | 0.5320606162934023  |
-    | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_24
-  @average_age
-  Scenario: average_age_cum_infections_24
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 400                 |
-    | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.6240963641577594  |
-    | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.2404924383007006  |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_25
-  @average_age
-  Scenario: average_age_cum_infections_25
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 15                  |
-    | pop_size        | 13013               |
-    | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
-    | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_26
-  @average_age
-  Scenario: average_age_cum_infections_26
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 66                  |
-    | quar_period     | 11                  |
-    | pop_size        | 11593               |
-    | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.39576785318565705 |
-    | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_27
-  @average_age
-  Scenario: average_age_cum_infections_27
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 13                  |
-    | pop_size        | 11593               |
-    | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.06566236367037942 |
-    | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_28
-  @average_age
-  Scenario: average_age_cum_infections_28
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 96                  |
-    | quar_period     | 15                  |
-    | pop_size        | 11593               |
-    | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.39576785318565705 |
-    | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_29
-  @average_age
-  Scenario: average_age_cum_infections_29
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 96                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.06566236367037942 |
-    | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_infections_30
-  @average_age
-  Scenario: average_age_cum_infections_30
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 96                  |
-    | quar_period     | 11                  |
-    | pop_size        | 13013               |
-    | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.39576785318565705 |
-    | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
-
-  @average_age_cum_deaths_0
-  @average_age
-  Scenario: average_age_cum_deaths_0
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 400                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
-    | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_deaths should increase
-
-  @average_age_cum_deaths_1
-  @average_age
-  Scenario: average_age_cum_deaths_1
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 96                  |
-    | quar_period     | 13                  |
-    | pop_size        | 17019               |
-    | pop_infected    | 140                 |
-    | symp_prob       | 0.5299357265511195  |
-    | asymp_prob      | 0.6240963641577594  |
-    | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.2404924383007006  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_deaths should increase
-
-  @average_age_cum_deaths_2
-  @average_age
-  Scenario: average_age_cum_deaths_2
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 11                  |
-    | pop_size        | 13013               |
-    | pop_infected    | 295                 |
-    | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.06566236367037942 |
-    | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
-    Then the cum_deaths should increase
-
-  @average_age_cum_deaths_3
-  @average_age
-  Scenario: average_age_cum_deaths_3
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 66                  |
-    | quar_period     | 15                  |
-    | pop_size        | 11593               |
-    | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.39576785318565705 |
-    | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_deaths should increase
-
-  @average_age_cum_deaths_4
-  @average_age
-  Scenario: average_age_cum_deaths_4
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 15                  |
-    | pop_size        | 13013               |
-    | pop_infected    | 400                 |
-    | symp_prob       | 0.7292420114738518  |
-    | asymp_prob      | 0.06566236367037942 |
-    | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_deaths should increase
-
-  @average_age_cum_deaths_5
-  @average_age
-  Scenario: average_age_cum_deaths_5
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 66                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 217                 |
-    | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.6240963641577594  |
-    | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_deaths should increase
-
-  @average_age_cum_deaths_6
-  @average_age
-  Scenario: average_age_cum_deaths_6
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 11                  |
-    | pop_size        | 11593               |
-    | pop_infected    | 295                 |
-    | symp_prob       | 0.5299357265511195  |
-    | asymp_prob      | 0.5320606162934023  |
-    | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
-    Then the cum_deaths should increase
-
-  @average_age_cum_deaths_7
-  @average_age
-  Scenario: average_age_cum_deaths_7
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 96                  |
-    | quar_period     | 15                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 140                 |
-    | symp_prob       | 0.7292420114738518  |
-    | asymp_prob      | 0.39576785318565705 |
-    | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.2404924383007006  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_deaths should increase
-
-  @average_age_cum_deaths_8
-  @average_age
-  Scenario: average_age_cum_deaths_8
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 13                  |
-    | pop_size        | 17019               |
-    | pop_infected    | 400                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
-    | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_deaths should increase
-
-  @average_age_cum_deaths_9
-  @average_age
-  Scenario: average_age_cum_deaths_9
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 66                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 217                 |
-    | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.06566236367037942 |
-    | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_deaths should increase
-
-  @average_age_cum_deaths_10
-  @average_age
-  Scenario: average_age_cum_deaths_10
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 96                  |
-    | quar_period     | 11                  |
-    | pop_size        | 11593               |
-    | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
-    | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
-    Then the cum_deaths should increase
-
-  @average_age_cum_deaths_11
-  @average_age
-  Scenario: average_age_cum_deaths_11
-    Given we run the model with average_age=20
-    When we run the model with average_age=41
-    And effect modifier values
-    | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 13                  |
-    | pop_size        | 11593               |
-    | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.39576785318565705 |
-    | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.2404924383007006  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_deaths should increase
-
-  @average_age_cum_deaths_12
-  @average_age
-  Scenario: average_age_cum_deaths_12
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value              |
@@ -1442,13 +853,602 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124 |
     | asymp_quar_prob | 0.2404924383007006 |
     | trace_probs     | 0.7734426077281416 |
-    | household_size  | 5.916              |
+    | household_size  | 4.469              |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_13
+  @average_age
+  Scenario: average_age_cum_infections_13
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 96                  |
+    | quar_period     | 11                  |
+    | pop_size        | 13013               |
+    | pop_infected    | 400                 |
+    | symp_prob       | 0.5299357265511195  |
+    | asymp_prob      | 0.39576785318565705 |
+    | symp_quar_prob  | 0.02312927617193368 |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_14
+  @average_age
+  Scenario: average_age_cum_infections_14
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 66                  |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 140                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.06566236367037942 |
+    | symp_quar_prob  | 0.02312927617193368 |
+    | asymp_quar_prob | 0.2404924383007006  |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_15
+  @average_age
+  Scenario: average_age_cum_infections_15
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 90                  |
+    | quar_period     | 11                  |
+    | pop_size        | 17019               |
+    | pop_infected    | 295                 |
+    | symp_prob       | 0.7292420114738518  |
+    | asymp_prob      | 0.5320606162934023  |
+    | symp_quar_prob  | 0.32012755679683896 |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_16
+  @average_age
+  Scenario: average_age_cum_infections_16
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 15                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 217                 |
+    | symp_prob       | 0.20143639198171964 |
+    | asymp_prob      | 0.39576785318565705 |
+    | symp_quar_prob  | 0.14055901473290044 |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_17
+  @average_age
+  Scenario: average_age_cum_infections_17
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 96                  |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 400                 |
+    | symp_prob       | 0.20143639198171964 |
+    | asymp_prob      | 0.06566236367037942 |
+    | symp_quar_prob  | 0.32012755679683896 |
+    | asymp_quar_prob | 0.2404924383007006  |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_18
+  @average_age
+  Scenario: average_age_cum_infections_18
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 90                  |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 140                 |
+    | symp_prob       | 0.5299357265511195  |
+    | asymp_prob      | 0.06566236367037942 |
+    | symp_quar_prob  | 0.02312927617193368 |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_19
+  @average_age
+  Scenario: average_age_cum_infections_19
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 15                  |
+    | pop_size        | 13013               |
+    | pop_infected    | 140                 |
+    | symp_prob       | 0.7292420114738518  |
+    | asymp_prob      | 0.6240963641577594  |
+    | symp_quar_prob  | 0.32012755679683896 |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_20
+  @average_age
+  Scenario: average_age_cum_infections_20
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 66                  |
+    | quar_period     | 13                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 400                 |
+    | symp_prob       | 0.20143639198171964 |
+    | asymp_prob      | 0.5320606162934023  |
+    | symp_quar_prob  | 0.02312927617193368 |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_21
+  @average_age
+  Scenario: average_age_cum_infections_21
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 96                  |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 295                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.39576785318565705 |
+    | symp_quar_prob  | 0.14055901473290044 |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_22
+  @average_age
+  Scenario: average_age_cum_infections_22
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
+    | pop_size        | 11593               |
+    | pop_infected    | 400                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.6240963641577594  |
+    | symp_quar_prob  | 0.0456075960115124  |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_23
+  @average_age
+  Scenario: average_age_cum_infections_23
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 66                  |
+    | quar_period     | 13                  |
+    | pop_size        | 17019               |
+    | pop_infected    | 295                 |
+    | symp_prob       | 0.7292420114738518  |
+    | asymp_prob      | 0.5320606162934023  |
+    | symp_quar_prob  | 0.14055901473290044 |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_24
+  @average_age
+  Scenario: average_age_cum_infections_24
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 140                 |
+    | symp_prob       | 0.20143639198171964 |
+    | asymp_prob      | 0.6240963641577594  |
+    | symp_quar_prob  | 0.02312927617193368 |
+    | asymp_quar_prob | 0.2404924383007006  |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_25
+  @average_age
+  Scenario: average_age_cum_infections_25
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 90                  |
+    | quar_period     | 15                  |
+    | pop_size        | 13013               |
+    | pop_infected    | 217                 |
+    | symp_prob       | 0.5299357265511195  |
+    | asymp_prob      | 0.5320606162934023  |
+    | symp_quar_prob  | 0.0456075960115124  |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_26
+  @average_age
+  Scenario: average_age_cum_infections_26
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 66                  |
+    | quar_period     | 11                  |
+    | pop_size        | 11593               |
+    | pop_infected    | 140                 |
+    | symp_prob       | 0.5299357265511195  |
+    | asymp_prob      | 0.39576785318565705 |
+    | symp_quar_prob  | 0.0456075960115124  |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_27
+  @average_age
+  Scenario: average_age_cum_infections_27
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 13                  |
+    | pop_size        | 11593               |
+    | pop_infected    | 140                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.06566236367037942 |
+    | symp_quar_prob  | 0.32012755679683896 |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_28
+  @average_age
+  Scenario: average_age_cum_infections_28
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 15                  |
+    | pop_size        | 11593               |
+    | pop_infected    | 295                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.39576785318565705 |
+    | symp_quar_prob  | 0.32012755679683896 |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_29
+  @average_age
+  Scenario: average_age_cum_infections_29
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 96                  |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 217                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.06566236367037942 |
+    | symp_quar_prob  | 0.32012755679683896 |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_infections_30
+  @average_age
+  Scenario: average_age_cum_infections_30
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
+    | pop_size        | 13013               |
+    | pop_infected    | 140                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.39576785318565705 |
+    | symp_quar_prob  | 0.32012755679683896 |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
+
+  @average_age_cum_deaths_0
+  @average_age
+  Scenario: average_age_cum_deaths_0
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 400                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.5320606162934023  |
+    | symp_quar_prob  | 0.32012755679683896 |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_deaths should increase
+
+  @average_age_cum_deaths_1
+  @average_age
+  Scenario: average_age_cum_deaths_1
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 96                  |
+    | quar_period     | 13                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 140                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.6240963641577594  |
+    | symp_quar_prob  | 0.14055901473290044 |
+    | asymp_quar_prob | 0.2404924383007006  |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
+    Then the cum_deaths should increase
+
+  @average_age_cum_deaths_2
+  @average_age
+  Scenario: average_age_cum_deaths_2
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 90                  |
+    | quar_period     | 11                  |
+    | pop_size        | 13013               |
+    | pop_infected    | 295                 |
+    | symp_prob       | 0.20143639198171964 |
+    | asymp_prob      | 0.06566236367037942 |
+    | symp_quar_prob  | 0.0456075960115124  |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
+    Then the cum_deaths should increase
+
+  @average_age_cum_deaths_3
+  @average_age
+  Scenario: average_age_cum_deaths_3
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 66                  |
+    | quar_period     | 11                  |
+    | pop_size        | 11593               |
+    | pop_infected    | 217                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.39576785318565705 |
+    | symp_quar_prob  | 0.02312927617193368 |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
+    Then the cum_deaths should increase
+
+  @average_age_cum_deaths_4
+  @average_age
+  Scenario: average_age_cum_deaths_4
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
+    | pop_size        | 13013               |
+    | pop_infected    | 400                 |
+    | symp_prob       | 0.7292420114738518  |
+    | asymp_prob      | 0.06566236367037942 |
+    | symp_quar_prob  | 0.14055901473290044 |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
+    Then the cum_deaths should increase
+
+  @average_age_cum_deaths_5
+  @average_age
+  Scenario: average_age_cum_deaths_5
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 66                  |
+    | quar_period     | 11                  |
+    | pop_size        | 17019               |
+    | pop_infected    | 217                 |
+    | symp_prob       | 0.20143639198171964 |
+    | asymp_prob      | 0.6240963641577594  |
+    | symp_quar_prob  | 0.32012755679683896 |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_deaths should increase
+
+  @average_age_cum_deaths_6
+  @average_age
+  Scenario: average_age_cum_deaths_6
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
+    | pop_size        | 11593               |
+    | pop_infected    | 295                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.5320606162934023  |
+    | symp_quar_prob  | 0.02312927617193368 |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_deaths should increase
+
+  @average_age_cum_deaths_7
+  @average_age
+  Scenario: average_age_cum_deaths_7
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 96                  |
+    | quar_period     | 15                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 140                 |
+    | symp_prob       | 0.7292420114738518  |
+    | asymp_prob      | 0.39576785318565705 |
+    | symp_quar_prob  | 0.0456075960115124  |
+    | asymp_quar_prob | 0.2404924383007006  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_deaths should increase
+
+  @average_age_cum_deaths_8
+  @average_age
+  Scenario: average_age_cum_deaths_8
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 13                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 400                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.6240963641577594  |
+    | symp_quar_prob  | 0.0456075960115124  |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
+    Then the cum_deaths should increase
+
+  @average_age_cum_deaths_9
+  @average_age
+  Scenario: average_age_cum_deaths_9
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 66                  |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 217                 |
+    | symp_prob       | 0.20143639198171964 |
+    | asymp_prob      | 0.06566236367037942 |
+    | symp_quar_prob  | 0.14055901473290044 |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_deaths should increase
+
+  @average_age_cum_deaths_10
+  @average_age
+  Scenario: average_age_cum_deaths_10
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 96                  |
+    | quar_period     | 11                  |
+    | pop_size        | 11593               |
+    | pop_infected    | 140                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.5320606162934023  |
+    | symp_quar_prob  | 0.32012755679683896 |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
+    Then the cum_deaths should increase
+
+  @average_age_cum_deaths_11
+  @average_age
+  Scenario: average_age_cum_deaths_11
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value               |
+    | n_days          | 90                  |
+    | quar_period     | 11                  |
+    | pop_size        | 11593               |
+    | pop_infected    | 295                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.39576785318565705 |
+    | symp_quar_prob  | 0.14055901473290044 |
+    | asymp_quar_prob | 0.2404924383007006  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_deaths should increase
+
+  @average_age_cum_deaths_12
+  @average_age
+  Scenario: average_age_cum_deaths_12
+    Given we run the model with average_age=30
+    When we run the model with average_age=41
+    And effect modifier values
+    | modifier        | value              |
+    | n_days          | 66                 |
+    | quar_period     | 11                 |
+    | pop_size        | 13013              |
+    | pop_infected    | 217                |
+    | symp_prob       | 0.3946267859089032 |
+    | asymp_prob      | 0.5320606162934023 |
+    | symp_quar_prob  | 0.0456075960115124 |
+    | asymp_quar_prob | 0.2404924383007006 |
+    | trace_probs     | 0.7734426077281416 |
+    | household_size  | 4.469              |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_13
   @average_age
   Scenario: average_age_cum_deaths_13
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -1461,13 +1461,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_14
   @average_age
   Scenario: average_age_cum_deaths_14
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -1478,34 +1478,34 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.2404924383007006  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_15
   @average_age
   Scenario: average_age_cum_deaths_15
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
     | n_days          | 90                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.7292420114738518  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_16
   @average_age
   Scenario: average_age_cum_deaths_16
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -1517,14 +1517,14 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_17
   @average_age
   Scenario: average_age_cum_deaths_17
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -1537,13 +1537,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.2404924383007006  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_18
   @average_age
   Scenario: average_age_cum_deaths_18
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -1551,18 +1551,18 @@ Feature: Compare interventions basic concrete
     | quar_period     | 13                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_19
   @average_age
   Scenario: average_age_cum_deaths_19
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -1575,32 +1575,32 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_20
   @average_age
   Scenario: average_age_cum_deaths_20
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 13                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_21
   @average_age
   Scenario: average_age_cum_deaths_21
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -1611,15 +1611,15 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_22
   @average_age
   Scenario: average_age_cum_deaths_22
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -1627,37 +1627,37 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_23
   @average_age
   Scenario: average_age_cum_deaths_23
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 13                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.7292420114738518  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_24
   @average_age
   Scenario: average_age_cum_deaths_24
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -1670,13 +1670,13 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.2404924383007006  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_25
   @average_age
   Scenario: average_age_cum_deaths_25
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -1687,15 +1687,15 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_26
   @average_age
   Scenario: average_age_cum_deaths_26
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -1703,18 +1703,18 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_27
   @average_age
   Scenario: average_age_cum_deaths_27
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
@@ -1725,19 +1725,19 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_28
   @average_age
   Scenario: average_age_cum_deaths_28
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
@@ -1746,36 +1746,36 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_29
   @average_age
   Scenario: average_age_cum_deaths_29
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
     | n_days          | 96                  |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @average_age_cum_deaths_30
   @average_age
   Scenario: average_age_cum_deaths_30
-    Given we run the model with average_age=20
+    Given we run the model with average_age=30
     When we run the model with average_age=41
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 13013               |
     | pop_infected    | 140                 |
@@ -1784,7 +1784,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @quar_period_cum_quarantined_0
@@ -1802,7 +1802,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_1
@@ -1819,8 +1819,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_2
@@ -1836,9 +1836,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_3
@@ -1854,9 +1854,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_4
@@ -1874,7 +1874,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_5
@@ -1890,9 +1890,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_6
@@ -1903,14 +1903,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_7
@@ -1920,15 +1920,15 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=15
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_8
@@ -1938,7 +1938,7 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=13
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 96                  |
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
@@ -1946,7 +1946,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_9
@@ -1960,11 +1960,11 @@ Feature: Compare interventions basic concrete
     | pop_size        | 17019               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_10
@@ -1974,7 +1974,7 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=13
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 96                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.5299357265511195  |
@@ -1982,7 +1982,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_11
@@ -1995,12 +1995,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 80                  |
     | pop_size        | 13013               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_12
@@ -2011,14 +2011,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_13
@@ -2029,14 +2029,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | pop_size        | 13013               |
+    | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_14
@@ -2054,7 +2054,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_15
@@ -2071,8 +2071,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_16
@@ -2090,7 +2090,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_17
@@ -2108,7 +2108,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.2404924383007006  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_18
@@ -2126,7 +2126,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_19
@@ -2136,15 +2136,15 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=15
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | pop_size        | 17019               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_20
@@ -2158,11 +2158,11 @@ Feature: Compare interventions basic concrete
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_21
@@ -2179,8 +2179,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_22
@@ -2196,9 +2196,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_23
@@ -2214,9 +2214,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_24
@@ -2227,14 +2227,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_25
@@ -2252,7 +2252,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_26
@@ -2270,7 +2270,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_27
@@ -2280,15 +2280,15 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=15
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_28
@@ -2301,12 +2301,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 66                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_quarantined_29
@@ -2316,7 +2316,7 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=15
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
@@ -2324,7 +2324,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @quar_period_cum_infections_0
@@ -2342,8 +2342,8 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_1
   @quar_period_short
@@ -2353,15 +2353,15 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_2
   @quar_period_short
@@ -2376,10 +2376,10 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_3
   @quar_period_short
@@ -2396,8 +2396,8 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_4
   @quar_period_short
@@ -2414,8 +2414,8 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_5
   @quar_period_short
@@ -2432,8 +2432,8 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_6
   @quar_period_short
@@ -2443,15 +2443,15 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_7
   @quar_period_short
@@ -2460,7 +2460,7 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=15
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
@@ -2468,8 +2468,8 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_8
   @quar_period_short
@@ -2486,8 +2486,8 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_9
   @quar_period_short
@@ -2497,15 +2497,15 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_10
   @quar_period_short
@@ -2520,10 +2520,10 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_11
   @quar_period_short
@@ -2539,9 +2539,9 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_12
   @quar_period_short
@@ -2556,10 +2556,10 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_13
   @quar_period_short
@@ -2569,15 +2569,15 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | pop_size        | 13013               |
+    | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_14
   @quar_period_short
@@ -2594,8 +2594,8 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_15
   @quar_period_short
@@ -2604,16 +2604,16 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=15
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.7292420114738518  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_16
   @quar_period_short
@@ -2628,10 +2628,10 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_17
   @quar_period_short
@@ -2646,10 +2646,10 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.2404924383007006  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_18
   @quar_period_short
@@ -2666,8 +2666,8 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_19
   @quar_period_short
@@ -2676,16 +2676,16 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=15
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | pop_size        | 17019               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_20
   @quar_period_short
@@ -2698,12 +2698,12 @@ Feature: Compare interventions basic concrete
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_21
   @quar_period_short
@@ -2718,10 +2718,10 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_22
   @quar_period_short
@@ -2736,10 +2736,10 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_23
   @quar_period_short
@@ -2754,10 +2754,10 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_24
   @quar_period_short
@@ -2772,10 +2772,10 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_25
   @quar_period_short
@@ -2791,9 +2791,9 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_26
   @quar_period_short
@@ -2810,8 +2810,8 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_27
   @quar_period_short
@@ -2820,16 +2820,16 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=15
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_28
   @quar_period_short
@@ -2841,13 +2841,13 @@ Feature: Compare interventions basic concrete
     | n_days          | 66                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_infections_29
   @quar_period_short
@@ -2856,16 +2856,16 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=15
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
-    Then the cum_infections should increase
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
+    Then the cum_infections should decrease
 
   @quar_period_cum_deaths_0
   @quar_period_short
@@ -2882,7 +2882,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_1
@@ -2899,8 +2899,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_2
@@ -2916,9 +2916,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_3
@@ -2935,8 +2935,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_4
@@ -2953,8 +2953,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_5
@@ -2968,11 +2968,11 @@ Feature: Compare interventions basic concrete
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_6
@@ -2983,14 +2983,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_7
@@ -3000,7 +3000,7 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=15
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
@@ -3008,7 +3008,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_8
@@ -3018,7 +3018,7 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=13
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
@@ -3026,7 +3026,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_9
@@ -3040,11 +3040,11 @@ Feature: Compare interventions basic concrete
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_10
@@ -3060,9 +3060,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_11
@@ -3079,8 +3079,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_12
@@ -3093,12 +3093,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 66                  |
     | pop_size        | 17019               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_13
@@ -3109,14 +3109,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | pop_size        | 13013               |
+    | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_14
@@ -3134,7 +3134,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_15
@@ -3144,15 +3144,15 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=15
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.7292420114738518  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_16
@@ -3165,12 +3165,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 80                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_17
@@ -3188,7 +3188,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_18
@@ -3206,7 +3206,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_19
@@ -3216,7 +3216,7 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=15
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | pop_size        | 17019               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.5299357265511195  |
@@ -3224,7 +3224,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_20
@@ -3238,11 +3238,11 @@ Feature: Compare interventions basic concrete
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_21
@@ -3256,11 +3256,11 @@ Feature: Compare interventions basic concrete
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_22
@@ -3277,8 +3277,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_23
@@ -3296,7 +3296,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_24
@@ -3307,14 +3307,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_25
@@ -3332,7 +3332,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_26
@@ -3342,15 +3342,15 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=15
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_27
@@ -3368,7 +3368,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_28
@@ -3381,12 +3381,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 66                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @quar_period_cum_deaths_29
@@ -3396,15 +3396,15 @@ Feature: Compare interventions basic concrete
     When we run the model with quar_period=15
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_quarantined_0
@@ -3422,7 +3422,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_1
@@ -3433,14 +3433,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 17019               |
     | pop_infected    | 140                 |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_2
@@ -3450,15 +3450,15 @@ Feature: Compare interventions basic concrete
     When we run the model with symp_prob=0.3946267859089032
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_3
@@ -3474,9 +3474,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 217                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_4
@@ -3494,7 +3494,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_5
@@ -3511,8 +3511,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_6
@@ -3523,14 +3523,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 13                  |
-    | pop_size        | 10000               |
+    | quar_period     | 11                  |
+    | pop_size        | 13013               |
     | pop_infected    | 140                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_7
@@ -3542,13 +3542,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 13013               |
     | pop_infected    | 217                 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_8
@@ -3566,7 +3566,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_9
@@ -3584,7 +3584,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_10
@@ -3596,13 +3596,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 400                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_11
@@ -3620,7 +3620,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_12
@@ -3637,8 +3637,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_13
@@ -3654,9 +3654,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 140                 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_14
@@ -3668,13 +3668,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 400                 |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_15
@@ -3692,7 +3692,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_16
@@ -3708,9 +3708,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 400                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_17
@@ -3727,8 +3727,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_18
@@ -3746,7 +3746,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_19
@@ -3757,14 +3757,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 17019               |
     | pop_infected    | 217                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_20
@@ -3782,7 +3782,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_21
@@ -3793,14 +3793,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_22
@@ -3818,7 +3818,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_23
@@ -3829,14 +3829,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_24
@@ -3847,14 +3847,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
-    | asymp_prob      | 0.39576785318565705 |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_25
@@ -3868,11 +3868,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 13013               |
     | pop_infected    | 140                 |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_26
@@ -3890,7 +3890,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_27
@@ -3901,14 +3901,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 17019               |
-    | pop_infected    | 140                 |
+    | pop_infected    | 400                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_28
@@ -3926,7 +3926,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_29
@@ -3944,7 +3944,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_quarantined_30
@@ -3956,13 +3956,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @symp_prob_cum_infections_0
@@ -3980,7 +3980,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_1
@@ -3992,13 +3992,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 13                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 140                 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_2
@@ -4014,9 +4014,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 295                 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_3
@@ -4027,14 +4027,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_4
@@ -4052,7 +4052,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_5
@@ -4068,9 +4068,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 295                 |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_6
@@ -4081,14 +4081,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 13                  |
-    | pop_size        | 10000               |
+    | quar_period     | 11                  |
+    | pop_size        | 13013               |
     | pop_infected    | 140                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_7
@@ -4100,13 +4100,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 13013               |
     | pop_infected    | 217                 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_8
@@ -4124,7 +4124,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_9
@@ -4142,7 +4142,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_10
@@ -4153,14 +4153,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 17019               |
     | pop_infected    | 400                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_11
@@ -4174,11 +4174,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_12
@@ -4195,8 +4195,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_13
@@ -4212,9 +4212,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 140                 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_14
@@ -4226,13 +4226,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 400                 |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_15
@@ -4242,7 +4242,7 @@ Feature: Compare interventions basic concrete
     When we run the model with symp_prob=0.5299357265511195
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 96                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
@@ -4250,7 +4250,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_16
@@ -4268,7 +4268,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_17
@@ -4286,7 +4286,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_18
@@ -4304,7 +4304,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_19
@@ -4320,9 +4320,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 217                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_20
@@ -4340,7 +4340,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_21
@@ -4356,9 +4356,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 295                 |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_22
@@ -4376,7 +4376,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_23
@@ -4393,8 +4393,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_24
@@ -4405,14 +4405,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
-    | asymp_prob      | 0.39576785318565705 |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_25
@@ -4429,8 +4429,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_26
@@ -4448,7 +4448,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_27
@@ -4461,12 +4461,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 80                  |
     | quar_period     | 13                  |
     | pop_size        | 17019               |
-    | pop_infected    | 140                 |
+    | pop_infected    | 400                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_28
@@ -4478,13 +4478,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 15                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_29
@@ -4494,7 +4494,7 @@ Feature: Compare interventions basic concrete
     When we run the model with symp_prob=0.7292420114738518
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 90                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
@@ -4502,7 +4502,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_infections_30
@@ -4514,13 +4514,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_prob_cum_deaths_0
@@ -4538,7 +4538,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_1
@@ -4549,14 +4549,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 17019               |
     | pop_infected    | 140                 |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_2
@@ -4573,8 +4573,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_3
@@ -4585,14 +4585,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_4
@@ -4609,8 +4609,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_5
@@ -4628,7 +4628,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_6
@@ -4645,8 +4645,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_7
@@ -4658,13 +4658,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 13013               |
     | pop_infected    | 217                 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_8
@@ -4676,13 +4676,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 295                 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_9
@@ -4693,14 +4693,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_10
@@ -4712,13 +4712,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 15                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_11
@@ -4728,7 +4728,7 @@ Feature: Compare interventions basic concrete
     When we run the model with symp_prob=0.5299357265511195
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
@@ -4736,7 +4736,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_12
@@ -4747,14 +4747,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 13013               |
     | pop_infected    | 295                 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_13
@@ -4772,7 +4772,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_14
@@ -4786,11 +4786,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 17019               |
     | pop_infected    | 400                 |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_15
@@ -4800,7 +4800,7 @@ Feature: Compare interventions basic concrete
     When we run the model with symp_prob=0.5299357265511195
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
@@ -4808,7 +4808,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_16
@@ -4824,9 +4824,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 400                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_17
@@ -4844,7 +4844,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_18
@@ -4862,7 +4862,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_19
@@ -4878,9 +4878,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 217                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_20
@@ -4892,13 +4892,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 13013               |
     | pop_infected    | 140                 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_21
@@ -4909,14 +4909,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_22
@@ -4926,7 +4926,7 @@ Feature: Compare interventions basic concrete
     When we run the model with symp_prob=0.7292420114738518
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 90                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
@@ -4934,7 +4934,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_23
@@ -4945,14 +4945,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_24
@@ -4966,11 +4966,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
-    | asymp_prob      | 0.39576785318565705 |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_25
@@ -4988,7 +4988,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_26
@@ -5005,8 +5005,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_27
@@ -5017,14 +5017,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 17019               |
-    | pop_infected    | 140                 |
+    | pop_infected    | 400                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_28
@@ -5035,14 +5035,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 17019               |
     | pop_infected    | 140                 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_29
@@ -5052,7 +5052,7 @@ Feature: Compare interventions basic concrete
     When we run the model with symp_prob=0.7292420114738518
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 90                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
@@ -5060,7 +5060,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_prob_cum_deaths_30
@@ -5072,13 +5072,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_quarantined_0
@@ -5096,7 +5096,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_1
@@ -5107,14 +5107,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | quar_period     | 13                  |
+    | pop_size        | 17019               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_2
@@ -5130,9 +5130,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_3
@@ -5143,14 +5143,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_4
@@ -5167,8 +5167,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.5299357265511195  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_5
@@ -5186,7 +5186,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_6
@@ -5196,7 +5196,7 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.6240963641577594
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 96                  |
     | quar_period     | 11                  |
     | pop_size        | 17019               |
     | pop_infected    | 295                 |
@@ -5204,7 +5204,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_7
@@ -5215,14 +5215,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_8
@@ -5234,13 +5234,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_9
@@ -5258,7 +5258,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_10
@@ -5269,14 +5269,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_11
@@ -5286,7 +5286,7 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.39576785318565705
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 90                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
@@ -5294,7 +5294,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.2404924383007006  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_12
@@ -5312,7 +5312,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_13
@@ -5322,15 +5322,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.5320606162934023
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | n_days          | 96                  |
+    | quar_period     | 13                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_14
@@ -5344,11 +5344,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_15
@@ -5366,7 +5366,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_16
@@ -5377,14 +5377,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
-    | pop_size        | 17019               |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_17
@@ -5398,11 +5398,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_18
@@ -5413,14 +5413,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_19
@@ -5437,8 +5437,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_20
@@ -5448,15 +5448,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.6240963641577594
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 96                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_21
@@ -5474,7 +5474,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_22
@@ -5485,14 +5485,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_23
@@ -5508,9 +5508,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_24
@@ -5521,14 +5521,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_25
@@ -5544,9 +5544,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_26
@@ -5556,15 +5556,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.6240963641577594
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | n_days          | 90                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.5299357265511195  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_27
@@ -5582,7 +5582,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_28
@@ -5594,13 +5594,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_29
@@ -5612,13 +5612,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_30
@@ -5636,7 +5636,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_quarantined_31
@@ -5646,15 +5646,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.6240963641577594
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_prob_cum_infections_0
@@ -5672,7 +5672,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_1
@@ -5683,14 +5683,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_2
@@ -5700,15 +5700,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.5320606162934023
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 90                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 13013               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_3
@@ -5722,11 +5722,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 15                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.7292420114738518  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_4
@@ -5740,11 +5740,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_5
@@ -5755,14 +5755,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_6
@@ -5774,13 +5774,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_7
@@ -5791,14 +5791,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_8
@@ -5807,16 +5807,16 @@ Feature: Compare interventions basic concrete
     Given we run the model with asymp_prob=0.39576785318565705
     When we run the model with asymp_prob=0.5320606162934023
     And effect modifier values
-    | modifier        | value              |
-    | n_days          | 80                 |
-    | quar_period     | 11                 |
-    | pop_size        | 10000              |
-    | pop_infected    | 217                |
-    | symp_prob       | 0.3946267859089032 |
-    | symp_quar_prob  | 0.0456075960115124 |
-    | asymp_quar_prob | 0.5362647235083882 |
-    | trace_probs     | 0.4179307148516287 |
-    | household_size  | 5.916              |
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 217                 |
+    | symp_prob       | 0.3946267859089032  |
+    | symp_quar_prob  | 0.0456075960115124  |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_9
@@ -5826,15 +5826,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.5320606162934023
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
-    | quar_period     | 11                  |
+    | n_days          | 80                  |
+    | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_10
@@ -5850,9 +5850,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_11
@@ -5870,7 +5870,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.2404924383007006  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_12
@@ -5882,13 +5882,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 13013               |
+    | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_13
@@ -5898,15 +5898,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.5320606162934023
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
-    | quar_period     | 13                  |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_14
@@ -5922,9 +5922,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_15
@@ -5935,14 +5935,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 13013               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_16
@@ -5953,14 +5953,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 17019               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_17
@@ -5974,11 +5974,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_18
@@ -5989,14 +5989,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_19
@@ -6006,15 +6006,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.6240963641577594
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_20
@@ -6032,7 +6032,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_21
@@ -6049,8 +6049,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_22
@@ -6061,14 +6061,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_23
@@ -6084,9 +6084,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_24
@@ -6103,8 +6103,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_25
@@ -6122,7 +6122,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_26
@@ -6132,15 +6132,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.6240963641577594
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 13                  |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_27
@@ -6158,7 +6158,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_28
@@ -6174,9 +6174,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_29
@@ -6192,9 +6192,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_30
@@ -6211,8 +6211,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_infections_31
@@ -6222,15 +6222,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.6240963641577594
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_prob_cum_deaths_0
@@ -6248,7 +6248,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_1
@@ -6259,14 +6259,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 17019               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_2
@@ -6278,13 +6278,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 13013               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_3
@@ -6295,14 +6295,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_4
@@ -6316,11 +6316,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_5
@@ -6337,8 +6337,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_6
@@ -6350,13 +6350,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 96                  |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_7
@@ -6374,7 +6374,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_8
@@ -6383,16 +6383,16 @@ Feature: Compare interventions basic concrete
     Given we run the model with asymp_prob=0.39576785318565705
     When we run the model with asymp_prob=0.5320606162934023
     And effect modifier values
-    | modifier        | value              |
-    | n_days          | 80                 |
-    | quar_period     | 11                 |
-    | pop_size        | 17019              |
-    | pop_infected    | 217                |
-    | symp_prob       | 0.3946267859089032 |
-    | symp_quar_prob  | 0.0456075960115124 |
-    | asymp_quar_prob | 0.5362647235083882 |
-    | trace_probs     | 0.4179307148516287 |
-    | household_size  | 5.916              |
+    | modifier        | value               |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
+    | pop_size        | 17019               |
+    | pop_infected    | 217                 |
+    | symp_prob       | 0.3946267859089032  |
+    | symp_quar_prob  | 0.0456075960115124  |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_9
@@ -6403,14 +6403,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_10
@@ -6421,14 +6421,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_11
@@ -6446,7 +6446,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.2404924383007006  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_12
@@ -6463,8 +6463,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_13
@@ -6482,7 +6482,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_14
@@ -6496,11 +6496,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_15
@@ -6510,7 +6510,7 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.39576785318565705
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 15                  |
     | pop_size        | 13013               |
     | pop_infected    | 140                 |
@@ -6518,7 +6518,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_16
@@ -6535,8 +6535,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_17
@@ -6554,7 +6554,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_18
@@ -6570,9 +6570,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_19
@@ -6590,7 +6590,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_20
@@ -6600,7 +6600,7 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.6240963641577594
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 96                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
@@ -6608,7 +6608,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_21
@@ -6626,7 +6626,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_22
@@ -6640,11 +6640,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 15                  |
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_23
@@ -6655,14 +6655,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_24
@@ -6673,14 +6673,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 90                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_25
@@ -6696,9 +6696,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_26
@@ -6708,7 +6708,7 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.6240963641577594
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 90                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
@@ -6716,7 +6716,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_27
@@ -6732,9 +6732,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_28
@@ -6751,8 +6751,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_29
@@ -6769,8 +6769,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_30
@@ -6787,8 +6787,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_prob_cum_deaths_31
@@ -6798,7 +6798,7 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_prob=0.6240963641577594
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
@@ -6806,7 +6806,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_quarantined_0
@@ -6824,7 +6824,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_1
@@ -6835,14 +6835,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | quar_period     | 13                  |
+    | pop_size        | 17019               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.5299357265511195  |
-    | asymp_prob      | 0.6240963641577594  |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_2
@@ -6860,7 +6860,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_3
@@ -6874,11 +6874,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 15                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_4
@@ -6896,7 +6896,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_5
@@ -6910,11 +6910,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 15                  |
     | pop_size        | 17019               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_6
@@ -6924,15 +6924,15 @@ Feature: Compare interventions basic concrete
     When we run the model with symp_quar_prob=0.32012755679683896
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | n_days          | 96                  |
+    | quar_period     | 13                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_7
@@ -6944,13 +6944,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 13013               |
+    | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_8
@@ -6961,14 +6961,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_9
@@ -6977,16 +6977,16 @@ Feature: Compare interventions basic concrete
     Given we run the model with symp_quar_prob=0.02312927617193368
     When we run the model with symp_quar_prob=0.0456075960115124
     And effect modifier values
-    | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 400                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | modifier        | value              |
+    | n_days          | 80                 |
+    | quar_period     | 11                 |
+    | pop_size        | 17019              |
+    | pop_infected    | 400                |
+    | symp_prob       | 0.3946267859089032 |
+    | asymp_prob      | 0.5320606162934023 |
+    | asymp_quar_prob | 0.5362647235083882 |
+    | trace_probs     | 0.7734426077281416 |
+    | household_size  | 4.469              |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_10
@@ -6997,14 +6997,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value              |
     | n_days          | 80                 |
-    | quar_period     | 15                 |
+    | quar_period     | 11                 |
     | pop_size        | 10000              |
     | pop_infected    | 217                |
     | symp_prob       | 0.3946267859089032 |
     | asymp_prob      | 0.6240963641577594 |
     | asymp_quar_prob | 0.6280014380485361 |
     | trace_probs     | 0.7734426077281416 |
-    | household_size  | 5.916              |
+    | household_size  | 4.469              |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_11
@@ -7016,13 +7016,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_12
@@ -7036,11 +7036,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_13
@@ -7055,10 +7055,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_14
@@ -7069,14 +7069,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
-    | pop_size        | 13013               |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_15
@@ -7090,11 +7090,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.7292420114738518  |
     | asymp_prob      | 0.39576785318565705 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_16
@@ -7111,8 +7111,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_17
@@ -7127,10 +7127,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_18
@@ -7148,7 +7148,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_19
@@ -7162,11 +7162,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.7292420114738518  |
     | asymp_prob      | 0.6240963641577594  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_20
@@ -7176,15 +7176,15 @@ Feature: Compare interventions basic concrete
     When we run the model with symp_quar_prob=0.32012755679683896
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | n_days          | 80                  |
+    | quar_period     | 13                  |
+    | pop_size        | 17019               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_21
@@ -7200,9 +7200,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_22
@@ -7213,14 +7213,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_23
@@ -7234,11 +7234,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 13                  |
     | pop_size        | 17019               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_24
@@ -7249,14 +7249,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_25
@@ -7267,14 +7267,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 17019               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_26
@@ -7292,7 +7292,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_27
@@ -7307,10 +7307,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.5299357265511195  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_28
@@ -7320,15 +7320,15 @@ Feature: Compare interventions basic concrete
     When we run the model with symp_quar_prob=0.32012755679683896
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.7292420114738518  |
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_quarantined_29
@@ -7346,7 +7346,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.6240963641577594  |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should remain the same
 
   @symp_quar_prob_cum_infections_0
@@ -7364,7 +7364,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_1
@@ -7375,14 +7375,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | quar_period     | 13                  |
+    | pop_size        | 17019               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.6240963641577594  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_2
@@ -7392,15 +7392,15 @@ Feature: Compare interventions basic concrete
     When we run the model with symp_quar_prob=0.0456075960115124
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 90                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_3
@@ -7416,9 +7416,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_4
@@ -7433,10 +7433,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.5320606162934023  |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_prob      | 0.6240963641577594  |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_5
@@ -7450,11 +7450,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_6
@@ -7468,11 +7468,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 13                  |
     | pop_size        | 13013               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_7
@@ -7489,8 +7489,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_8
@@ -7508,7 +7508,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_9
@@ -7520,13 +7520,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_10
@@ -7535,16 +7535,16 @@ Feature: Compare interventions basic concrete
     Given we run the model with symp_quar_prob=0.0456075960115124
     When we run the model with symp_quar_prob=0.14055901473290044
     And effect modifier values
-    | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 15                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | modifier        | value              |
+    | n_days          | 80                 |
+    | quar_period     | 11                 |
+    | pop_size        | 10000              |
+    | pop_infected    | 217                |
+    | symp_prob       | 0.3946267859089032 |
+    | asymp_prob      | 0.6240963641577594 |
+    | asymp_quar_prob | 0.6280014380485361 |
+    | trace_probs     | 0.7734426077281416 |
+    | household_size  | 4.469              |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_11
@@ -7556,13 +7556,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_12
@@ -7576,11 +7576,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_13
@@ -7595,10 +7595,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_14
@@ -7610,13 +7610,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 15                  |
-    | pop_size        | 10000               |
+    | pop_size        | 13013               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_15
@@ -7630,11 +7630,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.7292420114738518  |
     | asymp_prob      | 0.39576785318565705 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_16
@@ -7651,8 +7651,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_17
@@ -7669,8 +7669,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_18
@@ -7681,14 +7681,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_19
@@ -7699,14 +7699,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_20
@@ -7716,15 +7716,15 @@ Feature: Compare interventions basic concrete
     When we run the model with symp_quar_prob=0.32012755679683896
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 11                  |
+    | n_days          | 80                  |
+    | quar_period     | 13                  |
     | pop_size        | 17019               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_21
@@ -7742,7 +7742,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_22
@@ -7760,7 +7760,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_23
@@ -7778,7 +7778,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_24
@@ -7789,14 +7789,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_25
@@ -7811,10 +7811,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 17019               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_26
@@ -7826,13 +7826,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 11593               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_27
@@ -7841,16 +7841,16 @@ Feature: Compare interventions basic concrete
     Given we run the model with symp_quar_prob=0.14055901473290044
     When we run the model with symp_quar_prob=0.32012755679683896
     And effect modifier values
-    | modifier        | value               |
-    | n_days          | 80                  |
-    | quar_period     | 11                  |
-    | pop_size        | 11593               |
-    | pop_infected    | 295                 |
-    | symp_prob       | 0.5299357265511195  |
-    | asymp_prob      | 0.6240963641577594  |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | modifier        | value              |
+    | n_days          | 80                 |
+    | quar_period     | 13                 |
+    | pop_size        | 11593              |
+    | pop_infected    | 295                |
+    | symp_prob       | 0.5299357265511195 |
+    | asymp_prob      | 0.5320606162934023 |
+    | asymp_quar_prob | 0.6280014380485361 |
+    | trace_probs     | 0.7734426077281416 |
+    | household_size  | 4.469              |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_28
@@ -7861,14 +7861,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_infections_29
@@ -7884,9 +7884,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @symp_quar_prob_cum_deaths_0
@@ -7904,7 +7904,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_1
@@ -7915,14 +7915,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 17019               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.6240963641577594  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_2
@@ -7934,13 +7934,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 90                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 13013               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_3
@@ -7951,14 +7951,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_4
@@ -7973,10 +7973,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_5
@@ -7988,13 +7988,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 15                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_6
@@ -8004,15 +8004,15 @@ Feature: Compare interventions basic concrete
     When we run the model with symp_quar_prob=0.32012755679683896
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 13                  |
     | pop_size        | 13013               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_7
@@ -8029,8 +8029,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_8
@@ -8041,14 +8041,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_9
@@ -8058,7 +8058,7 @@ Feature: Compare interventions basic concrete
     When we run the model with symp_quar_prob=0.0456075960115124
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 17019               |
     | pop_infected    | 400                 |
@@ -8066,7 +8066,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_10
@@ -8077,14 +8077,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_11
@@ -8100,9 +8100,9 @@ Feature: Compare interventions basic concrete
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_12
@@ -8116,11 +8116,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_13
@@ -8135,10 +8135,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_14
@@ -8149,14 +8149,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_15
@@ -8170,11 +8170,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_16
@@ -8186,13 +8186,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_17
@@ -8206,11 +8206,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
+    | symp_prob       | 0.7292420114738518  |
+    | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_18
@@ -8221,14 +8221,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_19
@@ -8239,14 +8239,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.7292420114738518  |
     | asymp_prob      | 0.6240963641577594  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_20
@@ -8260,11 +8260,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 13                  |
     | pop_size        | 17019               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_21
@@ -8281,8 +8281,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_22
@@ -8293,14 +8293,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_23
@@ -8311,14 +8311,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | quar_period     | 13                  |
+    | pop_size        | 17019               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_24
@@ -8329,14 +8329,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_25
@@ -8351,10 +8351,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 17019               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_26
@@ -8366,13 +8366,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 11593               |
+    | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_27
@@ -8383,14 +8383,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.6240963641577594  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_28
@@ -8408,7 +8408,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @symp_quar_prob_cum_deaths_29
@@ -8425,8 +8425,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_quarantined_0
@@ -8444,7 +8444,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.32012755679683896 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_1
@@ -8455,14 +8455,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier       | value               |
     | n_days         | 80                  |
-    | quar_period    | 11                  |
+    | quar_period    | 13                  |
     | pop_size       | 17019               |
-    | pop_infected   | 400                 |
+    | pop_infected   | 140                 |
     | symp_prob      | 0.5299357265511195  |
-    | asymp_prob     | 0.5320606162934023  |
+    | asymp_prob     | 0.6240963641577594  |
     | symp_quar_prob | 0.14055901473290044 |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.4179307148516287  |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_2
@@ -8472,7 +8472,7 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_quar_prob=0.6280014380485361
     And effect modifier values
     | modifier       | value               |
-    | n_days         | 80                  |
+    | n_days         | 90                  |
     | quar_period    | 11                  |
     | pop_size       | 10000               |
     | pop_infected   | 295                 |
@@ -8480,7 +8480,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.0456075960115124  |
     | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_3
@@ -8491,14 +8491,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier       | value               |
     | n_days         | 66                  |
-    | quar_period    | 15                  |
+    | quar_period    | 11                  |
     | pop_size       | 11593               |
     | pop_infected   | 217                 |
     | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.02312927617193368 |
     | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_4
@@ -8513,10 +8513,10 @@ Feature: Compare interventions basic concrete
     | pop_size       | 10000               |
     | pop_infected   | 217                 |
     | symp_prob      | 0.3946267859089032  |
-    | asymp_prob     | 0.6240963641577594  |
+    | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.0456075960115124  |
-    | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_5
@@ -8534,7 +8534,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.02312927617193368 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_6
@@ -8552,7 +8552,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.32012755679683896 |
     | trace_probs    | 0.4179307148516287  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_7
@@ -8565,12 +8565,12 @@ Feature: Compare interventions basic concrete
     | n_days         | 80                  |
     | quar_period    | 11                  |
     | pop_size       | 10000               |
-    | pop_infected   | 140                 |
+    | pop_infected   | 400                 |
     | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_8
@@ -8584,11 +8584,11 @@ Feature: Compare interventions basic concrete
     | quar_period    | 13                  |
     | pop_size       | 10000               |
     | pop_infected   | 295                 |
-    | symp_prob      | 0.5299357265511195  |
+    | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.02312927617193368 |
     | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_9
@@ -8606,7 +8606,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_10
@@ -8620,11 +8620,11 @@ Feature: Compare interventions basic concrete
     | quar_period    | 13                  |
     | pop_size       | 10000               |
     | pop_infected   | 140                 |
-    | symp_prob      | 0.7292420114738518  |
+    | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.32012755679683896 |
-    | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_11
@@ -8642,7 +8642,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.32012755679683896 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_12
@@ -8659,8 +8659,8 @@ Feature: Compare interventions basic concrete
     | symp_prob      | 0.5299357265511195  |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.32012755679683896 |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.4179307148516287  |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_13
@@ -8669,16 +8669,16 @@ Feature: Compare interventions basic concrete
     Given we run the model with asymp_quar_prob=0.2404924383007006
     When we run the model with asymp_quar_prob=0.5362647235083882
     And effect modifier values
-    | modifier       | value               |
-    | n_days         | 80                  |
-    | quar_period    | 11                  |
-    | pop_size       | 13013               |
-    | pop_infected   | 400                 |
-    | symp_prob      | 0.3946267859089032  |
-    | asymp_prob     | 0.5320606162934023  |
-    | symp_quar_prob | 0.0456075960115124  |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | modifier       | value              |
+    | n_days         | 96                 |
+    | quar_period    | 15                 |
+    | pop_size       | 13013              |
+    | pop_infected   | 400                |
+    | symp_prob      | 0.3946267859089032 |
+    | asymp_prob     | 0.5320606162934023 |
+    | symp_quar_prob | 0.0456075960115124 |
+    | trace_probs    | 0.4179307148516287 |
+    | household_size | 4.469              |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_14
@@ -8695,8 +8695,8 @@ Feature: Compare interventions basic concrete
     | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.14055901473290044 |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.27025117739698024 |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_15
@@ -8707,14 +8707,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier       | value               |
     | n_days         | 80                  |
-    | quar_period    | 15                  |
+    | quar_period    | 11                  |
     | pop_size       | 13013               |
     | pop_infected   | 140                 |
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.02312927617193368 |
     | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_16
@@ -8731,8 +8731,8 @@ Feature: Compare interventions basic concrete
     | symp_prob      | 0.5299357265511195  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.0456075960115124  |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.7734426077281416  |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_17
@@ -8742,15 +8742,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_quar_prob=0.6280014380485361
     And effect modifier values
     | modifier       | value               |
-    | n_days         | 80                  |
+    | n_days         | 96                  |
     | quar_period    | 11                  |
     | pop_size       | 10000               |
     | pop_infected   | 217                 |
     | symp_prob      | 0.20143639198171964 |
-    | asymp_prob     | 0.5320606162934023  |
+    | asymp_prob     | 0.6240963641577594  |
     | symp_quar_prob | 0.0456075960115124  |
     | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_18
@@ -8762,13 +8762,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 80                  |
     | quar_period    | 15                  |
-    | pop_size       | 10000               |
+    | pop_size       | 17019               |
     | pop_infected   | 295                 |
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.0456075960115124  |
-    | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_19
@@ -8785,8 +8785,8 @@ Feature: Compare interventions basic concrete
     | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.02312927617193368 |
-    | trace_probs    | 0.4179307148516287  |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_20
@@ -8797,14 +8797,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier       | value               |
     | n_days         | 66                  |
-    | quar_period    | 11                  |
+    | quar_period    | 15                  |
     | pop_size       | 10000               |
     | pop_infected   | 400                 |
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_21
@@ -8816,13 +8816,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 80                  |
     | quar_period    | 11                  |
-    | pop_size       | 10000               |
+    | pop_size       | 17019               |
     | pop_infected   | 217                 |
     | symp_prob      | 0.7292420114738518  |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.02312927617193368 |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.4179307148516287  |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_22
@@ -8832,15 +8832,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_quar_prob=0.6280014380485361
     And effect modifier values
     | modifier       | value               |
-    | n_days         | 80                  |
-    | quar_period    | 11                  |
+    | n_days         | 96                  |
+    | quar_period    | 13                  |
     | pop_size       | 10000               |
     | pop_infected   | 400                 |
     | symp_prob      | 0.5299357265511195  |
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.0456075960115124  |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_23
@@ -8852,13 +8852,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 96                  |
     | quar_period    | 11                  |
-    | pop_size       | 10000               |
+    | pop_size       | 13013               |
     | pop_infected   | 217                 |
-    | symp_prob      | 0.7292420114738518  |
+    | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_24
@@ -8869,14 +8869,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier       | value               |
     | n_days         | 66                  |
-    | quar_period    | 11                  |
+    | quar_period    | 15                  |
     | pop_size       | 17019               |
     | pop_infected   | 295                 |
     | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.32012755679683896 |
-    | trace_probs    | 0.4179307148516287  |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_25
@@ -8886,15 +8886,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_quar_prob=0.6280014380485361
     And effect modifier values
     | modifier       | value               |
-    | n_days         | 80                  |
+    | n_days         | 90                  |
     | quar_period    | 11                  |
     | pop_size       | 11593               |
     | pop_infected   | 140                 |
-    | symp_prob      | 0.7292420114738518  |
+    | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.0456075960115124  |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_26
@@ -8911,8 +8911,8 @@ Feature: Compare interventions basic concrete
     | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.02312927617193368 |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.27025117739698024 |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_27
@@ -8930,7 +8930,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.32012755679683896 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_28
@@ -8947,8 +8947,8 @@ Feature: Compare interventions basic concrete
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.32012755679683896 |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.7734426077281416  |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_29
@@ -8965,8 +8965,8 @@ Feature: Compare interventions basic concrete
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.32012755679683896 |
-    | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_quarantined_30
@@ -8978,13 +8978,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 66                  |
     | quar_period    | 11                  |
-    | pop_size       | 17019               |
+    | pop_size       | 10000               |
     | pop_infected   | 217                 |
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_quarantined should decrease
 
   @asymp_quar_prob_cum_infections_0
@@ -9002,7 +9002,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.32012755679683896 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_1
@@ -9014,13 +9014,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 80                  |
     | quar_period    | 11                  |
-    | pop_size       | 10000               |
-    | pop_infected   | 400                 |
+    | pop_size       | 17019               |
+    | pop_infected   | 140                 |
     | symp_prob      | 0.5299357265511195  |
     | asymp_prob     | 0.6240963641577594  |
     | symp_quar_prob | 0.14055901473290044 |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.4179307148516287  |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_2
@@ -9037,8 +9037,8 @@ Feature: Compare interventions basic concrete
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.0456075960115124  |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.7734426077281416  |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_3
@@ -9052,11 +9052,11 @@ Feature: Compare interventions basic concrete
     | quar_period    | 15                  |
     | pop_size       | 11593               |
     | pop_infected   | 217                 |
-    | symp_prob      | 0.3946267859089032  |
+    | symp_prob      | 0.7292420114738518  |
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.02312927617193368 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_4
@@ -9068,13 +9068,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 66                  |
     | quar_period    | 11                  |
-    | pop_size       | 13013               |
+    | pop_size       | 10000               |
     | pop_infected   | 217                 |
     | symp_prob      | 0.3946267859089032  |
-    | asymp_prob     | 0.6240963641577594  |
+    | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.0456075960115124  |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_5
@@ -9086,13 +9086,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 80                  |
     | quar_period    | 11                  |
-    | pop_size       | 10000               |
+    | pop_size       | 17019               |
     | pop_infected   | 400                 |
-    | symp_prob      | 0.5299357265511195  |
+    | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.02312927617193368 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_6
@@ -9110,7 +9110,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.32012755679683896 |
     | trace_probs    | 0.4179307148516287  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_7
@@ -9123,12 +9123,12 @@ Feature: Compare interventions basic concrete
     | n_days         | 80                  |
     | quar_period    | 11                  |
     | pop_size       | 10000               |
-    | pop_infected   | 140                 |
+    | pop_infected   | 400                 |
     | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_8
@@ -9146,7 +9146,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.02312927617193368 |
     | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_9
@@ -9164,7 +9164,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_10
@@ -9175,14 +9175,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier       | value               |
     | n_days         | 66                  |
-    | quar_period    | 13                  |
+    | quar_period    | 11                  |
     | pop_size       | 10000               |
     | pop_infected   | 140                 |
     | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.32012755679683896 |
-    | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_11
@@ -9197,10 +9197,10 @@ Feature: Compare interventions basic concrete
     | pop_size       | 11593               |
     | pop_infected   | 295                 |
     | symp_prob      | 0.20143639198171964 |
-    | asymp_prob     | 0.6240963641577594  |
+    | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.32012755679683896 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_12
@@ -9218,7 +9218,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.32012755679683896 |
     | trace_probs    | 0.4179307148516287  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_13
@@ -9229,14 +9229,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier       | value              |
     | n_days         | 80                 |
-    | quar_period    | 11                 |
+    | quar_period    | 15                 |
     | pop_size       | 13013              |
     | pop_infected   | 400                |
     | symp_prob      | 0.3946267859089032 |
-    | asymp_prob     | 0.6240963641577594 |
+    | asymp_prob     | 0.5320606162934023 |
     | symp_quar_prob | 0.0456075960115124 |
     | trace_probs    | 0.4179307148516287 |
-    | household_size | 5.916              |
+    | household_size | 4.469              |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_14
@@ -9254,7 +9254,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_15
@@ -9265,14 +9265,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier       | value               |
     | n_days         | 80                  |
-    | quar_period    | 15                  |
+    | quar_period    | 11                  |
     | pop_size       | 13013               |
     | pop_infected   | 140                 |
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.02312927617193368 |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.7734426077281416  |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_16
@@ -9286,11 +9286,11 @@ Feature: Compare interventions basic concrete
     | quar_period    | 11                  |
     | pop_size       | 11593               |
     | pop_infected   | 217                 |
-    | symp_prob      | 0.3946267859089032  |
+    | symp_prob      | 0.5299357265511195  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.0456075960115124  |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.7734426077281416  |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_17
@@ -9300,15 +9300,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_quar_prob=0.6280014380485361
     And effect modifier values
     | modifier       | value               |
-    | n_days         | 96                  |
+    | n_days         | 80                  |
     | quar_period    | 13                  |
     | pop_size       | 10000               |
     | pop_infected   | 217                 |
     | symp_prob      | 0.20143639198171964 |
-    | asymp_prob     | 0.6240963641577594  |
+    | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.0456075960115124  |
     | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_18
@@ -9319,14 +9319,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier       | value               |
     | n_days         | 80                  |
-    | quar_period    | 15                  |
+    | quar_period    | 11                  |
     | pop_size       | 17019               |
     | pop_infected   | 295                 |
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.0456075960115124  |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.27025117739698024 |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_19
@@ -9343,8 +9343,8 @@ Feature: Compare interventions basic concrete
     | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.02312927617193368 |
-    | trace_probs    | 0.4179307148516287  |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_20
@@ -9362,7 +9362,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_21
@@ -9376,11 +9376,11 @@ Feature: Compare interventions basic concrete
     | quar_period    | 11                  |
     | pop_size       | 10000               |
     | pop_infected   | 217                 |
-    | symp_prob      | 0.3946267859089032  |
+    | symp_prob      | 0.7292420114738518  |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.02312927617193368 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_22
@@ -9390,15 +9390,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_quar_prob=0.6280014380485361
     And effect modifier values
     | modifier       | value               |
-    | n_days         | 80                  |
-    | quar_period    | 11                  |
+    | n_days         | 96                  |
+    | quar_period    | 13                  |
     | pop_size       | 10000               |
     | pop_infected   | 400                 |
-    | symp_prob      | 0.3946267859089032  |
+    | symp_prob      | 0.5299357265511195  |
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.0456075960115124  |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_23
@@ -9410,13 +9410,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 96                  |
     | quar_period    | 11                  |
-    | pop_size       | 10000               |
+    | pop_size       | 13013               |
     | pop_infected   | 217                 |
     | symp_prob      | 0.7292420114738518  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_24
@@ -9427,14 +9427,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier       | value               |
     | n_days         | 66                  |
-    | quar_period    | 15                  |
-    | pop_size       | 17019               |
+    | quar_period    | 11                  |
+    | pop_size       | 10000               |
     | pop_infected   | 295                 |
     | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.32012755679683896 |
-    | trace_probs    | 0.4179307148516287  |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_25
@@ -9444,7 +9444,7 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_quar_prob=0.6280014380485361
     And effect modifier values
     | modifier       | value               |
-    | n_days         | 80                  |
+    | n_days         | 90                  |
     | quar_period    | 11                  |
     | pop_size       | 11593               |
     | pop_infected   | 140                 |
@@ -9452,7 +9452,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.0456075960115124  |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_26
@@ -9464,13 +9464,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 80                  |
     | quar_period    | 11                  |
-    | pop_size       | 17019               |
+    | pop_size       | 10000               |
     | pop_infected   | 295                 |
-    | symp_prob      | 0.3946267859089032  |
+    | symp_prob      | 0.7292420114738518  |
     | asymp_prob     | 0.6240963641577594  |
     | symp_quar_prob | 0.02312927617193368 |
     | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_27
@@ -9482,13 +9482,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 66                  |
     | quar_period    | 11                  |
-    | pop_size       | 17019               |
+    | pop_size       | 10000               |
     | pop_infected   | 217                 |
     | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.32012755679683896 |
-    | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_28
@@ -9505,8 +9505,8 @@ Feature: Compare interventions basic concrete
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.32012755679683896 |
-    | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_29
@@ -9523,8 +9523,8 @@ Feature: Compare interventions basic concrete
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.32012755679683896 |
-    | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_infections_30
@@ -9536,13 +9536,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 66                  |
     | quar_period    | 11                  |
-    | pop_size       | 17019               |
+    | pop_size       | 10000               |
     | pop_infected   | 217                 |
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_infections should decrease
 
   @asymp_quar_prob_cum_deaths_0
@@ -9560,7 +9560,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.32012755679683896 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_1
@@ -9572,13 +9572,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 80                  |
     | quar_period    | 11                  |
-    | pop_size       | 17019               |
-    | pop_infected   | 400                 |
+    | pop_size       | 10000               |
+    | pop_infected   | 140                 |
     | symp_prob      | 0.5299357265511195  |
-    | asymp_prob     | 0.6240963641577594  |
+    | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.14055901473290044 |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.4179307148516287  |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_2
@@ -9588,7 +9588,7 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_quar_prob=0.6280014380485361
     And effect modifier values
     | modifier       | value               |
-    | n_days         | 80                  |
+    | n_days         | 90                  |
     | quar_period    | 11                  |
     | pop_size       | 10000               |
     | pop_infected   | 295                 |
@@ -9596,7 +9596,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.0456075960115124  |
     | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_3
@@ -9607,14 +9607,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier       | value               |
     | n_days         | 66                  |
-    | quar_period    | 15                  |
+    | quar_period    | 11                  |
     | pop_size       | 11593               |
     | pop_infected   | 217                 |
-    | symp_prob      | 0.7292420114738518  |
+    | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.02312927617193368 |
     | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_4
@@ -9626,13 +9626,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 66                  |
     | quar_period    | 11                  |
-    | pop_size       | 13013               |
+    | pop_size       | 10000               |
     | pop_infected   | 217                 |
     | symp_prob      | 0.3946267859089032  |
-    | asymp_prob     | 0.6240963641577594  |
+    | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.0456075960115124  |
     | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_5
@@ -9646,11 +9646,11 @@ Feature: Compare interventions basic concrete
     | quar_period    | 15                  |
     | pop_size       | 10000               |
     | pop_infected   | 400                 |
-    | symp_prob      | 0.5299357265511195  |
+    | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.02312927617193368 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_6
@@ -9668,7 +9668,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.32012755679683896 |
     | trace_probs    | 0.4179307148516287  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_7
@@ -9681,12 +9681,12 @@ Feature: Compare interventions basic concrete
     | n_days         | 80                  |
     | quar_period    | 11                  |
     | pop_size       | 10000               |
-    | pop_infected   | 140                 |
+    | pop_infected   | 400                 |
     | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.14055901473290044 |
-    | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_8
@@ -9700,11 +9700,11 @@ Feature: Compare interventions basic concrete
     | quar_period    | 13                  |
     | pop_size       | 10000               |
     | pop_infected   | 295                 |
-    | symp_prob      | 0.3946267859089032  |
+    | symp_prob      | 0.5299357265511195  |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.02312927617193368 |
     | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_9
@@ -9722,7 +9722,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_10
@@ -9736,11 +9736,11 @@ Feature: Compare interventions basic concrete
     | quar_period    | 13                  |
     | pop_size       | 10000               |
     | pop_infected   | 140                 |
-    | symp_prob      | 0.7292420114738518  |
+    | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.32012755679683896 |
     | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_11
@@ -9758,7 +9758,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.6240963641577594  |
     | symp_quar_prob | 0.32012755679683896 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_12
@@ -9770,13 +9770,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 66                  |
     | quar_period    | 11                  |
-    | pop_size       | 17019               |
+    | pop_size       | 10000               |
     | pop_infected   | 217                 |
-    | symp_prob      | 0.5299357265511195  |
+    | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.32012755679683896 |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.4179307148516287  |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_13
@@ -9786,15 +9786,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_quar_prob=0.5362647235083882
     And effect modifier values
     | modifier       | value               |
-    | n_days         | 80                  |
-    | quar_period    | 11                  |
+    | n_days         | 96                  |
+    | quar_period    | 15                  |
     | pop_size       | 13013               |
     | pop_infected   | 400                 |
     | symp_prob      | 0.3946267859089032  |
-    | asymp_prob     | 0.6240963641577594  |
+    | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.0456075960115124  |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_14
@@ -9812,7 +9812,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_15
@@ -9823,14 +9823,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier       | value               |
     | n_days         | 80                  |
-    | quar_period    | 15                  |
+    | quar_period    | 11                  |
     | pop_size       | 13013               |
     | pop_infected   | 140                 |
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.02312927617193368 |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.7734426077281416  |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_16
@@ -9848,7 +9848,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.0456075960115124  |
     | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_17
@@ -9858,15 +9858,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_quar_prob=0.6280014380485361
     And effect modifier values
     | modifier       | value               |
-    | n_days         | 80                  |
+    | n_days         | 96                  |
     | quar_period    | 13                  |
     | pop_size       | 10000               |
     | pop_infected   | 217                 |
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.6240963641577594  |
     | symp_quar_prob | 0.0456075960115124  |
-    | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.7734426077281416  |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_18
@@ -9884,7 +9884,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.0456075960115124  |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_19
@@ -9902,7 +9902,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.02312927617193368 |
     | trace_probs    | 0.4179307148516287  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_20
@@ -9913,14 +9913,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier       | value               |
     | n_days         | 66                  |
-    | quar_period    | 11                  |
+    | quar_period    | 15                  |
     | pop_size       | 10000               |
     | pop_infected   | 400                 |
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_21
@@ -9932,13 +9932,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 80                  |
     | quar_period    | 11                  |
-    | pop_size       | 17019               |
+    | pop_size       | 10000               |
     | pop_infected   | 217                 |
     | symp_prob      | 0.7292420114738518  |
-    | asymp_prob     | 0.6240963641577594  |
+    | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.02312927617193368 |
     | trace_probs    | 0.4179307148516287  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_22
@@ -9948,15 +9948,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_quar_prob=0.6280014380485361
     And effect modifier values
     | modifier       | value               |
-    | n_days         | 80                  |
-    | quar_period    | 11                  |
+    | n_days         | 96                  |
+    | quar_period    | 13                  |
     | pop_size       | 10000               |
     | pop_infected   | 400                 |
     | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.39576785318565705 |
     | symp_quar_prob | 0.0456075960115124  |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_23
@@ -9966,15 +9966,15 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_quar_prob=0.6280014380485361
     And effect modifier values
     | modifier       | value               |
-    | n_days         | 80                  |
+    | n_days         | 96                  |
     | quar_period    | 11                  |
-    | pop_size       | 10000               |
+    | pop_size       | 13013               |
     | pop_infected   | 217                 |
-    | symp_prob      | 0.3946267859089032  |
+    | symp_prob      | 0.7292420114738518  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_24
@@ -9985,14 +9985,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier       | value               |
     | n_days         | 66                  |
-    | quar_period    | 11                  |
-    | pop_size       | 10000               |
+    | quar_period    | 15                  |
+    | pop_size       | 17019               |
     | pop_infected   | 295                 |
     | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.32012755679683896 |
-    | trace_probs    | 0.4179307148516287  |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_25
@@ -10002,7 +10002,7 @@ Feature: Compare interventions basic concrete
     When we run the model with asymp_quar_prob=0.6280014380485361
     And effect modifier values
     | modifier       | value               |
-    | n_days         | 90                  |
+    | n_days         | 80                  |
     | quar_period    | 11                  |
     | pop_size       | 11593               |
     | pop_infected   | 140                 |
@@ -10010,7 +10010,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.0456075960115124  |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_26
@@ -10022,13 +10022,13 @@ Feature: Compare interventions basic concrete
     | modifier       | value               |
     | n_days         | 80                  |
     | quar_period    | 11                  |
-    | pop_size       | 17019               |
+    | pop_size       | 10000               |
     | pop_infected   | 295                 |
-    | symp_prob      | 0.3946267859089032  |
+    | symp_prob      | 0.7292420114738518  |
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.02312927617193368 |
     | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_27
@@ -10039,14 +10039,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier       | value               |
     | n_days         | 66                  |
-    | quar_period    | 11                  |
-    | pop_size       | 17019               |
+    | quar_period    | 13                  |
+    | pop_size       | 10000               |
     | pop_infected   | 217                 |
     | symp_prob      | 0.3946267859089032  |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.32012755679683896 |
-    | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_28
@@ -10064,7 +10064,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.5320606162934023  |
     | symp_quar_prob | 0.32012755679683896 |
     | trace_probs    | 0.7734426077281416  |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_29
@@ -10081,8 +10081,8 @@ Feature: Compare interventions basic concrete
     | symp_prob      | 0.20143639198171964 |
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.32012755679683896 |
-    | trace_probs    | 0.27025117739698024 |
-    | household_size | 5.916               |
+    | trace_probs    | 0.09610948155767196 |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @asymp_quar_prob_cum_deaths_30
@@ -10100,7 +10100,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob     | 0.06566236367037942 |
     | symp_quar_prob | 0.14055901473290044 |
     | trace_probs    | 0.09610948155767196 |
-    | household_size | 5.916               |
+    | household_size | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_quarantined_0
@@ -10118,7 +10118,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_1
@@ -10129,14 +10129,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | quar_period     | 13                  |
+    | pop_size        | 10000               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_2
@@ -10154,7 +10154,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.6280014380485361  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_3
@@ -10168,11 +10168,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 15                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_4
@@ -10190,7 +10190,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.6280014380485361  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_5
@@ -10200,7 +10200,7 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.27025117739698024
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 15                  |
     | pop_size        | 17019               |
     | pop_infected    | 400                 |
@@ -10208,7 +10208,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_6
@@ -10222,11 +10222,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_7
@@ -10237,14 +10237,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.7292420114738518  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_8
@@ -10262,7 +10262,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_9
@@ -10279,8 +10279,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_10
@@ -10290,15 +10290,15 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.7734426077281416
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_11
@@ -10310,13 +10310,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 13                  |
-    | pop_size        | 10000               |
+    | pop_size        | 11593               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_12
@@ -10326,15 +10326,15 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.4179307148516287
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 13                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.6280014380485361  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_13
@@ -10352,7 +10352,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_14
@@ -10370,7 +10370,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.5362647235083882  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_15
@@ -10380,7 +10380,7 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.4179307148516287
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
@@ -10388,7 +10388,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_16
@@ -10405,8 +10405,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_17
@@ -10424,7 +10424,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_18
@@ -10438,11 +10438,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_19
@@ -10459,8 +10459,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_20
@@ -10471,14 +10471,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 17019               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_21
@@ -10490,13 +10490,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_22
@@ -10505,16 +10505,16 @@ Feature: Compare interventions basic concrete
     Given we run the model with trace_probs=0.4179307148516287
     When we run the model with trace_probs=0.7734426077281416
     And effect modifier values
-    | modifier        | value               |
-    | n_days          | 66                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
-    | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | modifier        | value              |
+    | n_days          | 66                 |
+    | quar_period     | 13                 |
+    | pop_size        | 10000              |
+    | pop_infected    | 295                |
+    | symp_prob       | 0.3946267859089032 |
+    | asymp_prob      | 0.5320606162934023 |
+    | symp_quar_prob  | 0.0456075960115124 |
+    | asymp_quar_prob | 0.6280014380485361 |
+    | household_size  | 4.469              |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_23
@@ -10524,7 +10524,7 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.7734426077281416
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 96                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
@@ -10532,7 +10532,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_24
@@ -10550,7 +10550,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_25
@@ -10561,14 +10561,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_26
@@ -10583,10 +10583,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 13013               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_27
@@ -10596,15 +10596,15 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.7734426077281416
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 96                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_28
@@ -10614,7 +10614,7 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.7734426077281416
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 90                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
@@ -10622,7 +10622,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_29
@@ -10639,8 +10639,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_30
@@ -10658,7 +10658,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_quarantined_31
@@ -10675,8 +10675,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @trace_probs_cum_infections_0
@@ -10694,7 +10694,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_1
@@ -10706,13 +10706,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.5299357265511195  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_2
@@ -10730,7 +10730,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_3
@@ -10747,8 +10747,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.7292420114738518  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_4
@@ -10760,13 +10760,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 11593               |
+    | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_5
@@ -10776,15 +10776,15 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.27025117739698024
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 15                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_6
@@ -10798,11 +10798,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_7
@@ -10813,14 +10813,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_8
@@ -10831,14 +10831,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_9
@@ -10850,13 +10850,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.5362647235083882  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_10
@@ -10866,15 +10866,15 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.7734426077281416
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_11
@@ -10892,7 +10892,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_12
@@ -10902,15 +10902,15 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.4179307148516287
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 11                  |
+    | n_days          | 80                  |
+    | quar_period     | 13                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_13
@@ -10924,11 +10924,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 17019               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_14
@@ -10940,13 +10940,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 13013               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.5362647235083882  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_15
@@ -10956,15 +10956,15 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.4179307148516287
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.7292420114738518  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_16
@@ -10981,8 +10981,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_17
@@ -11000,7 +11000,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.5362647235083882  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_18
@@ -11018,7 +11018,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_19
@@ -11033,10 +11033,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 13013               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_20
@@ -11047,14 +11047,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_21
@@ -11071,8 +11071,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_22
@@ -11081,16 +11081,16 @@ Feature: Compare interventions basic concrete
     Given we run the model with trace_probs=0.4179307148516287
     When we run the model with trace_probs=0.7734426077281416
     And effect modifier values
-    | modifier        | value               |
-    | n_days          | 66                  |
-    | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
-    | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | modifier        | value              |
+    | n_days          | 66                 |
+    | quar_period     | 13                 |
+    | pop_size        | 10000              |
+    | pop_infected    | 295                |
+    | symp_prob       | 0.3946267859089032 |
+    | asymp_prob      | 0.5320606162934023 |
+    | symp_quar_prob  | 0.0456075960115124 |
+    | asymp_quar_prob | 0.6280014380485361 |
+    | household_size  | 4.469              |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_23
@@ -11105,10 +11105,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.5299357265511195  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_24
@@ -11126,7 +11126,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_25
@@ -11140,11 +11140,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 15                  |
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.6280014380485361  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_26
@@ -11159,10 +11159,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 13013               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_27
@@ -11180,7 +11180,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_28
@@ -11190,15 +11190,15 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.7734426077281416
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 90                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_29
@@ -11213,10 +11213,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_30
@@ -11234,7 +11234,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_infections_31
@@ -11249,10 +11249,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | household_size  | 4.469               |
     Then the cum_infections should decrease
 
   @trace_probs_cum_deaths_0
@@ -11270,7 +11270,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_1
@@ -11281,14 +11281,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 17019               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.5299357265511195  |
-    | asymp_prob      | 0.6240963641577594  |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_2
@@ -11306,7 +11306,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.6280014380485361  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_3
@@ -11320,11 +11320,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 15                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.7292420114738518  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_4
@@ -11341,8 +11341,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_5
@@ -11352,7 +11352,7 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.27025117739698024
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 15                  |
     | pop_size        | 17019               |
     | pop_infected    | 400                 |
@@ -11360,7 +11360,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_6
@@ -11370,7 +11370,7 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.7734426077281416
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 96                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
@@ -11378,7 +11378,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_7
@@ -11389,14 +11389,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_8
@@ -11407,14 +11407,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_9
@@ -11431,8 +11431,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_10
@@ -11442,7 +11442,7 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.7734426077281416
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
@@ -11450,7 +11450,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_11
@@ -11461,14 +11461,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_12
@@ -11478,15 +11478,15 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.4179307148516287
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 13                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_13
@@ -11504,7 +11504,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_14
@@ -11522,7 +11522,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.5362647235083882  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_15
@@ -11540,7 +11540,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_16
@@ -11551,14 +11551,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_17
@@ -11575,8 +11575,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_18
@@ -11594,7 +11594,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_19
@@ -11611,8 +11611,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_20
@@ -11623,14 +11623,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.6280014380485361  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_21
@@ -11643,12 +11643,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
-    | pop_infected    | 140                 |
+    | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_22
@@ -11657,16 +11657,16 @@ Feature: Compare interventions basic concrete
     Given we run the model with trace_probs=0.4179307148516287
     When we run the model with trace_probs=0.7734426077281416
     And effect modifier values
-    | modifier        | value              |
-    | n_days          | 66                 |
-    | quar_period     | 11                 |
-    | pop_size        | 10000              |
-    | pop_infected    | 295                |
-    | symp_prob       | 0.3946267859089032 |
-    | asymp_prob      | 0.5320606162934023 |
-    | symp_quar_prob  | 0.0456075960115124 |
-    | asymp_quar_prob | 0.6280014380485361 |
-    | household_size  | 5.916              |
+    | modifier        | value               |
+    | n_days          | 66                  |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
+    | pop_infected    | 295                 |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.5320606162934023  |
+    | symp_quar_prob  | 0.0456075960115124  |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_23
@@ -11681,10 +11681,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_24
@@ -11702,7 +11702,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_25
@@ -11719,8 +11719,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_26
@@ -11730,15 +11730,15 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.7734426077281416
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 96                  |
     | quar_period     | 11                  |
     | pop_size        | 13013               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_27
@@ -11753,10 +11753,10 @@ Feature: Compare interventions basic concrete
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_28
@@ -11766,7 +11766,7 @@ Feature: Compare interventions basic concrete
     When we run the model with trace_probs=0.7734426077281416
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 90                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
@@ -11774,7 +11774,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_29
@@ -11791,8 +11791,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_30
@@ -11810,7 +11810,7 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @trace_probs_cum_deaths_31
@@ -11827,8 +11827,8 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @n_days_cum_quarantined_0
@@ -11846,7 +11846,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_1
@@ -11857,14 +11857,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 13                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_2
@@ -11881,8 +11881,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_3
@@ -11900,7 +11900,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_4
@@ -11911,14 +11911,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 13013               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_5
@@ -11936,7 +11936,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_6
@@ -11950,11 +11950,11 @@ Feature: Compare interventions basic concrete
     | pop_size        | 13013               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_7
@@ -11970,9 +11970,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_8
@@ -11984,13 +11984,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | quar_period     | 11                  |
     | pop_size        | 17019               |
-    | pop_infected    | 140                 |
+    | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_9
@@ -12007,8 +12007,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_10
@@ -12018,15 +12018,15 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=90
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_11
@@ -12040,11 +12040,11 @@ Feature: Compare interventions basic concrete
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_12
@@ -12060,9 +12060,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_13
@@ -12078,9 +12078,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_14
@@ -12090,15 +12090,15 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=80
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 15                  |
-    | pop_size        | 17019               |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_15
@@ -12116,7 +12116,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_16
@@ -12133,8 +12133,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_17
@@ -12147,12 +12147,12 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_18
@@ -12163,14 +12163,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_19
@@ -12180,7 +12180,7 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=96
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
@@ -12188,7 +12188,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_20
@@ -12202,11 +12202,11 @@ Feature: Compare interventions basic concrete
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_21
@@ -12216,7 +12216,7 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=96
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
@@ -12224,7 +12224,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_22
@@ -12242,7 +12242,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_23
@@ -12253,14 +12253,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 13                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_24
@@ -12271,14 +12271,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_25
@@ -12289,14 +12289,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_26
@@ -12307,14 +12307,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 13013               |
+    | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_27
@@ -12327,12 +12327,12 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_28
@@ -12345,12 +12345,12 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_29
@@ -12362,13 +12362,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | quar_period     | 11                  |
     | pop_size        | 17019               |
-    | pop_infected    | 400                 |
+    | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_quarantined_30
@@ -12386,7 +12386,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @n_days_cum_infections_0
@@ -12404,7 +12404,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_1
@@ -12422,7 +12422,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_2
@@ -12438,9 +12438,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_3
@@ -12457,8 +12457,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_4
@@ -12468,7 +12468,7 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=96
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
@@ -12476,7 +12476,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_5
@@ -12487,14 +12487,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_6
@@ -12512,7 +12512,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_7
@@ -12528,9 +12528,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_8
@@ -12541,14 +12541,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
-    | pop_infected    | 140                 |
+    | pop_size        | 17019               |
+    | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_9
@@ -12565,8 +12565,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_10
@@ -12576,7 +12576,7 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=90
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.5299357265511195  |
@@ -12584,7 +12584,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_11
@@ -12594,15 +12594,15 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=80
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_12
@@ -12618,9 +12618,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_13
@@ -12630,15 +12630,15 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=96
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_14
@@ -12649,14 +12649,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 15                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_15
@@ -12674,7 +12674,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_16
@@ -12691,8 +12691,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_17
@@ -12708,9 +12708,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_18
@@ -12720,15 +12720,15 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=96
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 15                  |
-    | pop_size        | 17019               |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_19
@@ -12738,15 +12738,15 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=96
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_20
@@ -12760,11 +12760,11 @@ Feature: Compare interventions basic concrete
     | pop_size        | 17019               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_21
@@ -12774,15 +12774,15 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=96
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_22
@@ -12800,7 +12800,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_23
@@ -12811,14 +12811,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_24
@@ -12829,14 +12829,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_25
@@ -12847,14 +12847,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_26
@@ -12865,14 +12865,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 13013               |
+    | pop_size        | 10000               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.7292420114738518  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_27
@@ -12888,9 +12888,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_28
@@ -12903,12 +12903,12 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_29
@@ -12920,13 +12920,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | quar_period     | 11                  |
     | pop_size        | 17019               |
-    | pop_infected    | 400                 |
+    | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_infections_30
@@ -12937,14 +12937,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @n_days_cum_deaths_0
@@ -12962,7 +12962,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_1
@@ -12973,14 +12973,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 140                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_2
@@ -12996,9 +12996,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_3
@@ -13008,15 +13008,15 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=90
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_4
@@ -13027,14 +13027,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 13013               |
+    | pop_size        | 10000               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_5
@@ -13045,14 +13045,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_6
@@ -13070,7 +13070,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_7
@@ -13079,16 +13079,16 @@ Feature: Compare interventions basic concrete
     Given we run the model with n_days=90
     When we run the model with n_days=96
     And effect modifier values
-    | modifier        | value               |
-    | quar_period     | 11                  |
-    | pop_size        | 11593               |
-    | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
-    | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | modifier        | value              |
+    | quar_period     | 11                 |
+    | pop_size        | 11593              |
+    | pop_infected    | 295                |
+    | symp_prob       | 0.5299357265511195 |
+    | asymp_prob      | 0.5320606162934023 |
+    | symp_quar_prob  | 0.0456075960115124 |
+    | asymp_quar_prob | 0.5362647235083882 |
+    | trace_probs     | 0.4179307148516287 |
+    | household_size  | 4.469              |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_8
@@ -13099,14 +13099,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
-    | pop_infected    | 140                 |
+    | pop_size        | 10000               |
+    | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_9
@@ -13123,8 +13123,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_10
@@ -13142,7 +13142,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_11
@@ -13152,15 +13152,15 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=80
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 10000               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_12
@@ -13176,9 +13176,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_13
@@ -13188,15 +13188,15 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=96
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_14
@@ -13206,15 +13206,15 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=80
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 17019               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_15
@@ -13228,11 +13228,11 @@ Feature: Compare interventions basic concrete
     | pop_size        | 11593               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_16
@@ -13249,8 +13249,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_17
@@ -13267,8 +13267,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_18
@@ -13278,15 +13278,15 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=96
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 10000               |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_19
@@ -13303,8 +13303,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_20
@@ -13321,8 +13321,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_21
@@ -13339,8 +13339,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_22
@@ -13350,15 +13350,15 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=96
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 13013               |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_23
@@ -13368,15 +13368,15 @@ Feature: Compare interventions basic concrete
     When we run the model with n_days=96
     And effect modifier values
     | modifier        | value               |
-    | quar_period     | 13                  |
-    | pop_size        | 10000               |
+    | quar_period     | 11                  |
+    | pop_size        | 17019               |
     | pop_infected    | 217                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_24
@@ -13387,14 +13387,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_25
@@ -13412,7 +13412,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_26
@@ -13425,12 +13425,12 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_27
@@ -13443,12 +13443,12 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_28
@@ -13461,12 +13461,12 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_29
@@ -13478,13 +13478,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | quar_period     | 11                  |
     | pop_size        | 17019               |
-    | pop_infected    | 400                 |
+    | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @n_days_cum_deaths_30
@@ -13495,14 +13495,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_quarantined_0
@@ -13520,7 +13520,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_1
@@ -13531,14 +13531,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_infected    | 140                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_2
@@ -13555,8 +13555,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_3
@@ -13573,8 +13573,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_4
@@ -13584,7 +13584,7 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_size=17019
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 15                  |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
@@ -13592,7 +13592,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_5
@@ -13609,8 +13609,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_6
@@ -13628,7 +13628,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_7
@@ -13646,7 +13646,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_8
@@ -13663,8 +13663,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_9
@@ -13677,12 +13677,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 66                  |
     | quar_period     | 11                  |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_10
@@ -13700,7 +13700,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_11
@@ -13710,15 +13710,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_size=11593
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 13                  |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_12
@@ -13730,13 +13730,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_infected    | 400                 |
+    | pop_infected    | 140                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_13
@@ -13747,14 +13747,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_14
@@ -13768,11 +13768,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_15
@@ -13788,9 +13788,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_16
@@ -13808,7 +13808,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_17
@@ -13819,14 +13819,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_18
@@ -13836,15 +13836,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_size=17019
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 13                  |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_19
@@ -13862,7 +13862,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_20
@@ -13873,14 +13873,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_21
@@ -13890,15 +13890,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_size=17019
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 15                  |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_22
@@ -13908,15 +13908,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_size=17019
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 90                  |
     | quar_period     | 11                  |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_23
@@ -13934,7 +13934,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_24
@@ -13945,14 +13945,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_25
@@ -13965,12 +13965,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 66                  |
     | quar_period     | 11                  |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_26
@@ -13984,11 +13984,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 13                  |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_27
@@ -14006,7 +14006,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_28
@@ -14024,7 +14024,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_29
@@ -14035,14 +14035,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_quarantined_30
@@ -14053,14 +14053,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_size_cum_infections_0
@@ -14078,7 +14078,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_1
@@ -14089,14 +14089,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_infected    | 140                 |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_2
@@ -14114,7 +14114,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_3
@@ -14127,12 +14127,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 66                  |
     | quar_period     | 15                  |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_4
@@ -14150,7 +14150,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_5
@@ -14168,7 +14168,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_6
@@ -14182,11 +14182,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_7
@@ -14197,14 +14197,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_8
@@ -14215,14 +14215,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_9
@@ -14240,7 +14240,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_10
@@ -14258,7 +14258,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_11
@@ -14268,7 +14268,7 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_size=11593
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
@@ -14276,7 +14276,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_12
@@ -14288,13 +14288,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_infected    | 400                 |
+    | pop_infected    | 140                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_13
@@ -14305,14 +14305,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_14
@@ -14326,11 +14326,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_15
@@ -14346,9 +14346,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_16
@@ -14359,14 +14359,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_17
@@ -14377,14 +14377,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_18
@@ -14394,15 +14394,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_size=17019
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 13                  |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_19
@@ -14419,8 +14419,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_20
@@ -14437,8 +14437,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_21
@@ -14448,15 +14448,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_size=17019
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 15                  |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_22
@@ -14466,15 +14466,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_size=17019
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 90                  |
     | quar_period     | 11                  |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_23
@@ -14492,7 +14492,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_24
@@ -14503,14 +14503,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_25
@@ -14523,12 +14523,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 66                  |
     | quar_period     | 11                  |
     | pop_infected    | 295                 |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_26
@@ -14539,14 +14539,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_27
@@ -14560,11 +14560,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_28
@@ -14575,14 +14575,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_infected    | 295                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_29
@@ -14593,14 +14593,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_infections_30
@@ -14611,14 +14611,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_size_cum_deaths_0
@@ -14636,7 +14636,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_1
@@ -14647,14 +14647,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_infected    | 140                 |
     | symp_prob       | 0.5299357265511195  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_2
@@ -14670,9 +14670,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_3
@@ -14685,12 +14685,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 66                  |
     | quar_period     | 15                  |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_4
@@ -14700,15 +14700,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_size=17019
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 15                  |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_5
@@ -14725,8 +14725,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_6
@@ -14743,8 +14743,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_7
@@ -14755,14 +14755,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_infected    | 400                 |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_8
@@ -14778,9 +14778,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_9
@@ -14797,8 +14797,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_10
@@ -14811,12 +14811,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_infected    | 217                 |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | symp_prob       | 0.5299357265511195  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_11
@@ -14827,14 +14827,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 90                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_12
@@ -14846,13 +14846,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_infected    | 400                 |
+    | pop_infected    | 140                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_13
@@ -14870,7 +14870,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_14
@@ -14884,11 +14884,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_15
@@ -14904,9 +14904,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_16
@@ -14924,7 +14924,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_17
@@ -14935,14 +14935,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_18
@@ -14952,15 +14952,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_size=17019
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 13                  |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
     | pop_infected    | 400                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_19
@@ -14977,8 +14977,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_20
@@ -14989,14 +14989,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_infected    | 295                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_21
@@ -15006,15 +15006,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_size=17019
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 15                  |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_22
@@ -15024,7 +15024,7 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_size=17019
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 80                  |
+    | n_days          | 90                  |
     | quar_period     | 11                  |
     | pop_infected    | 217                 |
     | symp_prob       | 0.3946267859089032  |
@@ -15032,7 +15032,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_23
@@ -15050,7 +15050,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_24
@@ -15061,14 +15061,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.16550077992524106 |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_25
@@ -15084,9 +15084,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.6280014380485361  |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_26
@@ -15097,14 +15097,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_infected    | 140                 |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_27
@@ -15118,11 +15118,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_infected    | 217                 |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_28
@@ -15140,7 +15140,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_29
@@ -15157,8 +15157,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_size_cum_deaths_30
@@ -15168,7 +15168,7 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_size=17019
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_infected    | 400                 |
     | symp_prob       | 0.20143639198171964 |
@@ -15176,7 +15176,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should increase
 
   @pop_infected_cum_quarantined_0
@@ -15194,7 +15194,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_1
@@ -15212,7 +15212,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_2
@@ -15228,9 +15228,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_3
@@ -15243,12 +15243,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 66                  |
     | quar_period     | 15                  |
     | pop_size        | 11593               |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_4
@@ -15258,15 +15258,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_infected=400
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 15                  |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_5
@@ -15283,8 +15283,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_6
@@ -15298,11 +15298,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | asymp_quar_prob | 0.5362647235083882  |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_7
@@ -15313,14 +15313,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_8
@@ -15331,14 +15331,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 17019               |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_9
@@ -15356,7 +15356,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_10
@@ -15370,11 +15370,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_11
@@ -15390,9 +15390,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.2404924383007006  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_12
@@ -15404,13 +15404,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.39576785318565705 |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_13
@@ -15421,14 +15421,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 13013               |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_14
@@ -15446,7 +15446,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_15
@@ -15456,15 +15456,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_infected=400
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_16
@@ -15482,7 +15482,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_17
@@ -15492,15 +15492,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_infected=217
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 13013               |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_18
@@ -15510,15 +15510,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_infected=400
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_19
@@ -15536,7 +15536,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_20
@@ -15547,14 +15547,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 13013               |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_21
@@ -15565,14 +15565,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 11593               |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_22
@@ -15590,7 +15590,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_23
@@ -15602,13 +15602,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_24
@@ -15625,8 +15625,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_25
@@ -15644,7 +15644,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_26
@@ -15658,11 +15658,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 13                  |
     | pop_size        | 17019               |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_27
@@ -15676,11 +15676,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_28
@@ -15691,14 +15691,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 13013               |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_29
@@ -15715,8 +15715,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_quarantined_30
@@ -15727,14 +15727,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 10000               |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_quarantined should increase
 
   @pop_infected_cum_infections_0
@@ -15752,7 +15752,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_1
@@ -15765,12 +15765,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 80                  |
     | quar_period     | 13                  |
     | pop_size        | 17019               |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_2
@@ -15788,7 +15788,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_3
@@ -15801,12 +15801,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 66                  |
     | quar_period     | 15                  |
     | pop_size        | 11593               |
-    | symp_prob       | 0.7292420114738518  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.27025117739698024 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_4
@@ -15816,7 +15816,7 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_infected=400
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 15                  |
     | pop_size        | 10000               |
     | symp_prob       | 0.3946267859089032  |
@@ -15824,7 +15824,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_5
@@ -15836,13 +15836,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_6
@@ -15856,11 +15856,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_7
@@ -15871,14 +15871,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_8
@@ -15889,14 +15889,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 17019               |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_9
@@ -15914,7 +15914,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_10
@@ -15927,12 +15927,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
-    | symp_prob       | 0.5299357265511195  |
-    | asymp_prob      | 0.5320606162934023  |
+    | symp_prob       | 0.3946267859089032  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_11
@@ -15942,15 +15942,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_infected=217
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 11                  |
+    | n_days          | 80                  |
+    | quar_period     | 13                  |
     | pop_size        | 11593               |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_12
@@ -15964,11 +15964,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 17019               |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.39576785318565705 |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_13
@@ -15979,14 +15979,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 66                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 13013               |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_14
@@ -16002,9 +16002,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.5362647235083882  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_15
@@ -16022,7 +16022,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_16
@@ -16040,7 +16040,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_17
@@ -16051,14 +16051,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 96                  |
-    | quar_period     | 11                  |
+    | quar_period     | 15                  |
     | pop_size        | 13013               |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_18
@@ -16068,15 +16068,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_infected=400
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 13                  |
+    | n_days          | 80                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_19
@@ -16094,7 +16094,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_20
@@ -16111,8 +16111,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_21
@@ -16123,14 +16123,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 11593               |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_22
@@ -16143,12 +16143,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_23
@@ -16160,13 +16160,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_24
@@ -16177,14 +16177,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 10000               |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.16550077992524106 |
+    | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_25
@@ -16197,12 +16197,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 66                  |
     | quar_period     | 11                  |
     | pop_size        | 13013               |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_26
@@ -16213,14 +16213,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 17019               |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_27
@@ -16234,11 +16234,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_28
@@ -16249,14 +16249,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 13013               |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_29
@@ -16274,7 +16274,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_infections_30
@@ -16291,8 +16291,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.7734426077281416  |
+    | household_size  | 4.469               |
     Then the cum_infections should increase
 
   @pop_infected_cum_deaths_0
@@ -16310,7 +16310,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_1
@@ -16323,12 +16323,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 80                  |
     | quar_period     | 13                  |
     | pop_size        | 17019               |
-    | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | symp_prob       | 0.5299357265511195  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_2
@@ -16346,7 +16346,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_3
@@ -16364,7 +16364,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_4
@@ -16374,7 +16374,7 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_infected=400
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 15                  |
     | pop_size        | 10000               |
     | symp_prob       | 0.3946267859089032  |
@@ -16382,7 +16382,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_5
@@ -16394,13 +16394,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 11                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_6
@@ -16418,7 +16418,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_7
@@ -16429,14 +16429,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 15                  |
+    | quar_period     | 11                  |
     | pop_size        | 10000               |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.6280014380485361  |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_8
@@ -16447,14 +16447,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
-    | pop_size        | 17019               |
+    | quar_period     | 11                  |
+    | pop_size        | 10000               |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_9
@@ -16467,12 +16467,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 66                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.7292420114738518  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_10
@@ -16485,12 +16485,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_11
@@ -16500,15 +16500,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_infected=217
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
-    | quar_period     | 11                  |
+    | n_days          | 80                  |
+    | quar_period     | 13                  |
     | pop_size        | 11593               |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.2404924383007006  |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_12
@@ -16520,13 +16520,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 17019               |
+    | pop_size        | 10000               |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.39576785318565705 |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_13
@@ -16542,9 +16542,9 @@ Feature: Compare interventions basic concrete
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.32012755679683896 |
-    | asymp_quar_prob | 0.6280014380485361  |
+    | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_14
@@ -16562,7 +16562,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.5362647235083882  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_15
@@ -16572,15 +16572,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_infected=400
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.5362647235083882  |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_16
@@ -16597,8 +16597,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_17
@@ -16608,15 +16608,15 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_infected=217
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
-    | pop_size        | 13013               |
+    | pop_size        | 10000               |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.6240963641577594  |
+    | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_18
@@ -16626,7 +16626,7 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_infected=400
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 90                  |
+    | n_days          | 80                  |
     | quar_period     | 13                  |
     | pop_size        | 10000               |
     | symp_prob       | 0.3946267859089032  |
@@ -16634,7 +16634,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_19
@@ -16644,7 +16644,7 @@ Feature: Compare interventions basic concrete
     When we run the model with pop_infected=400
     And effect modifier values
     | modifier        | value               |
-    | n_days          | 96                  |
+    | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 10000               |
     | symp_prob       | 0.20143639198171964 |
@@ -16652,7 +16652,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_20
@@ -16663,14 +16663,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 11                  |
+    | quar_period     | 13                  |
     | pop_size        | 13013               |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_21
@@ -16688,7 +16688,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_22
@@ -16701,12 +16701,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 80                  |
     | quar_period     | 11                  |
     | pop_size        | 11593               |
-    | symp_prob       | 0.3946267859089032  |
+    | symp_prob       | 0.5299357265511195  |
     | asymp_prob      | 0.39576785318565705 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.4179307148516287  |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_23
@@ -16718,13 +16718,13 @@ Feature: Compare interventions basic concrete
     | modifier        | value               |
     | n_days          | 66                  |
     | quar_period     | 15                  |
-    | pop_size        | 10000               |
+    | pop_size        | 17019               |
     | symp_prob       | 0.20143639198171964 |
     | asymp_prob      | 0.5320606162934023  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_24
@@ -16741,8 +16741,8 @@ Feature: Compare interventions basic concrete
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.32012755679683896 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_25
@@ -16755,12 +16755,12 @@ Feature: Compare interventions basic concrete
     | n_days          | 66                  |
     | quar_period     | 11                  |
     | pop_size        | 13013               |
-    | symp_prob       | 0.5299357265511195  |
+    | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.06566236367037942 |
     | symp_quar_prob  | 0.14055901473290044 |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.4179307148516287  |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_26
@@ -16771,14 +16771,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 17019               |
     | symp_prob       | 0.3946267859089032  |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.6280014380485361  |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_27
@@ -16792,11 +16792,11 @@ Feature: Compare interventions basic concrete
     | quar_period     | 11                  |
     | pop_size        | 11593               |
     | symp_prob       | 0.20143639198171964 |
-    | asymp_prob      | 0.5320606162934023  |
+    | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
-    | trace_probs     | 0.27025117739698024 |
-    | household_size  | 5.916               |
+    | trace_probs     | 0.09610948155767196 |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_28
@@ -16814,7 +16814,7 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.02312927617193368 |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.09610948155767196 |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_29
@@ -16825,14 +16825,14 @@ Feature: Compare interventions basic concrete
     And effect modifier values
     | modifier        | value               |
     | n_days          | 80                  |
-    | quar_period     | 13                  |
+    | quar_period     | 11                  |
     | pop_size        | 13013               |
     | symp_prob       | 0.3946267859089032  |
     | asymp_prob      | 0.6240963641577594  |
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same
 
   @pop_infected_cum_deaths_30
@@ -16850,5 +16850,5 @@ Feature: Compare interventions basic concrete
     | symp_quar_prob  | 0.0456075960115124  |
     | asymp_quar_prob | 0.16550077992524106 |
     | trace_probs     | 0.7734426077281416  |
-    | household_size  | 5.916               |
+    | household_size  | 4.469               |
     Then the cum_deaths should remain the same

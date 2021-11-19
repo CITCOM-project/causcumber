@@ -101,11 +101,17 @@ def before_feature(context, feature):
         for row in feature.background.steps[0].table
     }
     # TODO: Make the number of samples a configurable parameter
-
-    lhs = lhsmdu.sample(len(distributions), 4).T
+    context.num_bins = 4
+    lhs = lhsmdu.sample(len(distributions), context.num_bins).T
     lhs = pd.DataFrame(lhs, columns=sorted(list(distributions)))
+    boundaries = np.arange(0, 1.1, 1.0 / context.num_bins)
+
+    context.bins = {}
     for col in lhs:
-        lhs[col] = lhsmdu.inverseTransformSample(distributions[col], lhs[col])
+        context.bins[col] = lhsmdu.inverseTransformSample(
+            distributions[col], boundaries
+        )
+        lhs[col] = lhsmdu.inverseTransformSample(distributions[col], lhs[col]).tolist()
 
     # Meta variables
     lhs["average_age"] = [avg_age(country) for country in lhs["location"]]
@@ -211,7 +217,7 @@ def output_feature_file(
         print(
             indent(
                 tabulate(
-                    [("parameter", "type", "value")] + feature_background,
+                    [("parameter", "type", "value", "bins")] + feature_background,
                     tablefmt="orgtbl",
                 )
             ),
@@ -309,7 +315,12 @@ def after_feature(context, feature):
                 tests.append(test)
 
     feature_background = [
-        (str(name), context.types[str(name)].__name__, str(val))
+        (
+            str(name),
+            context.types[str(name)].__name__,
+            str(val),
+            context.bins.get(str(name), ""),
+        )
         for name, val in background.items()
     ]
 
