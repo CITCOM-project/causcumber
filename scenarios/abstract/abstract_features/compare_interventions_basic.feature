@@ -71,7 +71,6 @@ Feature: Compare interventions basic
     | cum_quarantined | .*              |
     | .*              | cum_deaths      |
     | cum_infections  | cum_quarantined |
-    | .*_prob         | cum_quarantined |
     | .*_prob         | cum_infections  |
     | .*_prob         | cum_deaths      |
     | trace_probs     | .*              |
@@ -84,6 +83,7 @@ Feature: Compare interventions basic
     | trace_probs     | cum_quarantined |
     | n_days          | cum_deaths      |
     | location        | average_age     |
+    | location        | household_size  |
     Then we obtain the causal DAG
 
   # Scenario Outline: location # This is really just a proxy for age, but age isn't an input to the model
@@ -129,6 +129,7 @@ Feature: Compare interventions basic
     | asymp_quar_prob |
     | trace_probs     |
     | household_size  |
+    | average_age     |
     Then the <output> should <change>
     Examples:
     | output          | change          | comment                                                                            |
@@ -159,6 +160,7 @@ Feature: Compare interventions basic
     | asymp_quar_prob |
     | trace_probs     |
     | household_size  |
+    | average_age     |
     # Higher probability of testing means more infected people will be found so more people are quarantined
     Then the cum_quarantined should decrease
     # More tests -> more quarantined -> fewer cases
@@ -184,6 +186,7 @@ Feature: Compare interventions basic
     | asymp_quar_prob |
     | trace_probs     |
     | household_size  |
+    | average_age     |
     # Higher probability of testing means more infected people will be found so more people are quarantined
     Then the cum_quarantined should decrease
     # More tests -> more quarantined -> fewer cases
@@ -209,6 +212,7 @@ Feature: Compare interventions basic
     | asymp_quar_prob |
     | trace_probs     |
     | household_size  |
+    | average_age     |
     # Higher probability of testing means more infected people will be found so more people are quarantined
     Then the cum_quarantined should remain the same
     # More tests -> more quarantined -> fewer cases
@@ -234,6 +238,7 @@ Feature: Compare interventions basic
     | symp_quar_prob  |
     | trace_probs     |
     | household_size  |
+    | average_age     |
     # Higher probability of testing means more infected people will be found so more people are quarantined
     Then the cum_quarantined should decrease
     # More tests -> more quarantined -> fewer cases
@@ -258,6 +263,7 @@ Feature: Compare interventions basic
     | symp_quar_prob  |
     | asymp_quar_prob |
     | household_size  |
+    | average_age     |
     # Higher probability of testing means more infected people will be found less people need to quarantine
     Then the cum_quarantined should increase
     # More tests -> more quarantined -> fewer cases
@@ -281,6 +287,7 @@ Feature: Compare interventions basic
     | asymp_quar_prob |
     | trace_probs     |
     | household_size  |
+    | average_age     |
     Then the <output> should increase
     Examples:
     | output          |
@@ -304,6 +311,7 @@ Feature: Compare interventions basic
     | asymp_quar_prob |
     | trace_probs     |
     | household_size  |
+    | average_age     |
     Then the <output> should increase
     Examples:
     | output          |
@@ -327,6 +335,7 @@ Feature: Compare interventions basic
     | asymp_quar_prob |
     | trace_probs     |
     | household_size  |
+    | average_age     |
     Then the <output> should <change>
     Examples:
     | output          | change          | comment                                   |
