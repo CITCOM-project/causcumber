@@ -22,7 +22,7 @@ def before_feature(context, feature):
     context.feature_name = to_snake_case(context.feature.name)
     context.dag_path = f"dags/{context.feature_name}.dot"
     context.results_dir = f"results/{context.feature_name}"
-    context.concrete_tests = []
+    context.abstract_tests = []
     context.inputs = set()
     context.meta_variables = set()
     context.constraints = {}

@@ -9,6 +9,7 @@ import numpy as np
 from allpairspy import AllPairs
 
 from itertools import product
+from causal_testing.specification.scenario import Scenario
 
 import sys
 
@@ -27,22 +28,6 @@ from tabulate import tabulate
 
 from scipy import stats
 
-
-class countries_gen(stats.rv_discrete):
-    both = [
-        h
-        for h in covasim.data.country_age_data.data
-        if h in covasim.data.household_size_data.data
-    ]
-    both = sorted(both, key=lambda x: avg_age(x))
-
-    countries = dict(enumerate(both))
-
-    def ppf(self, q, *args, **kwds):
-        return np.vectorize(self.countries.get)(np.round(len(self.countries) * q))
-
-
-countries = countries_gen()
 
 obs_tag_re = re.compile("observational\((\"|')(.+)(\"|')\)")
 
@@ -97,33 +82,35 @@ def before_feature(context, feature):
     if not os.path.exists(context.results_dir):
         os.makedirs(context.results_dir, exist_ok=True)
 
-    distributions = {
-        row["parameter"]: eval(row["distribution"])
-        for row in feature.background.steps[0].table
-    }
-    # TODO: Make the number of samples a configurable parameter
-    context.num_bins = 4
-    lhs = lhsmdu.sample(len(distributions), context.num_bins).T
-    lhs = pd.DataFrame(lhs, columns=sorted(list(distributions)))
-    boundaries = np.arange(0, 1.1, 1.0 / context.num_bins)
-
-    context.bins = {}
-    for col in lhs:
-        context.bins[col] = lhsmdu.inverseTransformSample(
-            distributions[col], boundaries
-        )
-        lhs[col] = lhsmdu.inverseTransformSample(distributions[col], lhs[col]).tolist()
-
-    # Meta variables
-    lhs["average_age"] = [avg_age(country) for country in lhs["location"]]
-    lhs["household_size"] = [household_size(country) for country in lhs["location"]]
-    context.lhs = lhs
-    context.supported_countries = set(lhs["location"].tolist())
+    # distributions = {
+    #     row["parameter"]: eval(row["distribution"])
+    #     for row in feature.background.steps[0].table
+    # }
+    # # TODO: Make the number of samples a configurable parameter
+    # context.num_bins = 4
+    # lhs = lhsmdu.sample(len(distributions), context.num_bins).T
+    # lhs = pd.DataFrame(lhs, columns=sorted(list(distributions)))
+    # boundaries = np.arange(0, 1.1, 1.0 / context.num_bins)
+    #
+    # context.bins = {}
+    # for col in lhs:
+    #     context.bins[col] = lhsmdu.inverseTransformSample(
+    #         distributions[col], boundaries
+    #     )
+    #     lhs[col] = lhsmdu.inverseTransformSample(distributions[col], lhs[col]).tolist()
+    #
+    # # Meta variables
+    # lhs["average_age"] = [avg_age(country) for country in lhs["location"]]
+    # lhs["household_size"] = [household_size(country) for country in lhs["location"]]
+    # context.lhs = lhs
+    # context.supported_countries = set(lhs["location"].tolist())
+    context.supported_countries = ["Poland", "Japan", "Niger"]
 
 
 def before_scenario(context, scenario):
     context.constraints[scenario.name] = set()
     context.effect_modifiers = []
+    context.modelling_scenario = Scenario()
 
 
 def before_step(context, step):

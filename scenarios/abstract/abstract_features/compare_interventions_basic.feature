@@ -93,18 +93,18 @@ Feature: Compare interventions basic
   @average_age
   Scenario Outline: average_age
     When we increase the average_age
-    And have the effect modifiers
-    | effect_modifier |
-    | n_days          |
-    | quar_period     |
-    | pop_size        |
-    | pop_infected    |
-    | symp_prob       |
-    | asymp_prob      |
-    | symp_quar_prob  |
-    | asymp_quar_prob |
-    | trace_probs     |
-    | household_size  |
+    # And have the effect modifiers
+    # | effect_modifier |
+    # | n_days          |
+    # | quar_period     |
+    # | pop_size        |
+    # | pop_infected    |
+    # | symp_prob       |
+    # | asymp_prob      |
+    # | symp_quar_prob  |
+    # | asymp_quar_prob |
+    # | trace_probs     |
+    # | household_size  |
     Then the <output> should <change>
     # Age does have a direct effect on the cum_deaths since older folks are more likely to die from the disease
     Examples:
@@ -118,18 +118,18 @@ Feature: Compare interventions basic
   @quar_period_short
   Scenario Outline: quar_period
     When we increase the quar_period
-    And have the effect modifiers
-    | effect_modifier |
-    | n_days          |
-    | pop_size        |
-    | pop_infected    |
-    | symp_prob       |
-    | asymp_prob      |
-    | symp_quar_prob  |
-    | asymp_quar_prob |
-    | trace_probs     |
-    | household_size  |
-    | average_age     |
+    # And have the effect modifiers
+    # | effect_modifier |
+    # | n_days          |
+    # | pop_size        |
+    # | pop_infected    |
+    # | symp_prob       |
+    # | asymp_prob      |
+    # | symp_quar_prob  |
+    # | asymp_quar_prob |
+    # | trace_probs     |
+    # | household_size  |
+    # | average_age     |
     Then the <output> should <change>
     Examples:
     | output          | change          | comment                                                                            |
@@ -149,18 +149,18 @@ Feature: Compare interventions basic
     And trace_probs > 0
     # We only actually need this for cum_quarantined since people are only quarantined when trace_probs > 0
     When we increase the symp_prob
-    And have the effect modifiers
-    | effect_modifier |
-    | n_days          |
-    | quar_period     |
-    | pop_size        |
-    | pop_infected    |
-    | asymp_prob      |
-    | symp_quar_prob  |
-    | asymp_quar_prob |
-    | trace_probs     |
-    | household_size  |
-    | average_age     |
+    # And have the effect modifiers
+    # | effect_modifier |
+    # | n_days          |
+    # | quar_period     |
+    # | pop_size        |
+    # | pop_infected    |
+    # | asymp_prob      |
+    # | symp_quar_prob  |
+    # | asymp_quar_prob |
+    # | trace_probs     |
+    # | household_size  |
+    # | average_age     |
     # Higher probability of testing means more infected people will be found so more people are quarantined
     Then the cum_quarantined should decrease
     # More tests -> more quarantined -> fewer cases
@@ -175,18 +175,18 @@ Feature: Compare interventions basic
   Scenario: asymp_prob
     Given trace_probs > 0
     When we increase the asymp_prob
-    And have the effect modifiers
-    | effect_modifier |
-    | n_days          |
-    | quar_period     |
-    | pop_size        |
-    | pop_infected    |
-    | symp_prob       |
-    | symp_quar_prob  |
-    | asymp_quar_prob |
-    | trace_probs     |
-    | household_size  |
-    | average_age     |
+    # And have the effect modifiers
+    # | effect_modifier |
+    # | n_days          |
+    # | quar_period     |
+    # | pop_size        |
+    # | pop_infected    |
+    # | symp_prob       |
+    # | symp_quar_prob  |
+    # | asymp_quar_prob |
+    # | trace_probs     |
+    # | household_size  |
+    # | average_age     |
     # Higher probability of testing means more infected people will be found so more people are quarantined
     Then the cum_quarantined should decrease
     # More tests -> more quarantined -> fewer cases
@@ -201,18 +201,18 @@ Feature: Compare interventions basic
   Scenario: symp_quar_prob
     Given trace_probs > 0
     When we increase the symp_quar_prob
-    And have the effect modifiers
-    | effect_modifier |
-    | n_days          |
-    | quar_period     |
-    | pop_size        |
-    | pop_infected    |
-    | symp_prob       |
-    | asymp_prob      |
-    | asymp_quar_prob |
-    | trace_probs     |
-    | household_size  |
-    | average_age     |
+    # And have the effect modifiers
+    # | effect_modifier |
+    # | n_days          |
+    # | quar_period     |
+    # | pop_size        |
+    # | pop_infected    |
+    # | symp_prob       |
+    # | asymp_prob      |
+    # | asymp_quar_prob |
+    # | trace_probs     |
+    # | household_size  |
+    # | average_age     |
     # Higher probability of testing means more infected people will be found so more people are quarantined
     Then the cum_quarantined should remain the same
     # More tests -> more quarantined -> fewer cases
@@ -227,18 +227,18 @@ Feature: Compare interventions basic
   Scenario: asymp_quar_prob
     Given trace_probs > 0
     When we increase the asymp_quar_prob
-    And have the effect modifiers
-    | effect_modifier |
-    | n_days          |
-    | quar_period     |
-    | pop_size        |
-    | pop_infected    |
-    | symp_prob       |
-    | asymp_prob      |
-    | symp_quar_prob  |
-    | trace_probs     |
-    | household_size  |
-    | average_age     |
+    # And have the effect modifiers
+    # | effect_modifier |
+    # | n_days          |
+    # | quar_period     |
+    # | pop_size        |
+    # | pop_infected    |
+    # | symp_prob       |
+    # | asymp_prob      |
+    # | symp_quar_prob  |
+    # | trace_probs     |
+    # | household_size  |
+    # | average_age     |
     # Higher probability of testing means more infected people will be found so more people are quarantined
     Then the cum_quarantined should decrease
     # More tests -> more quarantined -> fewer cases
@@ -252,18 +252,18 @@ Feature: Compare interventions basic
   @trace_probs
   Scenario: trace_probs
     When we increase the trace_probs
-    And have the effect modifiers
-    | effect_modifier |
-    | n_days          |
-    | quar_period     |
-    | pop_size        |
-    | pop_infected    |
-    | symp_prob       |
-    | asymp_prob      |
-    | symp_quar_prob  |
-    | asymp_quar_prob |
-    | household_size  |
-    | average_age     |
+    # And have the effect modifiers
+    # | effect_modifier |
+    # | n_days          |
+    # | quar_period     |
+    # | pop_size        |
+    # | pop_infected    |
+    # | symp_prob       |
+    # | asymp_prob      |
+    # | symp_quar_prob  |
+    # | asymp_quar_prob |
+    # | household_size  |
+    # | average_age     |
     # Higher probability of testing means more infected people will be found less people need to quarantine
     Then the cum_quarantined should increase
     # More tests -> more quarantined -> fewer cases
@@ -276,18 +276,18 @@ Feature: Compare interventions basic
   @n_days
   Scenario Outline: n_days
     When we increase the n_days
-    And have the effect modifiers
-    | effect_modifier |
-    | quar_period     |
-    | pop_size        |
-    | pop_infected    |
-    | symp_prob       |
-    | asymp_prob      |
-    | symp_quar_prob  |
-    | asymp_quar_prob |
-    | trace_probs     |
-    | household_size  |
-    | average_age     |
+    # And have the effect modifiers
+    # | effect_modifier |
+    # | quar_period     |
+    # | pop_size        |
+    # | pop_infected    |
+    # | symp_prob       |
+    # | asymp_prob      |
+    # | symp_quar_prob  |
+    # | asymp_quar_prob |
+    # | trace_probs     |
+    # | household_size  |
+    # | average_age     |
     Then the <output> should increase
     Examples:
     | output          |
@@ -300,18 +300,18 @@ Feature: Compare interventions basic
   @pop_size
   Scenario Outline: pop_size
     When we increase the pop_size
-    And have the effect modifiers
-    | effect_modifier |
-    | n_days          |
-    | quar_period     |
-    | pop_infected    |
-    | symp_prob       |
-    | asymp_prob      |
-    | symp_quar_prob  |
-    | asymp_quar_prob |
-    | trace_probs     |
-    | household_size  |
-    | average_age     |
+    # And have the effect modifiers
+    # | effect_modifier |
+    # | n_days          |
+    # | quar_period     |
+    # | pop_infected    |
+    # | symp_prob       |
+    # | asymp_prob      |
+    # | symp_quar_prob  |
+    # | asymp_quar_prob |
+    # | trace_probs     |
+    # | household_size  |
+    # | average_age     |
     Then the <output> should increase
     Examples:
     | output          |
@@ -324,18 +324,18 @@ Feature: Compare interventions basic
   @pop_infected
   Scenario Outline: pop_infected
     When we increase the pop_infected
-    And have the effect modifiers
-    | effect_modifier |
-    | n_days          |
-    | quar_period     |
-    | pop_size        |
-    | symp_prob       |
-    | asymp_prob      |
-    | symp_quar_prob  |
-    | asymp_quar_prob |
-    | trace_probs     |
-    | household_size  |
-    | average_age     |
+    # And have the effect modifiers
+    # | effect_modifier |
+    # | n_days          |
+    # | quar_period     |
+    # | pop_size        |
+    # | symp_prob       |
+    # | asymp_prob      |
+    # | symp_quar_prob  |
+    # | asymp_quar_prob |
+    # | trace_probs     |
+    # | household_size  |
+    # | average_age     |
     Then the <output> should <change>
     Examples:
     | output          | change          | comment                                   |
