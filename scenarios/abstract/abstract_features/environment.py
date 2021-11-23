@@ -86,12 +86,13 @@ def before_feature(context, feature):
     context.results_dir = f"results/{context.feature_name}"
     context.solver = z3.Solver()
     context.z3_variables = {}
-    context.concrete_tests = []
+    context.abstract_tests = []
     context.inputs = set()
     context.meta_variables = set()
     context.constraints = {}
     context.background_constraints = set()
     context.ranges = {}
+    context.modelling_scenarios = []
 
     if not os.path.exists(context.results_dir):
         os.makedirs(context.results_dir, exist_ok=True)
@@ -237,7 +238,78 @@ def output_feature_file(
         print("\n\n".join(tests), file=f)
 
 
-def after_feature(context, feature):
+def direct_causes(dag, node):
+    return {cause for cause, effect in dag.edges() if effect == node}
+
+
+def generate_concrete_tests(abstract_test):
+    """Generate concrete test cases for a given abstract test.
+
+    :param AbstractTest abstract_test: An abstract test case.
+    :return: A set of concrete test cases and corresponding model runs.
+    :rtype: (set, DataFrame)
+    """
+    raise NotImplementedError
+
+
+def depends_only_on_inputs(dag, treatment_var):
+    """Returns true if the given treatment variable depends only on input
+    variables or metavariables which can be evaluated using only input variables.
+
+    :param AGraph dag: A causal DAG.
+    :param str treatment_var: Name of the treatment variable. # TODO: Make "Variable" a class.
+    :return: Boolean True if the treatment variable depends only on input variables.
+    :rtype: bool
+    """
+    raise NotImplementedError
+
+
+def run_covasim(runs, desired_outputs):
+    """Runs covasim under the given input configurations.
+
+    :param DataFrame runs: A DataFrame representing the desired run configurations.
+    :param iterable desired_outputs: The desired model outputs.
+    :return: A DataFrame representing the executed runs.
+    :rtype: DataFrame
+    """
+    raise NotImplementedError
+
+
+def fit_distribution(data):
+    """Fits a SciPy distribution to a given set of values.
+
+    :param iterable data: A collection of data values.
+    :return: A Beta distribution fitted to the data. TODO: Make this configurable.
+    :rtype: scipy.stats.beta
+    """
+    raise NotImplementedError
+
+
+def after_feature_new(context, feature):
+    first_pass_tests = {}
+    first_pass_runs = {}
+    second_pass_tests = []
+    for abstract_test in context.abstract_tests:
+        if depends_only_on_inputs(context.dag, test.treatment_var):
+            concrete_tests, runs = generate_concrete_tests(abstract_test)
+            first_pass_tests = first_pass_tests.union(concrete_tests)
+            first_pass_runs = first_pass_runs.union(runs)
+        else:
+            second_pass_tests.append(abstract_test)
+    data = run_covasim(first_pass_runs, context.desired_outputs)
+    for test in first_pass_tests:
+        test.execute(data)
+    for column in data:
+        if column in context.distributions:
+            continue
+        context.distributions[column] = fit_distribution(data[column])
+    for abstract_test in second_pass_tests:
+        concrete_tests, _ = generate_concrete_tests(abstract_test)
+        for test in concrete_tests:
+            test.execute(data)
+
+
+def after_feature_old(context, feature):
     # TODO: Come up with a way of getting all the variables in there so we can
     # get z3 to come up with values for them even if there's no constraints on them
     # TODO: Possibly, we might want to add in soft constraints as we generate
@@ -267,7 +339,7 @@ def after_feature(context, feature):
     tests = []
     runs = []
 
-    for t in context.concrete_tests:
+    for t in context.abstract_tests:
         scenario = t["scenario"]
         treatment_var = context.z3_variables[t["treatment_var"]]
         constraints = context.constraints[scenario]
