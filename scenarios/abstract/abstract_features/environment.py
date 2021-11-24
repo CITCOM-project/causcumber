@@ -77,8 +77,7 @@ def before_feature(context, feature):
     context.constraints = {}
     context.background_constraints = set()
     context.ranges = {}
-    context.modelling_scenarios = []
-
+    context.modelling_scenarios = set()
     if not os.path.exists(context.results_dir):
         os.makedirs(context.results_dir, exist_ok=True)
 
@@ -104,13 +103,24 @@ def before_feature(context, feature):
     # lhs["household_size"] = [household_size(country) for country in lhs["location"]]
     # context.lhs = lhs
     # context.supported_countries = set(lhs["location"].tolist())
-    context.supported_countries = ["Poland", "Japan", "Niger"]
+    context.supported_countries = sorted(
+        [
+            h
+            for h in covasim.data.country_age_data.data
+            if h in covasim.data.household_size_data.data
+        ],
+        key=lambda x: avg_age(x),
+    )
 
 
 def before_scenario(context, scenario):
     context.constraints[scenario.name] = set()
     context.effect_modifiers = []
-    context.modelling_scenario = Scenario()
+    scenario.modelling_scenario = Scenario()
+
+
+def after_scenario(context, scenario):
+    context.modelling_scenarios.add(scenario.modelling_scenario)
 
 
 def before_step(context, step):
@@ -270,6 +280,11 @@ def fit_distribution(data):
     :rtype: scipy.stats.beta
     """
     raise NotImplementedError
+
+
+def after_feature(context, feature):
+    for scenario in context.modelling_scenarios:
+        print(scenario)
 
 
 def after_feature_new(context, feature):

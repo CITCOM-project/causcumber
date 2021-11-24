@@ -17,28 +17,25 @@ from covasim_utils import avg_age, household_size
 
 
 def add_constraint(context, constraint):
-    if context.background_step:
-        context.background_constraints.add(constraint)
-    else:
-        context.constraints[context.scenario.name].add(constraint)
+    context.scenario.modelling_scenario.constraints.add(constraint)
 
 
 @given("{v1} in {set}")
 def step_impl(context, v1, set):
     folded = fold(
         lambda acc, x: z3.Or(acc, x),
-        [context.modelling_scenario.variables[v1] == e for e in eval(set)],
+        [context.scenario.modelling_scenario.variables[v1] == e for e in eval(set)],
         False,
     )
-    add_constraint(context, folded)
+    add_constraint(context, z3.simplify(folded))
 
 
 @given("average_age = average_ages(location)")
 def step_impl(context):
     avg_ages = {x: avg_age(x) for x in context.supported_countries}
 
-    age = context.modelling_scenario.variables["average_age"].z3
-    loc = context.modelling_scenario.variables["location"].z3
+    age = context.scenario.modelling_scenario.variables["average_age"].z3
+    loc = context.scenario.modelling_scenario.variables["location"].z3
     folded = fold(
         lambda acc, x: z3.If(loc == x[0], x[1], acc), list(avg_ages.items()), 0
     )
@@ -47,8 +44,8 @@ def step_impl(context):
 
 @given("household_size = household_sizes(location)")
 def step_impl(context):
-    size = context.modelling_scenario.variables["household_size"].z3
-    loc = context.modelling_scenario.variables["location"].z3
+    size = context.scenario.modelling_scenario.variables["household_size"].z3
+    loc = context.scenario.modelling_scenario.variables["location"].z3
     folded = fold(
         lambda acc, x: z3.If(loc == x, household_size(x), acc),
         context.supported_countries,
@@ -61,22 +58,27 @@ def step_impl(context):
 def step_impl(context, lower, v, upper):
     add_constraint(
         context,
-        context.z3_variables.get(lower, lower) <= context.z3_variables.get(v, v),
+        context.scenario.modelling_scenario.variables.get(lower, lower)
+        <= context.scenario.modelling_scenario.variables.get(v, v),
     )
     add_constraint(
         context,
-        context.z3_variables.get(v, v) <= context.z3_variables.get(upper, upper),
+        context.scenario.modelling_scenario.variables.get(v, v)
+        <= context.scenario.modelling_scenario.variables.get(upper, upper),
     )
 
 
 @given("{lower} < {v} <= {upper}")
 def step_impl(context, lower, v, upper):
     add_constraint(
-        context, context.z3_variables.get(lower, lower) < context.z3_variables.get(v, v)
+        context,
+        context.scenario.modelling_scenario.variables.get(lower, lower)
+        < context.scenario.modelling_scenario.variables.get(v, v),
     )
     add_constraint(
         context,
-        context.z3_variables.get(v, v) <= context.z3_variables.get(upper, upper),
+        context.scenario.modelling_scenario.variables.get(v, v)
+        <= context.scenario.modelling_scenario.variables.get(upper, upper),
     )
 
 
@@ -84,10 +86,13 @@ def step_impl(context, lower, v, upper):
 def step_impl(context, lower, v, upper):
     add_constraint(
         context,
-        context.z3_variables.get(lower, lower) <= context.z3_variables.get(v, v),
+        context.scenario.modelling_scenario.variables.get(lower, lower)
+        <= context.scenario.modelling_scenario.variables.get(v, v),
     )
     add_constraint(
-        context, context.z3_variables.get(v, v) < context.z3_variables.get(upper, upper)
+        context,
+        context.scenario.modelling_scenario.variables.get(v, v)
+        < context.scenario.modelling_scenario.variables.get(upper, upper),
     )
 
 
@@ -95,28 +100,35 @@ def step_impl(context, lower, v, upper):
 def step_impl(context, lower, v):
     add_constraint(
         context,
-        context.z3_variables.get(lower, lower) <= context.z3_variables.get(v, v),
+        context.scenario.modelling_scenario.variables.get(lower, lower)
+        <= context.scenario.modelling_scenario.variables.get(v, v),
     )
 
 
 @given("{v} < {upper}")
 def step_impl(context, v, upper):
     add_constraint(
-        context, context.z3_variables.get(v, v) < context.z3_variables.get(upper, upper)
+        context,
+        context.scenario.modelling_scenario.variables.get(v, v)
+        < context.scenario.modelling_scenario.variables.get(upper, upper),
     )
 
 
 @given("{v} > {upper}")
 def step_impl(context, v, upper):
     add_constraint(
-        context, context.z3_variables.get(v, v) > context.z3_variables.get(upper, upper)
+        context,
+        context.scenario.modelling_scenario.variables.get(v, v)
+        > context.scenario.modelling_scenario.variables.get(upper, upper),
     )
 
 
 @given("{v1} >= {v2}")
 def step_impl(context, v1, v2):
     add_constraint(
-        context, context.z3_variables.get(v1, v1) >= context.z3_variables.get(v2, v2)
+        context,
+        context.scenario.modelling_scenario.variables.get(v1, v1)
+        >= context.scenario.modelling_scenario.variables.get(v2, v2),
     )
 
 
@@ -137,10 +149,11 @@ def step_impl(context, mutate, parameter):
 use_step_matcher("parse")
 
 
-@when(u"have the effect modifiers")
+@when("have the effect modifiers")
 def step_impl(context):
     context.effect_modifiers = [
-        context.z3_variables[row["effect_modifier"]] for row in context.table
+        context.scenario.modelling_scenario.variables[row["effect_modifier"]]
+        for row in context.table
     ]
 
 

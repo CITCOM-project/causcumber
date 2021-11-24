@@ -8,17 +8,18 @@ from causcumber.causcumber_utils import draw_connected_dag
 
 
 class countries_gen(stats.rv_discrete):
-    both = [
+    supported_countries = [
         h
         for h in covasim.data.country_age_data.data
         if h in covasim.data.household_size_data.data
     ]
-    both = sorted(both, key=lambda x: avg_age(x))
-
-    countries = dict(enumerate(both))
+    supported_countries.sort(key=lambda x: avg_age(x))
+    supported_countries = dict(enumerate(supported_countries))
 
     def ppf(self, q, *args, **kwds):
-        return np.vectorize(self.countries.get)(np.round(len(self.countries) * q))
+        return np.vectorize(self.supported_countries.get)(
+            np.round(len(self.supported_countries) * q)
+        )
 
 
 countries = countries_gen()
@@ -37,13 +38,13 @@ def step_impl(context):
     for row in context.table:
         var = Input(row["parameter"], locate(row["type"]))
         var.distribution = eval(row["distribution"])
-        context.modelling_scenario.variables[row["parameter"]] = var
+        context.scenario.modelling_scenario.variables[row["parameter"]] = var
 
 
 @given(u"the following meta variables")
 def step_impl(context):
     for row in context.table:
-        context.modelling_scenario.variables[row["variable"]] = Meta(
+        context.scenario.modelling_scenario.variables[row["variable"]] = Meta(
             row["variable"], locate(row["type"]), eval("populate_" + row["variable"]),
         )
 
@@ -51,15 +52,15 @@ def step_impl(context):
 @given(u"the following variables are recorded at the end of the simulation")
 def step_impl(context):
     for row in context.table:
-        context.modelling_scenario.variables[row["variable"]] = Output(
+        context.scenario.modelling_scenario.variables[row["variable"]] = Output(
             row["variable"], locate(row["type"])
         )
 
 
 @given("a connected DAG")
 def step_impl(context):
-    inputs = context.modelling_scenario.inputs().union(
-        context.modelling_scenario.metas()
+    inputs = context.scenario.modelling_scenario.inputs().union(
+        context.scenario.modelling_scenario.metas()
     )
     context.repeating_unit = draw_connected_dag(inputs, context.outputs)
 
