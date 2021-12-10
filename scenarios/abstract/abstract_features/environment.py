@@ -313,7 +313,7 @@ def fit_distribution(data) -> stats.beta:
     """
 
     params = stats.beta.fit(data)
-    return beta(*params)
+    return stats.beta(*params)
 
 
 def execute_test(scenario, causal_dag, causal_test_case, observational_data_csv_path):
@@ -369,13 +369,12 @@ def after_feature(context, feature):
 
     for scenario, test in first_pass_tests:
         execute_test(scenario, context.dag, test, observational_data_csv_path)
-    for column in data:
-        if column in context.distributions:
-            continue
-        context.distributions[column] = fit_distribution(data[column])
 
     for scenario, abstract_test in second_pass_tests:
-        concrete_tests, _ = generate_concrete_tests(abstract_test)
+        for variable in scenario.variables.values():
+            if variable.distribution is None:
+                variable.distribution = fit_distribution(data[variable.name])
+        concrete_tests, _ = abstract_test.generate_concrete_tests(4)
         for test in concrete_tests:
             execute_test(scenario, context.dag, test, observational_data_csv_path)
 
