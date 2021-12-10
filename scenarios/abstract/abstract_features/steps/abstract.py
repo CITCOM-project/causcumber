@@ -2,6 +2,9 @@ from functools import reduce as fold
 from behave import use_step_matcher
 import numpy as np
 import z3
+from causal_testing.testing.abstract_causal_test_case import AbstractCausalTestCase
+from causal_testing.testing.causal_test_outcome import Positive, Negative, NoEffect
+from causal_testing.specification.variable import Output
 
 # This is an "unused import" but is needed by `eval` to add in the location
 # constraint from the feature file
@@ -24,7 +27,7 @@ def add_constraint(context, constraint):
 def step_impl(context, v1, set):
     folded = fold(
         lambda acc, x: z3.Or(acc, x),
-        [context.scenario.modelling_scenario.variables[v1] == e for e in eval(set)],
+        [context.scenario.modelling_scenario.variables[v1].z3 == e for e in eval(set)],
         False,
     )
     add_constraint(context, z3.simplify(folded))
@@ -143,7 +146,11 @@ use_step_matcher("re")
 @when("we (?P<mutate>\w+) the (?P<parameter>\w+)")
 def step_impl(context, mutate, parameter):
     context.treatment_var = parameter
-    context.mutation = mutations[mutate]
+    context.scenario.modelling_scenario.setup_treatment_variables()
+    context.mutation = mutations[mutate](
+        context.scenario.modelling_scenario.treatment_variables[parameter],
+        context.scenario.modelling_scenario.variables[parameter],
+    )
 
 
 use_step_matcher("parse")
@@ -157,16 +164,31 @@ def step_impl(context):
     ]
 
 
+changes = {
+    "increase": Positive(),
+    "decrease": Negative(),
+    "remain the same": NoEffect(),
+}
+
+
 @then("the {output} should {change}")
 def step_impl(context, output, change):
-    context.abstract_tests.append(
-        {
-            "scenario": context.scenario.name,
-            "treatment_var": context.treatment_var,
-            "mutation": context.mutation,
-            "outcome_var": output,
-            "expected_change": change,
-            "effect_modifiers": context.effect_modifiers,
-            "tags": context.scenario.tags,
-        }
+    scenario = context.scenario.modelling_scenario
+    causal_test_case = AbstractCausalTestCase(
+        scenario=context.scenario.modelling_scenario,
+        intervention_constraints={context.mutation},
+        treatment_variables={scenario.variables[context.treatment_var]},
+        expected_causal_effect=changes[change],
+        outcome_variables={scenario.variables[output]},
+        effect_modifiers=None,
     )
+    context.abstract_tests.append((scenario, causal_test_case))
+    #     {
+    #         "scenario": context.scenario.name,
+    #         "treatment_var": context.treatment_var,
+    #         "mutation": context.mutation,
+    #         "outcome_var": output,
+    #         "expected_change": change,
+    #         "effect_modifiers": context.effect_modifiers,
+    #         "tags": context.scenario.tags,
+    #     }

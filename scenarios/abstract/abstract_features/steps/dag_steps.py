@@ -5,6 +5,7 @@ import scipy.stats as stats
 import covasim
 from covasim_utils import avg_age, household_size
 from causcumber.causcumber_utils import draw_connected_dag
+import re
 
 
 class countries_gen(stats.rv_discrete):
@@ -52,9 +53,9 @@ def step_impl(context):
 @given(u"the following variables are recorded at the end of the simulation")
 def step_impl(context):
     for row in context.table:
-        context.scenario.modelling_scenario.variables[row["variable"]] = Output(
-            row["variable"], locate(row["type"])
-        )
+        var = Output(row["variable"], locate(row["type"]))
+        context.outputs.add(var)
+        context.scenario.modelling_scenario.variables[row["variable"]] = var
 
 
 @given("a connected DAG")
@@ -62,7 +63,9 @@ def step_impl(context):
     inputs = context.scenario.modelling_scenario.inputs().union(
         context.scenario.modelling_scenario.metas()
     )
-    context.repeating_unit = draw_connected_dag(inputs, context.outputs)
+    inputs = [v.name for v in inputs]
+    outputs = [v.name for v in context.outputs]
+    context.repeating_unit = draw_connected_dag(inputs, outputs)
 
 
 @then(u"we obtain the causal DAG")

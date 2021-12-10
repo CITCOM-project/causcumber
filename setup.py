@@ -12,5 +12,6 @@ setup(
                       'pydot',
                       'pygraphviz',
                       'rpy2',
-                      'behave']
+                      'behave',
+                      'lhsmdu']
 )
