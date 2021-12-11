@@ -22,7 +22,7 @@ import xml.etree.ElementTree as ET
 import xml.dom.minidom  
 from kivy.config import Config
 Config.set('graphics', 'width', '1200')
-Config.set('graphics', 'height', '700')
+Config.set('graphics', 'height', '900')
 Config.write()
 
 Builder.load_string('''
@@ -54,7 +54,6 @@ Builder.load_string('''
                 on_release: root.load(filechooser.path, filechooser.selection)
         
 ''')
-
 
 class displayResult(ScrollView):
     text = StringProperty('')
@@ -96,48 +95,47 @@ class main(App):
         displayLayout.add_widget(resultLayout) 
 
         inputLayout = GridLayout(cols=1,  width="600dp")
-        self.choose_input_title = Label(text='Choose different input', size_hint=(1, 0.1)) # Title
+        self.choose_input_title = Label(text='Choose different input', size_hint=(1, 0.3)) # Title
         inputLayout.add_widget(self.choose_input_title) 
-        self.paremeter1 = Label(text='Parameter 1', size_hint=(1, 0.1)) #modify parameter 1
+        self.paremeter1 = Label(text='Parameter 1', size_hint=(1, 0.3)) #modify parameter 1
         inputLayout.add_widget(self.paremeter1) 
-        self.input1 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        self.input1 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
         inputLayout.add_widget(self.input1)
-        self.paremeter2 = Label(text='Parameter 2', size_hint=(1, 0.1)) #modify parameter 2
+        self.paremeter2 = Label(text='Parameter 2', size_hint=(1, 0.3)) #modify parameter 2
         inputLayout.add_widget(self.paremeter2) 
-        self.input2 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        self.input2 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
         inputLayout.add_widget(self.input2)  
 
-        self.paremeter2 = Label(text='quar_period(int)', size_hint=(1, 0.1)) #modify parameter 
+        self.paremeter2 = Label(text='quar_period(int)', size_hint=(1, 0.3)) #modify parameter 
         inputLayout.add_widget(self.paremeter2) 
-        self.input3 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        self.input3 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
         inputLayout.add_widget(self.input3)  
-        self.paremeter2 = Label(text='n_days(int)', size_hint=(1, 0.1)) #modify parameter 
+        self.paremeter2 = Label(text='n_days(int)', size_hint=(1, 0.3)) #modify parameter 
         inputLayout.add_widget(self.paremeter2) 
-        self.input4 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        self.input4 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
         inputLayout.add_widget(self.input4)  
-        self.paremeter2 = Label(text='pop_type(str)', size_hint=(1, 0.1)) #modify parameter
+        self.paremeter2 = Label(text='pop_type(str)', size_hint=(1, 0.3)) #modify parameter
         inputLayout.add_widget(self.paremeter2) 
-        self.input5 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        self.input5 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
         inputLayout.add_widget(self.input5)  
-        self.paremeter2 = Label(text='pop_size(int)', size_hint=(1, 0.1)) #modify parameter 
+        self.paremeter2 = Label(text='pop_size(int)', size_hint=(1, 0.3)) #modify parameter 
         inputLayout.add_widget(self.paremeter2) 
-        self.input6 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        self.input6 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
         inputLayout.add_widget(self.input6)  
-        self.paremeter2 = Label(text='pop_infected(int)', size_hint=(1, 0.1)) #modify parameter 
+        self.paremeter2 = Label(text='pop_infected(int)', size_hint=(1, 0.3)) #modify parameter 
         inputLayout.add_widget(self.paremeter2) 
-        self.input7 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        self.input7 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
         inputLayout.add_widget(self.input7)  
-        self.paremeter2 = Label(text='location(str)', size_hint=(1, 0.1)) #modify parameter 
+        self.paremeter2 = Label(text='location(str)', size_hint=(1, 0.3)) #modify parameter 
         inputLayout.add_widget(self.paremeter2) 
-        self.input8 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        self.input8 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
         inputLayout.add_widget(self.input8)  
-        self.paremeter2 = Label(text='interventions(str)', size_hint=(1, 0.1)) #modify parameter 
+        self.paremeter2 = Label(text='interventions(str)', size_hint=(1, 0.3)) #modify parameter 
         inputLayout.add_widget(self.paremeter2) 
-        self.input9 = TextInput(text='', size_hint=(1, 0.5), multiline=False) 
+        self.input9 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
         inputLayout.add_widget(self.input9)   
         displayLayout.add_widget(inputLayout)
         
-
         runBehave = Button(text='Run behave', size_hint=(1, 0.1)) # Run update function 
         runBehave.bind(on_press=self.update)
         displayLayout.add_widget(runBehave) 
@@ -173,7 +171,6 @@ class main(App):
                             result += str(item.strip())
                             result += "\n"                 
 
-
                 if child.find("error") is not None:
                     ertag = child.find("error")
                     cdatatext = ertag.text
@@ -190,17 +187,34 @@ class main(App):
             self.display_result.text = "Please select a feature file"  
         os.chdir('..')   
     
-
     def save_file(self, instance):
         parameter_input1 = self.input1.text
+        parameter_input1 = parameter_input1.replace('\t', '')
+
         parameter_input2 = self.input2.text
+        parameter_input2 = parameter_input2.replace('\t', '')
+
         parameter_input3 = self.input3.text
+        parameter_input3 = parameter_input3.replace('\t', '') 
+
         parameter_input4 = self.input4.text
+        parameter_input4 = parameter_input4.replace('\t', '')
+
         parameter_input5 = self.input5.text
+        parameter_input5 = parameter_input5.replace('\t', '')
+
         parameter_input6 = self.input6.text
+        parameter_input6 = parameter_input6.replace('\t', '')
+
         parameter_input7 = self.input7.text
+        parameter_input7 = parameter_input7.replace('\t', '')
+
         parameter_input8 = self.input8.text
+        parameter_input8 = parameter_input8.replace('\t', '')
+
         parameter_input9 = self.input9.text
+        parameter_input9 = parameter_input9.replace('\t', '')
+
         feature_file_name = "compare_" + parameter_input1 + "_" + parameter_input2 + ".feature"    #generate file name based on input
         self.created_file_feature.append(feature_file_name)
         os.chdir('features')
@@ -226,8 +240,7 @@ class main(App):
 
     def show_load(self, instance):
         content = LoadDialog(load=self.load, cancel=self.dismiss_popup)
-        self._popup = Popup(title="Load file", content=content,
-                            size_hint=(0.9, 0.9))
+        self._popup = Popup(title="Load file", content=content, size_hint=(0.9, 0.9))
         self._popup.open()
 
     def load(self, path, filename):
