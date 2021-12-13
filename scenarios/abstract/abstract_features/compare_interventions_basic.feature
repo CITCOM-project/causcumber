@@ -36,10 +36,11 @@ Feature: Compare interventions basic
     # The theoretical limits is the following
     # But this is too vague. Z3 will just shove out 0 all the time, which is stupid
     # is the following
-    And 0 <= pop_infected <= pop_size
+    # And 0 <= pop_infected <= pop_size
     # but this does mean the model operates more within its "comfort zone".
     # We want to make sure we have at least some people infected
     # We want to make sure we have enough so that the pandemic gets going most of the time
+    And 100 <= pop_infected <= pop_size
     # I'm not really sure how/whether we can do this sort of thing automatically.
     # This is the sort of thing that the category partition method was meant to
     # deal with, but the categories are a bit more "fuzzy" here. There's not a
@@ -119,11 +120,11 @@ Feature: Compare interventions basic
   # These probs are effect modifiers of each other
   @symp_prob
   Scenario: symp_prob
-    Given symp_prob > 0
-    And asymp_prob > 0
-    And symp_quar_prob > 0
-    And asymp_quar_prob > 0
-    And trace_probs > 0
+    # Given symp_prob > 0
+    # And asymp_prob > 0
+    # And symp_quar_prob > 0
+    # And asymp_quar_prob > 0
+    # And trace_probs > 0
     # We only actually need this for cum_quarantined since people are only quarantined when trace_probs > 0
     When we increase the symp_prob
     # Higher probability of testing means more infected people will be found so more people are quarantined
@@ -138,7 +139,7 @@ Feature: Compare interventions basic
   # These probs are effect modifiers of each other
   @asymp_prob
   Scenario: asymp_prob
-    Given trace_probs > 0
+    # Given trace_probs > 0
     When we increase the asymp_prob
     # Higher probability of testing means more infected people will be found so more people are quarantined
     Then the cum_quarantined should decrease
@@ -152,7 +153,7 @@ Feature: Compare interventions basic
   # These probs are effect modifiers of each other
   @symp_quar_prob
   Scenario: symp_quar_prob
-    Given trace_probs > 0
+    # Given trace_probs > 0
     When we increase the symp_quar_prob
     # Higher probability of testing means more infected people will be found so more people are quarantined
     Then the cum_quarantined should remain the same
@@ -166,7 +167,7 @@ Feature: Compare interventions basic
   # These probs are effect modifiers of each other
   @asymp_quar_prob
   Scenario: asymp_quar_prob
-    Given trace_probs > 0
+    # Given trace_probs > 0
     When we increase the asymp_quar_prob
     # Higher probability of testing means more infected people will be found so more people are quarantined
     Then the cum_quarantined should decrease

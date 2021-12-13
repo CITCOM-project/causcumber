@@ -38,6 +38,7 @@ def populate_household_size(data):
 def step_impl(context):
     for row in context.table:
         var = Input(row["parameter"], locate(row["type"]))
+        context.types[row["parameter"]] = locate(row["type"])
         var.distribution = eval(row["distribution"])
         context.scenario.modelling_scenario.variables[row["parameter"]] = var
 
@@ -48,14 +49,16 @@ def step_impl(context):
         context.scenario.modelling_scenario.variables[row["variable"]] = Meta(
             row["variable"], locate(row["type"]), eval("populate_" + row["variable"]),
         )
+        context.types[row["variable"]] = locate(row["type"])
 
 
 @given(u"the following variables are recorded at the end of the simulation")
 def step_impl(context):
     for row in context.table:
         var = Output(row["variable"], locate(row["type"]))
-        context.outputs.add(var)
+        context.outputs.add(var.name)
         context.scenario.modelling_scenario.variables[row["variable"]] = var
+        context.types[row["variable"]] = locate(row["type"])
 
 
 @given("a connected DAG")
@@ -64,8 +67,7 @@ def step_impl(context):
         context.scenario.modelling_scenario.metas()
     )
     inputs = [v.name for v in inputs]
-    outputs = [v.name for v in context.outputs]
-    context.repeating_unit = draw_connected_dag(inputs, outputs)
+    context.repeating_unit = draw_connected_dag(inputs, context.outputs)
 
 
 @then(u"we obtain the causal DAG")
