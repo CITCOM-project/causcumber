@@ -6,6 +6,7 @@ import covasim
 from covasim_utils import avg_age, household_size
 from causcumber.causcumber_utils import draw_connected_dag
 import re
+import numpy as np
 
 
 class countries_gen(stats.rv_discrete):
