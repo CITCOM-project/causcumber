@@ -54,12 +54,20 @@ Feature: Compare interventions basic
     # This covers the base case in the ITE
     And average_age > 0
     And household_size = household_sizes(location)
+
     # Probabilities must be between zero and one
     And 0 <= symp_prob <= 1
     And 0 <= asymp_prob <= 1
     And 0 <= symp_quar_prob <= 1
     And 0 <= asymp_quar_prob <= 1
     And 0 <= trace_probs <= 1
+
+    # Further restrict probabilities to suit the particular modelling scenario
+    And 0.1 <= symp_prob <= 0.5
+    And 0 <= asymp_prob <= 0.05
+    And 0.5 <= symp_quar_prob <= 1
+    And 0.5 <= asymp_quar_prob <= 1
+    And 0.1 <= trace_probs <= 0.3
 
   # TODO: this is a bit clunky. It might not be  reasonable to assume that a
   # domain expert would be able to list all edges that wouldn’t be present
