@@ -2,7 +2,7 @@ from functools import reduce as fold
 from behave import use_step_matcher
 import numpy as np
 import z3
-from causal_testing.testing.abstract_causal_test_case import AbstractCausalTestCase
+from causal_testing.generation.abstract_causal_test_case import AbstractCausalTestCase
 from causal_testing.testing.causal_test_outcome import Positive, Negative, NoEffect
 from causal_testing.specification.variable import Output
 

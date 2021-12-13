@@ -188,7 +188,7 @@ def execute_test(scenario, causal_dag, causal_test_case, observational_data_csv_
                                              causal_test_engine.scenario_execution_data_df)
     causal_test_result = causal_test_engine.execute_test(estimation_model)
     if not causal_test_case.expected_causal_effect.apply(causal_test_result):
-        logger.error(f"{causal_test_case}\n    FAILED")
+        logger.error(f"{causal_test_case}\n    FAILED - actual causal effect was {causal_test_result.ci_low()} < {causal_test_result.ate} < {causal_test_result.ci_high()}")
 
 
 def after_feature(context, feature):
