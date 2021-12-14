@@ -29,8 +29,8 @@ Feature: Compare interventions basic
     # These are pretty much arbitrary, but we want to give test case generation as much help as possible
     And 60 <= n_days <= 365
     # There's no point in quarantining people for longer than the length of time the model is run
-    And 0 <= quar_period < n_days
-    And 10000 <= pop_size <= 100000
+    And 0 <= quar_period <= n_days
+    And 10000 <= pop_size <= 20000
 
     # We can't have more initially infected people than the total population
     # The theoretical limits is the following
@@ -62,12 +62,14 @@ Feature: Compare interventions basic
     And 0 <= asymp_quar_prob <= 1
     And 0 <= trace_probs <= 1
 
-    # Further restrict probabilities to suit the particular modelling scenario
+    # Further restrict parameters to suit the particular modelling scenario
     And 0.1 <= symp_prob <= 0.5
     And 0 <= asymp_prob <= 0.05
     And 0.5 <= symp_quar_prob <= 1
     And 0.5 <= asymp_quar_prob <= 1
     And 0.1 <= trace_probs <= 0.3
+    And quar_period <= 14
+    And 30 <= average_age <= 40
 
   # TODO: this is a bit clunky. It might not be  reasonable to assume that a
   # domain expert would be able to list all edges that wouldn’t be present
@@ -98,6 +100,18 @@ Feature: Compare interventions basic
 
   # Scenario Outline: location # This is really just a proxy for age, but age isn't an input to the model
 
+  # Bare minimum two runs where 0 <= quar_period 14
+  # Probably want to do 0-x1 and x1-14 by BVA
+  @quar_period
+  Scenario Outline: quar_period
+  When we increase the quar_period
+  Then the <output> should <change>
+  Examples:
+  | output          | change          | comment                                                                            |
+  | cum_quarantined | decrease        | Longer quarantine means fewer cases means fewer quarantine                         |
+  | cum_infections  | decrease        | Longer quarantine means less chance of infected individuals passing on the disease |
+  | cum_deaths      | remain the same | No direct causal effect, only via cum_infections                                   |
+
   # This is controlled entirely by location, so we want to do at least two locations with different average ages
   # Do we want to run it for every country?
   @average_age
@@ -108,20 +122,8 @@ Feature: Compare interventions basic
     Examples:
     | output          | change   |
     | cum_quarantined | decrease |
-    | cum_infections  | decrease |
+    | cum_infections  | increase |
     | cum_deaths      | increase |
-
-  # Bare minimum two runs where 0 <= quar_period 14
-  # Probably want to do 0-x1 and x1-14 by BVA
-  @quar_period_short
-  Scenario Outline: quar_period
-    When we increase the quar_period
-    Then the <output> should <change>
-    Examples:
-    | output          | change          | comment                                                                            |
-    | cum_quarantined | decrease        | Longer quarantine means fewer cases means fewer quarantine                         |
-    | cum_infections  | decrease        | Longer quarantine means less chance of infected individuals passing on the disease |
-    | cum_deaths      | remain the same | No direct causal effect, only via cum_infections                                   |
 
   # For each prob, bare minimum two runs between 0 and 1
   # Probably want to do 0-x1 and x2-1 by BVA

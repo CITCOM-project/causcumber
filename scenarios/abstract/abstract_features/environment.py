@@ -84,8 +84,7 @@ def before_feature(context, feature):
     if not os.path.exists(context.results_dir):
         os.makedirs(context.results_dir, exist_ok=True)
 
-    context.supported_countries = ["Poland", "Niger", "Japan"]
-    sorted(
+    context.supported_countries = sorted(
         [
             h
             for h in covasim.data.country_age_data.data
@@ -187,15 +186,20 @@ def execute_test(scenario, causal_dag, causal_test_case, observational_data_csv_
                                              (list(causal_test_case.outcome_variables)[0].name,),
                                              causal_test_engine.scenario_execution_data_df)
     causal_test_result = causal_test_engine.execute_test(estimation_model)
-    if not causal_test_case.expected_causal_effect.apply(causal_test_result):
+    test_passes = causal_test_case.expected_causal_effect.apply(causal_test_result)
+    if not test_passes:
         logger.error(f"{causal_test_case}\n    FAILED - actual causal effect was {causal_test_result.ci_low()} < {causal_test_result.ate} < {causal_test_result.ci_high()}")
-
+    return test_passes
 
 def after_feature(context, feature):
     context.dag = CausalDAG(context.dag_path)
+    observational_data_csv_path = f"results/{context.feature.name}.csv"
+
     first_pass_tests = []
     first_pass_runs = []
     second_pass_tests = []
+    failed_tests = 0
+
     for scenario, abstract_test in context.abstract_tests:
         if all(
             [
@@ -209,12 +213,12 @@ def after_feature(context, feature):
             first_pass_runs.append(runs)
         else:
             second_pass_tests.append((scenario, abstract_test))
-    assert len(first_pass_runs) > 0, "Must have at least one first pass test."
+    assert len(first_pass_runs) > 0 or os.path.exists(observational_data_csv_path),\
+           "Must have at least one first pass test if not using observational data."
     first_pass_runs = pd.concat(first_pass_runs)
     data = None
 
     # TODO: Update to use data_collector
-    observational_data_csv_path = f"results/{context.feature.name}.csv"
     if os.path.exists(observational_data_csv_path):
         data = pd.read_csv(observational_data_csv_path)
     else:
@@ -226,7 +230,7 @@ def after_feature(context, feature):
         data.to_csv(observational_data_csv_path)
 
     for scenario, test in first_pass_tests:
-        execute_test(scenario, context.dag, test, observational_data_csv_path)
+        failed_tests += not execute_test(scenario, context.dag, test, observational_data_csv_path)
 
     for scenario, abstract_test in second_pass_tests:
         for variable in scenario.variables.values():
@@ -234,7 +238,9 @@ def after_feature(context, feature):
                 variable.distribution = fit_distribution(data[variable.name])
         concrete_tests, _ = abstract_test.generate_concrete_tests(4)
         for test in concrete_tests:
-            execute_test(scenario, context.dag, test, observational_data_csv_path)
+            failed_tests += not execute_test(scenario, context.dag, test, observational_data_csv_path)
+    print("Results:")
+    print(f"{failed_tests} out of {len(first_pass_tests) + len(second_pass_tests)} failed.")
 
 
 def before_tag(context, tag):

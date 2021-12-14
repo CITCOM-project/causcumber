@@ -136,8 +136,8 @@ def step_impl(context, v1, v2):
 
 
 mutations = {
-    "increase": lambda x, x_prime: x_prime > x,
-    "decrease": lambda x, x_prime: x_prime < x,
+    "increase": lambda x, x_prime: z3.Or(x_prime > (x*3)/2, x_prime > x + 5),
+    "decrease": lambda x, x_prime: z3.Or(x_prime < (x*3)/2, x_prime < x - 5),
 }
 
 use_step_matcher("re")
@@ -148,8 +148,8 @@ def step_impl(context, mutate, parameter):
     context.treatment_var = parameter
     context.scenario.modelling_scenario.setup_treatment_variables()
     context.mutation = mutations[mutate](
-        context.scenario.modelling_scenario.treatment_variables[parameter],
         context.scenario.modelling_scenario.variables[parameter],
+        context.scenario.modelling_scenario.treatment_variables[parameter],
     )
 
 
@@ -183,12 +183,3 @@ def step_impl(context, output, change):
         effect_modifiers=None,
     )
     context.abstract_tests.append((scenario, causal_test_case))
-    #     {
-    #         "scenario": context.scenario.name,
-    #         "treatment_var": context.treatment_var,
-    #         "mutation": context.mutation,
-    #         "outcome_var": output,
-    #         "expected_change": change,
-    #         "effect_modifiers": context.effect_modifiers,
-    #         "tags": context.scenario.tags,
-    #     }
