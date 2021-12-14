@@ -156,7 +156,10 @@ def run_covasim(runs, desired_outputs, n_runs=3):
             for k, v in run_params.items():
                 data[k] = [v for _ in range(1)]
             all_runs.append(data)
-    return pd.concat(all_runs)
+        data = pd.concat(all_runs)
+        data["average_age"] = [avg_age(c) for c in data["location"]]
+        data["household_size"] = [household_size(c) for c in data["location"]]
+    return data
 
 
 def fit_distribution(data) -> stats.beta:
@@ -199,6 +202,7 @@ def after_feature(context, feature):
     first_pass_runs = []
     second_pass_tests = []
     failed_tests = 0
+    dataframes = []
 
     for scenario, abstract_test in context.abstract_tests:
         if all(
@@ -211,26 +215,34 @@ def after_feature(context, feature):
             concrete_tests, runs = abstract_test.generate_concrete_tests(4)
             first_pass_tests += [(scenario, test) for test in concrete_tests]
             first_pass_runs.append(runs)
+            datapath = f"results/exp_data/{abstract_test.datapath()}"
+            if os.path.exists(datapath):
+                data = pd.read_csv(datapath, index_col=0)
+            else:
+                data = run_covasim(runs, context.outputs)
+                data.to_csv(datapath)
+            for test in concrete_tests:
+                failed_tests += not execute_test(scenario, context.dag, test, datapath)
+            dataframes .append(data)
         else:
             second_pass_tests.append((scenario, abstract_test))
-    assert len(first_pass_runs) > 0 or os.path.exists(observational_data_csv_path),\
+    assert len(first_pass_runs) > 0 or os.path.exists(datapath),\
            "Must have at least one first pass test if not using observational data."
-    first_pass_runs = pd.concat(first_pass_runs)
-    data = None
+    # first_pass_runs = pd.concat(first_pass_runs)
+    pd.concat(dataframes).to_csv(observational_data_csv_path)
 
-    # TODO: Update to use data_collector
-    if os.path.exists(observational_data_csv_path):
-        data = pd.read_csv(observational_data_csv_path)
-    else:
-        data = run_covasim(first_pass_runs, context.outputs)
-        data["average_age"] = [avg_age(c) for c in data["location"]]
-        data["household_size"] = [household_size(c) for c in data["location"]]
-        for column in data:
-            data[column] = data[column].astype(context.types[column])
-        data.to_csv(observational_data_csv_path)
 
-    for scenario, test in first_pass_tests:
-        failed_tests += not execute_test(scenario, context.dag, test, observational_data_csv_path)
+    # # TODO: Update to use data_collector
+    # if os.path.exists(observational_data_csv_path):
+    #     data = pd.read_csv(observational_data_csv_path)
+    # else:
+    #     data = run_covasim(first_pass_runs, context.outputs)
+    #     for column in data:
+    #         data[column] = data[column].astype(context.types[column])
+    #     data.to_csv(observational_data_csv_path)
+
+    # for scenario, test in first_pass_tests:
+    #     failed_tests += not execute_test(scenario, context.dag, test, observational_data_csv_path)
 
     for scenario, abstract_test in second_pass_tests:
         for variable in scenario.variables.values():
