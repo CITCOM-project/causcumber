@@ -5,13 +5,13 @@ Feature: Compare interventions
   Background:
     Given a simulation with parameters
       | parameter     | value      | type |
-      | quar_period   | [quar_period_place_holder]          | int  |
-      | n_days        | [n_days_place_holder]         | int  |
-      | pop_type      | [pop_type_place_holder]     | str  |
-      | pop_size      | [pop_size_place_holder]      | int  |
-      | pop_infected  | [pop_infected_place_holder]        | int  |
-      | location      | [location_place_holder]         | str  |
-      | interventions | [interventions_place_holder]   | str  |
+      | quar_period   | [quar_period(int)_place_holder]          | int  |
+      | n_days        | [n_days(int)_place_holder]         | int  |
+      | pop_type      | [pop_type(str)_place_holder]     | str  |
+      | pop_size      | [pop_size(int)_place_holder]      | int  |
+      | pop_infected  | [pop_infected(int)_place_holder]        | int  |
+      | location      | [location(str)_place_holder]         | str  |
+      | interventions | [interventions(str)_place_holder]   | str  |
     And the following variables are recorded weekly
       | variable          | type |
       | cum_tests         | int  |

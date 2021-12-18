@@ -21,8 +21,11 @@ import io
 import xml.etree.ElementTree as ET
 import xml.dom.minidom  
 from kivy.config import Config
+
+from readFile import read_parameter_file
 Config.set('graphics', 'width', '1200')
 Config.set('graphics', 'height', '900')
+Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 Config.write()
 
 Builder.load_string('''
@@ -70,11 +73,11 @@ class main(App):
     loadfile = ObjectProperty(None)
 
     def __init__(self,**kwargs):
-        super(main,self).__init__(**kwargs)
-        os.chdir('compare_interventions')
+        super(main,self).__init__(**kwargs)       
         self.current_File = ""
 
     def build(self):
+        os.chdir('compare_interventions')
 
         Window.bind(on_request_close=self.on_request_close)
         
@@ -97,43 +100,23 @@ class main(App):
         inputLayout = GridLayout(cols=1,  width="600dp")
         self.choose_input_title = Label(text='Choose different input', size_hint=(1, 0.3)) # Title
         inputLayout.add_widget(self.choose_input_title) 
-        self.paremeter1 = Label(text='Parameter 1', size_hint=(1, 0.3)) #modify parameter 1
-        inputLayout.add_widget(self.paremeter1) 
-        self.input1 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
-        inputLayout.add_widget(self.input1)
-        self.paremeter2 = Label(text='Parameter 2', size_hint=(1, 0.3)) #modify parameter 2
-        inputLayout.add_widget(self.paremeter2) 
-        self.input2 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
-        inputLayout.add_widget(self.input2)  
+        self.compared_parameter1 = Label(text='Compared_parameter1', size_hint=(1, 0.3)) #modify parameter 1
+        inputLayout.add_widget(self.compared_parameter1) 
+        self.input_compared_parameter1 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
+        inputLayout.add_widget(self.input_compared_parameter1)
+        self.compared_parameter2 = Label(text='Compared_parameter2', size_hint=(1, 0.3)) #modify parameter 1
+        inputLayout.add_widget(self.compared_parameter2) 
+        self.input_compared_parameter2 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
+        inputLayout.add_widget(self.input_compared_parameter2)  
 
-        self.paremeter2 = Label(text='quar_period(int)', size_hint=(1, 0.3)) #modify parameter 
-        inputLayout.add_widget(self.paremeter2) 
-        self.input3 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
-        inputLayout.add_widget(self.input3)  
-        self.paremeter2 = Label(text='n_days(int)', size_hint=(1, 0.3)) #modify parameter 
-        inputLayout.add_widget(self.paremeter2) 
-        self.input4 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
-        inputLayout.add_widget(self.input4)  
-        self.paremeter2 = Label(text='pop_type(str)', size_hint=(1, 0.3)) #modify parameter
-        inputLayout.add_widget(self.paremeter2) 
-        self.input5 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
-        inputLayout.add_widget(self.input5)  
-        self.paremeter2 = Label(text='pop_size(int)', size_hint=(1, 0.3)) #modify parameter 
-        inputLayout.add_widget(self.paremeter2) 
-        self.input6 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
-        inputLayout.add_widget(self.input6)  
-        self.paremeter2 = Label(text='pop_infected(int)', size_hint=(1, 0.3)) #modify parameter 
-        inputLayout.add_widget(self.paremeter2) 
-        self.input7 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
-        inputLayout.add_widget(self.input7)  
-        self.paremeter2 = Label(text='location(str)', size_hint=(1, 0.3)) #modify parameter 
-        inputLayout.add_widget(self.paremeter2) 
-        self.input8 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
-        inputLayout.add_widget(self.input8)  
-        self.paremeter2 = Label(text='interventions(str)', size_hint=(1, 0.3)) #modify parameter 
-        inputLayout.add_widget(self.paremeter2) 
-        self.input9 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
-        inputLayout.add_widget(self.input9)   
+        parameter_list = read_parameter_file()
+
+        for x in range(len(parameter_list)):
+            globals()[f"self.paremeter{x}"] = Label(text=parameter_list[x], size_hint=(1, 0.3)) 
+            inputLayout.add_widget(globals()[f"self.paremeter{x}"])
+            globals()['input%s' % x] = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
+            inputLayout.add_widget(globals()['input%s' % x])
+
         displayLayout.add_widget(inputLayout)
         
         runBehave = Button(text='Run behave', size_hint=(1, 0.1)) # Run update function 
@@ -188,46 +171,26 @@ class main(App):
         os.chdir('..')   
     
     def save_file(self, instance):
-        parameter_input1 = self.input1.text
-        parameter_input1 = parameter_input1.replace('\t', '')
+        compared_parameter_input1 = self.input_compared_parameter1.text
+        compared_parameter_input1 = compared_parameter_input1.replace('\t', '')
 
-        parameter_input2 = self.input2.text
-        parameter_input2 = parameter_input2.replace('\t', '')
+        compared_parameter_input2 = self.input_compared_parameter2.text
+        compared_parameter_input2 = compared_parameter_input2.replace('\t', '')
 
-        parameter_input3 = self.input3.text
-        parameter_input3 = parameter_input3.replace('\t', '') 
+        parameter_list = read_parameter_file()
 
-        parameter_input4 = self.input4.text
-        parameter_input4 = parameter_input4.replace('\t', '')
+        for x in range(len(parameter_list)):
+            globals()['parameter_input%s' % x] = globals()['input%s' % x].text
+            globals()['parameter_input%s' % x] = globals()['parameter_input%s' % x].replace('\t', '')
 
-        parameter_input5 = self.input5.text
-        parameter_input5 = parameter_input5.replace('\t', '')
-
-        parameter_input6 = self.input6.text
-        parameter_input6 = parameter_input6.replace('\t', '')
-
-        parameter_input7 = self.input7.text
-        parameter_input7 = parameter_input7.replace('\t', '')
-
-        parameter_input8 = self.input8.text
-        parameter_input8 = parameter_input8.replace('\t', '')
-
-        parameter_input9 = self.input9.text
-        parameter_input9 = parameter_input9.replace('\t', '')
-
-        feature_file_name = "compare_" + parameter_input1 + "_" + parameter_input2 + ".feature"    #generate file name based on input
+        feature_file_name = "compare_" + compared_parameter_input1 + "_" + compared_parameter_input2 + ".feature"    #generate file name based on input
         self.created_file_feature.append(feature_file_name)
         os.chdir('features')
         file = open("feature_template.txt",encoding="utf-8")
         template = file.read()
 
-        template = template.replace("[quar_period_place_holder]", parameter_input3)
-        template = template.replace("[n_days_place_holder]", parameter_input4)
-        template = template.replace("[pop_type_place_holder]", "hybrid")
-        template = template.replace("[pop_size_place_holder]", parameter_input6)
-        template = template.replace("[pop_infected_place_holder]", parameter_input7)
-        template = template.replace("[location_place_holder]", "UK")
-        template = template.replace("[interventions_place_holder]", "baseline")
+        for x in range(len(parameter_list)):
+            template = template.replace("["+parameter_list[x]+"_place_holder]", globals()['parameter_input%s' % x])
 
         file.close()
         f = open(feature_file_name, "a")                                                           #generate feature file with input file name   
