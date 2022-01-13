@@ -46,6 +46,7 @@ def before_feature(context, feature):
     context.feature_name = to_snake_case(context.feature.name)
     context.dag_path = f"dags/{context.feature_name}.dot"
     context.results_dir = f"results/{context.feature_name}"
+    context.inputs = set()
     if not os.path.exists(context.results_dir):
         os.makedirs(context.results_dir, exist_ok=True)
 
