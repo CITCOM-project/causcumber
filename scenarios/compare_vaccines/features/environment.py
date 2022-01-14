@@ -5,7 +5,7 @@ import sys
 
 sys.path.append("../../")
 from covasim_utils import save_results_df
-from causcumber_utils import to_snake_case
+from causcumber.causcumber_utils import to_snake_case
 from behave import fixture, use_fixture
 
 

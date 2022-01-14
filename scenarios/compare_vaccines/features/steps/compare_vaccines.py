@@ -11,7 +11,7 @@ from behave import *
 from pydoc import locate
 from behave_utils import table_to_dict
 from covasim_utils import run_covasim_by_week, save_results_df
-from causcumber_utils import run_dowhy, draw_connected_repeating_unit, iterate_repeating_unit
+from causcumber.causcumber_utils import run_dowhy, draw_connected_repeating_unit, iterate_repeating_unit
 
 use_step_matcher("re")
 
