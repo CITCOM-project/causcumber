@@ -3,14 +3,14 @@
 Feature: Compare interventions basic
   Background:
     Given a simulation with parameters
-      | parameter     | value      | type |
-      | quar_period   | 14         | int  |
-      | n_days        | 84         | int  |
-      | pop_type      | hybrid     | str  |
-      | pop_size      | 50000      | int  |
-      | pop_infected  | 100        | int  |
-      | location      | UK         | str  |
-      | interventions | baseline   | str  |
+      | parameter     | value          | type |
+      | quar_period   | 14             | int  |
+      | n_days        | 84             | int  |
+      | pop_type      | hybrid         | str  |
+      | pop_size      | 50000          | int  |
+      | pop_infected  | 100            | int  |
+      | location      | United Kingdom | str  |
+      | interventions | baseline       | str  |
     And the following variables are recorded at the end of the simulation
       | variable          | type |
       | cum_tests         | int  |
@@ -100,9 +100,9 @@ Feature: Compare interventions basic
     When we run the model with location=<treatment>
     Then the cum_deaths should be <relationship> <control>
     Examples:
-      | treatment | relationship | control | note                                    |
-      | Japan     | >            | UK      | Because Japan has an older population   |
-      | Rwanda    | <            | UK      | Because Rwanda has a younger population |
+      | treatment | relationship | control        | note                                    |
+      | Japan     | >            | United Kingdom | Because Japan has an older population   |
+      | Rwanda    | <            | United Kingdom | Because Rwanda has a younger population |
 
   Scenario: Large population
     Given we run the model with pop_size=50000

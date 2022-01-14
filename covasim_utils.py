@@ -1,13 +1,13 @@
 """ Utilities for running Covasim. """
 import numpy as np
-
 import covasim as cv
+import sciris as sc
 import pandas as pd
 import os
 
 
 def avg_age(location):
-    ages = cv.data.country_age_data.data[location]
+    ages = cv.data.loaders.map_entries(cv.data.country_age_data.data, location)[location]
     total_pop = sum(ages.values())
     avg = 0
     for age in ages:
@@ -22,7 +22,7 @@ def avg_age(location):
 
 
 def household_size(location):
-    return cv.data.household_size_data.data[location]
+    return cv.data.loaders.get_household_size(location)
 
 
 # Instantiate named covasim interventions with parameters
