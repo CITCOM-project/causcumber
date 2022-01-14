@@ -3,15 +3,15 @@
 Feature: Compare start dates
   Background:
     Given a simulation with parameters
-      | parameter     | value      | type |
-      | quar_period   | 14         | int  |
-      | n_days        | 84         | int  |
-      | pop_type      | hybrid     | str  |
-      | pop_size      | 50000      | int  |
-      | pop_infected  | 100        | int  |
-      | location      | UK         | str  |
-      | start_day     | 2020-01-03 | str  |
-      | interventions | baseline   | str  |
+      | parameter     | value          | type |
+      | quar_period   | 14             | int  |
+      | n_days        | 84             | int  |
+      | pop_type      | hybrid         | str  |
+      | pop_size      | 50000          | int  |
+      | pop_infected  | 100            | int  |
+      | location      | United Kingdom | str  |
+      | start_day     | 2020-01-03     | str  |
+      | interventions | baseline       | str  |
     And the following variables are recorded weekly
       | variable          | type |
       | cum_tests         | int  |

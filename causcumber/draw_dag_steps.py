@@ -21,37 +21,55 @@ def step_impl(context):
     for row in context.table:
         cast_type = locate(row["type"])
         context.types[row["parameter"]] = cast_type
-        if "value" in context.table.headings:
+        if hasattr(context, "z3_types") and hasattr(context, "z3_variables"):
+            context.z3_variables[row["parameter"]] = context.z3_types[cast_type](
+                row["parameter"]
+            )
+        context.inputs.add(row["parameter"])
+        if "value" in row.headings:
             context.params_dict[row["parameter"]] = cast_type(row["value"])
+
+
+@given("the following meta variables")
+def step_impl(context):
+    """
+    Populate the params_dict with the specified meta variables.
+    """
+    for row in context.table:
+        cast_type = locate(row["type"])
+        var = row["variable"]
+        context.types[var] = cast_type
+        context.z3_variables[var] = context.z3_types[cast_type](var)
+        context.meta_variables.add(row["variable"])
+        if "value" in row:
+            context.params_dict[var] = cast_type(row["value"])
 
 
 @given("the following variables are recorded every time step")
 def step_impl(context):
-    context.desired_outputs = [row["variable"] for row in context.table]
     for row in context.table:
+        context.outputs.add(row["variable"])
         context.types[row["variable"]] = locate(row["type"])
 
 
 @given("the following variables are recorded at the end of the simulation")
 def step_impl(context):
-    context.desired_outputs = [row["variable"] for row in context.table]
     for row in context.table:
+        context.outputs.add(row["variable"])
         context.types[row["variable"]] = locate(row["type"])
 
 
 @given("a connected repeating unit")
 def step_impl(context):
-    inputs = list(context.params_dict.keys())
-    context.repeating_unit = draw_connected_repeating_unit(
-        inputs, context.desired_outputs
-    )
+    inputs = context.inputs.union(context.meta_variables)
+    context.repeating_unit = draw_connected_repeating_unit(inputs, context.outputs)
     context.repeating_unit.write(f"dags/{context.feature_name}_repeating_unit.dot")
 
 
 @given("a connected DAG")
 def step_impl(context):
-    inputs = list(context.params_dict.keys())
-    context.repeating_unit = draw_connected_dag(inputs, context.desired_outputs)
+    inputs = context.inputs.union(context.meta_variables)
+    context.repeating_unit = draw_connected_dag(inputs, context.outputs)
 
 
 @when("we prune the following edges")

@@ -5,7 +5,7 @@ import sys
 
 sys.path.append("../../")
 from covasim_utils import save_results_df
-from causcumber_utils import to_snake_case
+from causcumber.causcumber_utils import to_snake_case
 from behave import fixture, use_fixture
 
 
@@ -13,7 +13,7 @@ from behave import fixture, use_fixture
 def set_results_df(context):
     """ Add a results dataframe which stores simulation outputs to context. """
     context.results_df = pd.DataFrame()
-    context.desired_outputs = []
+    context.outputs = []
 
 
 @fixture

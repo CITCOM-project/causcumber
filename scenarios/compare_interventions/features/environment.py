@@ -14,19 +14,6 @@ from covasim_utils import interventions
 
 obs_tag_re = re.compile('observational\(("|\')(.+)("|\')\)')
 
-@fixture
-def set_desired_outputs(context):
-    """ Add a results dataframe which stores simulation outputs to context. """
-    context.desired_outputs = []
-
-
-@fixture
-def set_parameters_dict(context):
-    """ Add a parameters dictionary which stores simulation parameters to context."""
-    context.params_dict = dict()
-    context.types = {}
-
-
 def print_head(filename):
     if not os.path.exists(os.path.dirname(filename)):
         os.makedirs(os.path.dirname(filename), exist_ok=True)
@@ -42,12 +29,22 @@ def before_all(context):
 
 def before_feature(context, feature):
     print(f"Running Feature `{feature.name}`")
-    use_fixture(set_parameters_dict, context)
+    context.params_dict = dict()
+    context.types = {}
     context.feature_name = to_snake_case(context.feature.name)
     context.dag_path = f"dags/{context.feature_name}.dot"
     context.results_dir = f"results/{context.feature_name}"
+    context.inputs = set()
+    context.outputs = set()
+    context.meta_variables = set()
+    context.frequency = None
+
     if not os.path.exists(context.results_dir):
         os.makedirs(context.results_dir, exist_ok=True)
+
+
+def before_scenario(context, scenario):
+    context.effect_modifiers = {}
 
 
 def after_feature(context, feature):
