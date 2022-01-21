@@ -126,7 +126,7 @@ def run_influenza1918(runs, outputs):
     from shutil import move
     stats = []
 
-    repeats = 10
+    repeats = 1
     print(runs)
     for i, run in runs.iterrows():
         for repeat in range(repeats):

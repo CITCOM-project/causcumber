@@ -17,21 +17,21 @@ Feature: Influenza1918 Abstract
       | peak            | int   |
       | peak_infectious | float |
 
-      And MortalityProb in [0.01, 0.02, 0.005]
-      And Infected in [1000, 500, 2000]
+      # And MortalityProb in [0.01, 0.02, 0.005]
+      # And Infected in [1000, 500, 2000]
       # And RecoveryTime in [2.5, 1.25, 5]
       # And MortalityTime in [1, 0.5, 1]
       # And TransmissionProb in [0.15, 0.075, 0.3]
       # And EncounterRate in [4, 2, 8]
       # And IncubationTime in [3, 1.5, 6]
 
-      # And 0.01 < MortalityProb <= 1
+      And 0.005 <= MortalityProb <= 0.02
+      And 500 <= Infected <= 5000
       # And RecoveryTime > 0.01
       # And MortalityTime > 0.01
       # And 0.01 < TransmissionProb <= 1
       # And IncubationTime > 0.01
       # And EncounterRate > 0.01
-      # And Infected > 500
 
   @draw_dag
   Scenario: Draw DAG
