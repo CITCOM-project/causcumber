@@ -207,6 +207,10 @@ def after_feature(context, feature):
             for test in concrete_tests:
                 pass_ = execute_test(scenario, context.dag, test, datapath)
                 if not pass_ and context.config.stop:
+                    print("FAILURE")
+                    print(scenario)
+                    print(test)
+                    print(datapath)
                     sys.exit(1)
                 failed_tests += not pass_
             dataframes .append(data)
