@@ -1,4 +1,4 @@
-from re import template
+from re import L, template
 import re
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
@@ -14,19 +14,21 @@ from kivy.core.window import Window
 from kivy.factory import Factory
 from kivy.properties import ObjectProperty
 from kivy.uix.popup import Popup
+from kivy.uix.screenmanager import ScreenManager, Screen
 
 import os
-import io
-#import json
 import xml.etree.ElementTree as ET
-import xml.dom.minidom  
-from kivy.config import Config
 
-from readFile import read_parameter_file
-Config.set('graphics', 'width', '1200')
-Config.set('graphics', 'height', '900')
-Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
-Config.write()
+##################
+import numpy as np
+from math import sin
+import re
+from kivy_garden.graph import Graph, MeshLinePlot
+##################
+from gui.removeFile import created_file_feature
+from gui.removeFile import created_file_xml
+from gui.readFile import read_parameter_file
+##################
 
 Builder.load_string('''
 <displayResult>:
@@ -54,82 +56,87 @@ Builder.load_string('''
 
             Button:
                 text: "Load"
-                on_release: root.load(filechooser.path, filechooser.selection)
-        
+                on_release: root.load(filechooser.path, filechooser.selection) 
 ''')
+
+class ScreenManagement(ScreenManager):
+    def __init__(self, **kwargs):
+        super(ScreenManagement, self).__init__(**kwargs)
 
 class displayResult(ScrollView):
     text = StringProperty('')
-
+            
 class LoadDialog(FloatLayout):
     load = ObjectProperty(None)
     cancel = ObjectProperty(None)
 
-class main(App):
-
-    created_file_feature = []
-    created_file_xml = []
-    current_file = ""
+class MainWindow(Screen):
     loadfile = ObjectProperty(None)
 
-    def __init__(self,**kwargs):
-        super(main,self).__init__(**kwargs)       
-        self.current_File = ""
-
-    def build(self):
+    def __init__(self, **kwargs):
+        super(MainWindow, self).__init__(**kwargs)
         os.chdir('compare_interventions')
-
-        Window.bind(on_request_close=self.on_request_close)
+        self.current_File = ""       
         
-        Layout = BoxLayout(orientation = 'vertical')
-        banner = Label(text='Causcumber', size_hint=(1, 0.1))
-        Layout.add_widget(banner)
+        layout = BoxLayout(orientation = 'vertical')
+        layout.add_widget(Label(text='Causcumber', size_hint=(1, 0.1)))
+        
+        displayLayout = GridLayout(cols=2)
 
-        displayLayout = GridLayout(cols=2,  width="600dp")
-
-        resultLayout = GridLayout(cols=1,  width="600dp")
+        self.resultLayout = BoxLayout(orientation = 'vertical')
         self.select_feature_file = Button(text='Select feature file', size_hint=(1, 0.1)) # Choose feature file to run
         self.select_feature_file.bind(on_press=self.show_load)
-        resultLayout.add_widget(self.select_feature_file) 
-        self.Result = Label(text='Result', size_hint=(1, 0.1)) # Title
-        resultLayout.add_widget(self.Result)
+        self.resultLayout.add_widget(self.select_feature_file) 
+        self.resultLayout.add_widget(Label(text='Result', size_hint=(1, 0.1)))
         self.display_result = displayResult(text='') # Display result
-        resultLayout.add_widget(self.display_result)    
-        displayLayout.add_widget(resultLayout) 
+        self.resultLayout.add_widget(self.display_result) 
+        
+        ############################
+        self.graph = Graph(xlabel='X', ylabel='Y', x_ticks_minor=5,
+            x_ticks_major=25, y_ticks_major=1,
+            y_grid_label=True, x_grid_label=True, padding=5,
+            x_grid=True, y_grid=True, xmin=-1, xmax=1, ymin=0, ymax=3) 
+        self.resultLayout.add_widget(self.graph)
+        ############################
 
-        inputLayout = GridLayout(cols=1,  width="600dp")
-        self.choose_input_title = Label(text='Choose different input', size_hint=(1, 0.3)) # Title
-        inputLayout.add_widget(self.choose_input_title) 
-        self.compared_parameter1 = Label(text='Compared_parameter1', size_hint=(1, 0.3)) #modify parameter 1
-        inputLayout.add_widget(self.compared_parameter1) 
-        self.input_compared_parameter1 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
+        runBehave = Button(text='Run behave', size_hint=(1, 0.145)) # Run update function 
+        runBehave.bind(on_press=self.update)
+        self.resultLayout.add_widget(runBehave) 
+
+        displayLayout.add_widget(self.resultLayout) 
+
+        inputLayout = BoxLayout(orientation = 'vertical', size_hint_x = None, width = 300)
+        ############################
+        editDotFile = Button(text='Edit dot files', size_hint=(1, 0.17)) # create dot files
+        editDotFile.bind(on_press=self.screen_transition)
+        inputLayout.add_widget(editDotFile) 
+        ############################
+        inputLayout.add_widget(Label(text='Choose different input', size_hint=(1, 0.2))) # Title
+        inputLayout.add_widget(Label(text='Compared_parameter1', size_hint=(1, 0.2))) #modify parameter 1
+        self.input_compared_parameter1 = TextInput(text='', size_hint=(1, 0.16), multiline=False) 
         inputLayout.add_widget(self.input_compared_parameter1)
-        self.compared_parameter2 = Label(text='Compared_parameter2', size_hint=(1, 0.3)) #modify parameter 1
-        inputLayout.add_widget(self.compared_parameter2) 
-        self.input_compared_parameter2 = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
-        inputLayout.add_widget(self.input_compared_parameter2)  
+        inputLayout.add_widget(Label(text='Compared_parameter2', size_hint=(1, 0.2))) #modify parameter 1
+        self.input_compared_parameter2 = TextInput(text='', size_hint=(1, 0.16), multiline=False) 
+        inputLayout.add_widget(self.input_compared_parameter2)
 
         parameter_list = read_parameter_file()
 
         for x in range(len(parameter_list)):
-            globals()[f"self.paremeter{x}"] = Label(text=parameter_list[x], size_hint=(1, 0.3)) 
+            globals()[f"self.paremeter{x}"] = Label(text=parameter_list[x], size_hint=(1, 0.2)) 
             inputLayout.add_widget(globals()[f"self.paremeter{x}"])
-            globals()['input%s' % x] = TextInput(text='', size_hint=(1, 0.25), multiline=False) 
+            globals()['input%s' % x] = TextInput(text='', size_hint=(1, 0.16), multiline=False) 
             inputLayout.add_widget(globals()['input%s' % x])
 
-        displayLayout.add_widget(inputLayout)
-        
-        runBehave = Button(text='Run behave', size_hint=(1, 0.1)) # Run update function 
-        runBehave.bind(on_press=self.update)
-        displayLayout.add_widget(runBehave) 
-
-        saveInput = Button(text='Save input', size_hint=(1, 0.1)) # save input as new feature file
+        inputLayout.add_widget(Label(text='', size_hint=(1, 0.15)))
+        saveInput = Button(text='Save input', size_hint=(1, 0.25)) # save input as new feature file
         saveInput.bind(on_press=self.save_file)
-        displayLayout.add_widget(saveInput) 
+        inputLayout.add_widget(saveInput) 
 
-        Layout.add_widget(displayLayout)
+        displayLayout.add_widget(inputLayout)    
 
-        return Layout
+        layout.add_widget(displayLayout)
+        
+        self.add_widget(layout)
 
     def update(self, userInput):
         os.chdir('reports')
@@ -137,6 +144,7 @@ class main(App):
             tree = ET.parse(self.current_File)
             root = tree.getroot()
             result = ""
+            graph_counter = 1
             for child in root:
                 if child.tag == "testcase":
                     ertag = child.find("system-out")
@@ -151,6 +159,22 @@ class main(App):
                             result += str(item.strip()) 
                             result += "\n"
                         if "Confidence" in item:
+                            pattern1 = "95% Confidence Intervals: \[(.*?)\,"
+                            pattern2 = "\,(.*?)\]"
+                            point1 = float(re.search(pattern1, item).group(1))
+                            if point1 < self.graph.xmin:
+                                self.graph.xmin = point1-10
+                            point2 = float(re.search(pattern2, item).group(1))
+                            if point2 > self.graph.xmax:
+                                self.graph.xmax = point2+10
+                            ########################## place holder require data
+                            plot1 = MeshLinePlot(color=[0, 1, 0, 1])
+                            plot1.points = [(x, graph_counter) for x in np.arange(point1, point2)]
+                            graph_counter+=1 
+                            self.graph.ymax=graph_counter+1                        
+                            self.graph.add_plot(plot1)
+                            ##########################
+
                             result += str(item.strip())
                             result += "\n"                 
 
@@ -167,9 +191,9 @@ class main(App):
 
             self.display_result.text = result
         else:
-            self.display_result.text = "Please select a feature file"  
+            self.display_result.text = "Please select a feature file"
         os.chdir('..')   
-    
+
     def save_file(self, instance):
         compared_parameter_input1 = self.input_compared_parameter1.text
         compared_parameter_input1 = compared_parameter_input1.replace('\t', '')
@@ -183,8 +207,9 @@ class main(App):
             globals()['parameter_input%s' % x] = globals()['input%s' % x].text
             globals()['parameter_input%s' % x] = globals()['parameter_input%s' % x].replace('\t', '')
 
-        feature_file_name = "compare_" + compared_parameter_input1 + "_" + compared_parameter_input2 + ".feature"    #generate file name based on input
-        self.created_file_feature.append(feature_file_name)
+        feature_file_name = "compare_" + compared_parameter_input1 + "_" + compared_parameter_input2 + ".feature"    #generate file name based on input 
+        created_file_feature.append(feature_file_name)
+
         os.chdir('features')
         file = open("feature_template.txt",encoding="utf-8")
         template = file.read()
@@ -211,21 +236,11 @@ class main(App):
         filename_xml = filename.replace('.feature', '')
         behave_cmd = "behave features/"+ filename + " --format json --junit"
         self.current_File = ("TESTS-"+filename_xml+".xml")
-        self.created_file_xml.append("TESTS-"+filename_xml+".xml")
+        created_file_xml.append("TESTS-"+filename_xml+".xml")
         os.system(behave_cmd)       
         self.dismiss_popup()
-    
-    def on_request_close(self, instance):  #remove results.json and other feature file created when closing the program
-        os.chdir('reports')
-        for self.created_file_xml in self.created_file_xml:
-            os.remove(self.created_file_xml)
-        os.chdir('..')
-        #os.remove("results.json")
-        os.chdir('features')
-        for self.created_file_feature in self.created_file_feature:
-            os.remove(self.created_file_feature)
-        os.chdir('..')
-        print("Closing")
+
+    def screen_transition(self, *args):
+        self.manager.current = 'edit dot1'
 
 Factory.register('LoadDialog', cls=LoadDialog)
-main().run()
