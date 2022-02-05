@@ -23,7 +23,7 @@ class EditDotWindow2(Screen):
 
         resultLayout = GridLayout(cols=1,  width="600dp")
         resultLayout.add_widget(Label(text='Graphviz', size_hint=(1, 0.1)))# Title
-        os.chdir('dags')
+
         img_viewer = BoxLayout(orientation = 'vertical')
         self.img=Image(source='graphviz_graph.png')
         self.img.allow_stretch = False
@@ -39,7 +39,6 @@ class EditDotWindow2(Screen):
         displayLayout.add_widget(resultLayout) 
 
         resultLayout.add_widget(img_viewer) 
-        os.chdir('..')
     
         self.inputLayout = BoxLayout(orientation = 'vertical')
 

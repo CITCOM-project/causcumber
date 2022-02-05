@@ -45,7 +45,7 @@ Builder.load_string('''
         orientation: "vertical"
         FileChooserListView:
             id: filechooser
-            path: "C:/dissertation/causcumber/scenarios/compare_interventions/features"
+            path: "features"
 
         BoxLayout:
             size_hint_y: None
@@ -75,11 +75,17 @@ class MainWindow(Screen):
 
     def __init__(self, **kwargs):
         super(MainWindow, self).__init__(**kwargs)
-        os.chdir('compare_interventions')
         self.current_File = ""       
         
         layout = BoxLayout(orientation = 'vertical')
-        layout.add_widget(Label(text='Causcumber', size_hint=(1, 0.1)))
+
+        bannerLayout = GridLayout(cols=2, size_hint=(1, 0.05))
+        bannerLayout.add_widget(Label(text='Causcumber'))
+        exit_scenario_btn = Button(text='Exit', size_hint_x = None, width = 100) # Choose feature file to run
+        exit_scenario_btn.bind(on_press=self.exit_scenario)
+        bannerLayout.add_widget(exit_scenario_btn) 
+
+        layout.add_widget(bannerLayout)
         
         displayLayout = GridLayout(cols=2)
 
@@ -232,7 +238,7 @@ class MainWindow(Screen):
         self._popup.open()
 
     def load(self, path, filename):
-        filename = filename[0].replace('C:\\dissertation\\causcumber\\scenarios\\compare_interventions\\features\\', '')
+        filename = filename[0][0: 0:] + filename[0][filename[0].rfind('\\') + 1::]
         filename_xml = filename.replace('.feature', '')
         behave_cmd = "behave features/"+ filename + " --format json --junit"
         self.current_File = ("TESTS-"+filename_xml+".xml")
@@ -242,5 +248,9 @@ class MainWindow(Screen):
 
     def screen_transition(self, *args):
         self.manager.current = 'edit dot1'
+
+    def exit_scenario(self, *args):
+        os.chdir('..')
+        self.manager.current = 'home'
 
 Factory.register('LoadDialog', cls=LoadDialog)
