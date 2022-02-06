@@ -17,6 +17,8 @@ import gui.selectScenario
 from gui.mainWindow import MainWindow
 from gui.editDotWindow1 import EditDotWindow1
 from gui.editDotWindow2 import EditDotWindow2
+from gui.editFeatureWindow1 import EditFeatureWindow1
+from gui.editFeatureWindow2 import EditFeatureWindow2
 ##################
 
 class ScreenManagement(ScreenManager):
@@ -35,7 +37,9 @@ class Application(App):
         sm.add_widget(gui.selectScenario.NewScenario(name='new scenario'))
         sm.add_widget(MainWindow(name='Main'))
         sm.add_widget(EditDotWindow1(name='edit dot1'))  
-        sm.add_widget(EditDotWindow2(name='edit dot2'))      
+        sm.add_widget(EditDotWindow2(name='edit dot2')) 
+        sm.add_widget(EditFeatureWindow1(name='edit feature1'))      
+        sm.add_widget(EditFeatureWindow2(name='edit feature2'))
         return sm
 
     def on_request_close(self, instance):  #remove results.json and other feature file created when closing the program                  

@@ -1,3 +1,4 @@
+from imp import reload
 from re import L, template
 import re
 from turtle import onclick
@@ -49,22 +50,43 @@ class HomeScreen(Screen):
 class SelectScenario(Screen):
     def __init__(self, **kwargs):
         super(SelectScenario, self).__init__(**kwargs) 
-        layout = FloatLayout()
-        self.button_area = BoxLayout(orientation = 'vertical',size_hint=(0.5, None),pos_hint={'center_y': 0.5, 'center_x': 0.5})
-        layout.add_widget(self.button_area)
+        self.layout = FloatLayout()
+        self.scrollview = None
+        
+        self.layout.add_widget(Button(text='refresh',size_hint=(0.5, 0.05),pos_hint={'center_y': 0.2, 'center_x': 0.5},on_press=self.refresh))
+        
+        cancel_btn = Button(text="Cancel",size_hint=(1, 0.05))
+        cancel_btn.bind(on_press=self.cancel_create)
+        self.layout.add_widget(cancel_btn)
+
+        self.add_widget(self.layout)
+        
         self.list_scenarios()
-        self.add_widget(layout)
 
     def list_scenarios(self):
+        if self.scrollview: self.remove_widget(self.scrollview) 
+        
+        button_area = GridLayout(cols=1, size_hint_y=None)
+        button_area.bind(minimum_height=button_area.setter("height"))
         for item in os.listdir(path='.'):
             if "compare" in item:
-                scenario_btn = Button(text=item)
+                scenario_btn = Button(text=item, size_hint=(0.5, None))
                 scenario_btn.bind(on_press=self.move_directory)
-                self.button_area.add_widget(scenario_btn)
-    
+                button_area.add_widget(scenario_btn)
+        self.scrollview = ScrollView(size_hint=(0.5, 0.5),pos_hint={'center_y': 0.5, 'center_x': 0.5})
+        self.scrollview.add_widget(button_area)
+        self.layout.add_widget(self.scrollview)
+
+    def refresh(self, instance):
+        if self.scrollview: self.layout.remove_widget(self.scrollview) 
+        self.list_scenarios()
+
     def move_directory(self, instance):
         os.chdir(instance.text)
         self.manager.current = 'Main'
+
+    def cancel_create(self, instance):
+        self.manager.current = 'home'
 
 class NewScenario(Screen): 
     def __init__(self, **kwargs):
@@ -75,10 +97,15 @@ class NewScenario(Screen):
         input_area.add_widget(Label(text='Enter compare variable', font_size='30sp',size_hint=(1, 0.2)))
         self.variable_name = TextInput(text='', font_size='20sp',size_hint=(1, 0.04), multiline=False)
         input_area.add_widget(self.variable_name)
-        input_area.add_widget(Label(text='',size_hint=(1, 0.1)))
-        create_scenario_btn = Button(text="Create scenario",size_hint=(1, 0.08))
+        input_area.add_widget(Label(text='',size_hint=(1, 0.07)))
+        create_scenario_btn = Button(text="Create scenario",size_hint=(1, 0.05))
         create_scenario_btn.bind(on_press=self.create_scenario)
         input_area.add_widget(create_scenario_btn)
+        input_area.add_widget(Label(text='',size_hint=(1, 0.07)))
+        cancel_btn = Button(text="Cancel",size_hint=(1, 0.05))
+        cancel_btn.bind(on_press=self.cancel_create)
+        input_area.add_widget(cancel_btn)
+
 
         layout.add_widget(input_area)
         self.add_widget(layout)
@@ -96,6 +123,14 @@ class NewScenario(Screen):
         basic_folders = ["dags","features","reports","results"]
         for folder_name in basic_folders:
             os.mkdir(os.path.join(path, folder_name))
+            if folder_name == 'features':
+                os.chdir('features')
+                os.mkdir(os.path.join(os.getcwd(), "steps"))
+                os.chdir('..')
 
-        print(os.getcwd())
+        self.variable_name.text = ''
         self.manager.current = 'Main'
+
+    def cancel_create(self, instance):
+        self.variable_name.text = ''
+        self.manager.current = 'home'

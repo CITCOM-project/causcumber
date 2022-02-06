@@ -113,30 +113,13 @@ class MainWindow(Screen):
 
         inputLayout = BoxLayout(orientation = 'vertical', size_hint_x = None, width = 300)
         ############################
-        editDotFile = Button(text='Edit dot files', size_hint=(1, 0.17)) # create dot files
-        editDotFile.bind(on_press=self.screen_transition)
+        editDotFile = Button(text='Edit dot files', size_hint=(1, 0.5)) # create dot files
+        editDotFile.bind(on_press=self.screen_transition1)
         inputLayout.add_widget(editDotFile) 
         ############################
-        inputLayout.add_widget(Label(text='Choose different input', size_hint=(1, 0.2))) # Title
-        inputLayout.add_widget(Label(text='Compared_parameter1', size_hint=(1, 0.2))) #modify parameter 1
-        self.input_compared_parameter1 = TextInput(text='', size_hint=(1, 0.16), multiline=False) 
-        inputLayout.add_widget(self.input_compared_parameter1)
-        inputLayout.add_widget(Label(text='Compared_parameter2', size_hint=(1, 0.2))) #modify parameter 1
-        self.input_compared_parameter2 = TextInput(text='', size_hint=(1, 0.16), multiline=False) 
-        inputLayout.add_widget(self.input_compared_parameter2)
-
-        parameter_list = read_parameter_file()
-
-        for x in range(len(parameter_list)):
-            globals()[f"self.paremeter{x}"] = Label(text=parameter_list[x], size_hint=(1, 0.2)) 
-            inputLayout.add_widget(globals()[f"self.paremeter{x}"])
-            globals()['input%s' % x] = TextInput(text='', size_hint=(1, 0.16), multiline=False) 
-            inputLayout.add_widget(globals()['input%s' % x])
-
-        inputLayout.add_widget(Label(text='', size_hint=(1, 0.15)))
-        saveInput = Button(text='Save input', size_hint=(1, 0.25)) # save input as new feature file
-        saveInput.bind(on_press=self.save_file)
-        inputLayout.add_widget(saveInput) 
+        editFeatureFile = Button(text='Edit feature files', size_hint=(1, 0.5)) # save input as new feature file
+        editFeatureFile.bind(on_press=self.screen_transition2)
+        inputLayout.add_widget(editFeatureFile) 
 
         displayLayout.add_widget(inputLayout)    
 
@@ -246,8 +229,11 @@ class MainWindow(Screen):
         os.system(behave_cmd)       
         self.dismiss_popup()
 
-    def screen_transition(self, *args):
+    def screen_transition1(self, *args):
         self.manager.current = 'edit dot1'
+
+    def screen_transition2(self, *args):
+        self.manager.current = 'edit feature1'
 
     def exit_scenario(self, *args):
         os.chdir('..')
