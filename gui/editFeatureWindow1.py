@@ -8,6 +8,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.screenmanager import Screen
 import os
 from kivy.uix.image import Image
+import gui.editFeatureVariable
 ##################
 
 class EditFeatureWindow1(Screen):
@@ -85,18 +86,17 @@ class EditFeatureWindow1(Screen):
  
         self.add_widget(Layout)    
 
-    def view_graph(self, instance):
-        os.chdir('dags')      
-        os.startfile("graphviz_graph.png")
-        os.chdir('..')
-
     def next_step(self, instance):
+        gui.editFeatureVariable.targetFeatureFileName = '' 
+        gui.editFeatureVariable.parameterNames = []
+
         split_parameterName = self.paramterName.text.split()    #parameter
         final_parameterName = []
         for x in split_parameterName:
             x = x.replace('\n', '')
             x = x.replace(';', '')
             final_parameterName.append(x)
+            gui.editFeatureVariable.parameterNames.append(x)
 
         split_parameterValue = self.paramterValue.text.split()  #value
         final_parameterValue = []
@@ -118,6 +118,7 @@ class EditFeatureWindow1(Screen):
             x = x.replace('\n', '')
             x = x.replace(';', '')
             final_variableName.append(x)
+            gui.editFeatureVariable.parameterNames.append(x)
 
         split_variableType = self.variableType.text.split()    #variable type
         final_variableType = []
@@ -134,6 +135,7 @@ class EditFeatureWindow1(Screen):
             content += "      | " + final_variableName[x] + "  | " + final_variableType[x] + "  |\n"
         
         filename = "compare_" + self.feature_file_name.text+ ".feature"
+        gui.editFeatureVariable.targetFeatureFileName = filename
         os.chdir('features')
         f = open(filename, "w")
         f.write(content)

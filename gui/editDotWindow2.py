@@ -89,8 +89,7 @@ class EditDotWindow2(Screen):
                 if not any(filter in line for filter in parameter_filter):
                     self.output_parameter_list.append(line)          
             
-            
-
+        
             for x in range(len(self.output_parameter_list)):
                 globals()[f"self.parameter_btn{x}"] = Button(text=self.output_parameter_list[x].strip(), size_hint_y=None, height=44)
                 globals()[f"self.parameter_btn{x}"].bind(on_release=self.edit_relationship)
