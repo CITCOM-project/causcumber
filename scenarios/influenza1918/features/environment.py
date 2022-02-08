@@ -175,6 +175,7 @@ def execute_test(scenario, causal_dag, causal_test_case, observational_data_csv_
     test_passes = causal_test_case.expected_causal_effect.apply(causal_test_result)
     if not test_passes:
         logger.error(f"{causal_test_case}\n    FAILED - actual causal effect was {causal_test_result.ci_low()} < {causal_test_result.ate} < {causal_test_result.ci_high()}")
+        print(observational_data_csv_path)
     return test_passes
 
 def after_feature(context, feature):
@@ -186,6 +187,7 @@ def after_feature(context, feature):
     second_pass_tests = []
     failed_tests = 0
     dataframes = []
+    num_concrete = 10
 
     for scenario, abstract_test in context.abstract_tests:
         print("=======================================")
@@ -196,7 +198,7 @@ def after_feature(context, feature):
                 for v in abstract_test.treatment_variables
             ]
         ):
-            concrete_tests, runs = abstract_test.generate_concrete_tests(4)
+            concrete_tests, runs = abstract_test.generate_concrete_tests(num_concrete)
             first_pass_tests += [(scenario, test) for test in concrete_tests]
             first_pass_runs.append(runs)
             datapath = f"results/{context.feature_name}/{abstract_test.datapath()}"
@@ -237,13 +239,14 @@ def after_feature(context, feature):
         for variable in scenario.variables.values():
             if variable.distribution is None:
                 variable.distribution = fit_distribution(data[variable.name])
-        concrete_tests, _ = abstract_test.generate_concrete_tests(4)
+        concrete_tests, _ = abstract_test.generate_concrete_tests(num_concrete)
         for test in concrete_tests:
             pass_ = execute_test(scenario, context.dag, test, observational_data_csv_path)
             if not pass_ and context.config.stop:
+                logger.warn(f"FAILURE\n{scenario}\n{test}\n{datapath}")
                 sys.exit(1)
             failed_tests += not pass_
-    logger.info(f"Results:\n  {failed_tests} out of {len(first_pass_tests) + len(second_pass_tests)} failed.")
+    print(f"Results:\n  {failed_tests} out of {len(first_pass_tests) + len(second_pass_tests)} failed.")
 
 
 def before_tag(context, tag):

@@ -4,25 +4,55 @@ digraph "" {
 	];
 	subgraph cluster_outputs {
 		graph [label="Model outputs"];
-		peak_infectious;
 		deceased;
-		recovered;
+		peak_infectious;
 		peak;
 		cases;
+		recovered;
 	}
 	subgraph cluster_inputs {
 		graph [label="Model inputs"];
 		MortalityProb;
+		IncubationTime;
+		RecoveryTime;
+		TransmissionProb;
+		MortalityTime;
+		EncounterRate;
 		Infected;
 	}
-	MortalityProb -> peak_infectious;
 	MortalityProb -> deceased;
-	MortalityProb -> recovered;
+	MortalityProb -> peak_infectious;
 	MortalityProb -> peak;
 	MortalityProb -> cases;
-	Infected -> peak_infectious;
+	MortalityProb -> recovered;
+	IncubationTime -> deceased;
+	IncubationTime -> peak_infectious;
+	IncubationTime -> peak;
+	IncubationTime -> cases;
+	IncubationTime -> recovered;
+	RecoveryTime -> deceased;
+	RecoveryTime -> peak_infectious;
+	RecoveryTime -> peak;
+	RecoveryTime -> cases;
+	RecoveryTime -> recovered;
+	TransmissionProb -> deceased;
+	TransmissionProb -> peak_infectious;
+	TransmissionProb -> peak;
+	TransmissionProb -> cases;
+	TransmissionProb -> recovered;
+	MortalityTime -> deceased;
+	MortalityTime -> peak_infectious;
+	MortalityTime -> peak;
+	MortalityTime -> cases;
+	MortalityTime -> recovered;
+	EncounterRate -> deceased;
+	EncounterRate -> peak_infectious;
+	EncounterRate -> peak;
+	EncounterRate -> cases;
+	EncounterRate -> recovered;
 	Infected -> deceased;
-	Infected -> recovered;
+	Infected -> peak_infectious;
 	Infected -> peak;
 	Infected -> cases;
+	Infected -> recovered;
 }

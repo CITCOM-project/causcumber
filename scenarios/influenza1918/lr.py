@@ -17,47 +17,26 @@ from causal_testing.testing.causal_test_case import CausalTestCase
 from causal_testing.testing.causal_test_outcome import Negative
 from causal_testing.testing.estimators import LinearRegressionEstimator
 
-
-print("Here's the bog standard linear regression")
 observational_data_csv_path = (
-    "results/exp_data/MortalityProbMortalityProb2_deceased_Negative.csv"
+    "results/influenza1918_abstract/MortalityTimeMortalityTime2_deceased_Negative.csv"
 )
-data = pd.read_csv(observational_data_csv_path)
-
-X = data[["MortalityProb", "Infected"]]
-y = data["recovered"]
-# X = np.array([[1, 1], [1, 2], [2, 2], [2, 3]])
-# y = 1 * x_0 + 2 * x_1 + 3
-# y = np.dot(X, np.array([1, 2])) + 3
-reg = LinearRegression().fit(X, y)
-print(reg.coef_)
-
-treatment_point = pd.DataFrame({"MortalityProb": [0.01], "Infected": [1000]})
-control_point = pd.DataFrame({"MortalityProb": [0.02], "Infected": [1000]})
-
-treatment = reg.predict(treatment_point)
-control = reg.predict(control_point)
-print(treatment - control)
+data = pd.read_csv(observational_data_csv_path, index_col=0)
 
 print("Here's the CT framework")
 
 # inputs
 Infected = Input("Infected", float)
 MortalityProb = Input("MortalityProb", float)
+MortalityTime = Input("MortalityTime", float)
 
 # outputs
-# Deceased = Output("deceased", float)
-Recovered = Output("recovered", float)
+Deceased = Output("deceased", float)
+Recovered = Output("deceased", float)
 
 # Scenario
 scenario = Scenario(
-    {Infected, MortalityProb, Recovered},
-    {
-        500 <= Infected.z3,
-        Infected.z3 <= 5000,
-        0.005 <= MortalityProb.z3,
-        MortalityProb.z3 <= 0.02,
-    },
+    {Infected, MortalityProb, Recovered, MortalityTime},
+    set(),
 )
 scenario.setup_treatment_variables()
 
@@ -91,3 +70,18 @@ causal_test_result = causal_test_engine.execute_test(estimation_model)
 
 print(causal_test_result)
 # test_passes = causal_test_case.expected_causal_effect.apply(causal_test_result)
+
+print("Here's the bog standard linear regression")
+X = data[[x.name for x in scenario.inputs()]]
+y = data[[y.name for y in causal_test_case.outcome_variables]]
+reg = LinearRegression().fit(X, y)
+print(reg.coef_)
+
+treatment_point = pd.DataFrame({"Infected": [1000], "MortalityProb": [0.01], "MortalityTime": [0.722]})
+control_point = pd.DataFrame({"Infected": [1000], "MortalityProb": [0.01], "MortalityTime": [1.44]})
+
+treatment = reg.predict(treatment_point)
+control = reg.predict(control_point)
+print(treatment - control)
+
+

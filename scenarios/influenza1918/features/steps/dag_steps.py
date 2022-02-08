@@ -28,6 +28,10 @@ class countries_gen(stats.rv_discrete):
 
 countries = countries_gen()
 
+def truncnorm(mu, sigma, lower, upper):
+    return stats.truncnorm(
+    (lower - mu) / sigma, (upper - mu) / sigma, loc=mu, scale=sigma)
+
 
 def populate_average_age(data):
     data["average_age"] = [avg_age(country) for country in data["location"]]
