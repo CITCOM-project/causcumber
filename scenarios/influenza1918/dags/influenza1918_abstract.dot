@@ -2,27 +2,27 @@ digraph "" {
 	graph [newrank=True,
 		rankdir=LR
 	];
+	subgraph cluster_outputs {
+		graph [label="Model outputs"];
+		peak_infectious;
+		deceased;
+		recovered;
+		peak;
+		cases;
+	}
 	subgraph cluster_inputs {
 		graph [label="Model inputs"];
 		MortalityProb;
 		Infected;
 	}
-	subgraph cluster_outputs {
-		graph [label="Model outputs"];
-		peak_infectious;
-		deceased;
-		cases;
-		peak;
-		recovered;
-	}
 	MortalityProb -> peak_infectious;
 	MortalityProb -> deceased;
-	MortalityProb -> cases;
-	MortalityProb -> peak;
 	MortalityProb -> recovered;
+	MortalityProb -> peak;
+	MortalityProb -> cases;
 	Infected -> peak_infectious;
 	Infected -> deceased;
-	Infected -> cases;
-	Infected -> peak;
 	Infected -> recovered;
+	Infected -> peak;
+	Infected -> cases;
 }

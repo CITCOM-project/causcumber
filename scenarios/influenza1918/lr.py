@@ -25,7 +25,7 @@ observational_data_csv_path = (
 data = pd.read_csv(observational_data_csv_path)
 
 X = data[["MortalityProb", "Infected"]]
-y = data["deceased"]
+y = data["recovered"]
 # X = np.array([[1, 1], [1, 2], [2, 2], [2, 3]])
 # y = 1 * x_0 + 2 * x_1 + 3
 # y = np.dot(X, np.array([1, 2])) + 3
@@ -46,12 +46,12 @@ Infected = Input("Infected", float)
 MortalityProb = Input("MortalityProb", float)
 
 # outputs
-Deceased = Output("deceased", float)
+# Deceased = Output("deceased", float)
 Recovered = Output("recovered", float)
 
 # Scenario
 scenario = Scenario(
-    {Infected, MortalityProb, Deceased},
+    {Infected, MortalityProb, Recovered},
     {
         500 <= Infected.z3,
         Infected.z3 <= 5000,

@@ -188,6 +188,7 @@ def after_feature(context, feature):
     dataframes = []
 
     for scenario, abstract_test in context.abstract_tests:
+        print("=======================================")
         if all(
             [
                 # context.dag.depends_on_outputs(v.name, scenario)
@@ -198,22 +199,20 @@ def after_feature(context, feature):
             concrete_tests, runs = abstract_test.generate_concrete_tests(4)
             first_pass_tests += [(scenario, test) for test in concrete_tests]
             first_pass_runs.append(runs)
-            datapath = f"results/exp_data/{abstract_test.datapath()}"
+            datapath = f"results/{context.feature_name}/{abstract_test.datapath()}"
             if os.path.exists(datapath):
                 data = pd.read_csv(datapath, index_col=0)
             else:
                 data = run_influenza1918(runs, context.outputs)
                 data.to_csv(datapath)
             for test in concrete_tests:
+                print("  =====")
                 pass_ = execute_test(scenario, context.dag, test, datapath)
                 if not pass_ and context.config.stop:
-                    print("FAILURE")
-                    print(scenario)
-                    print(test)
-                    print(datapath)
+                    logger.warn(f"FAILURE\n{scenario}\n{test}\n{datapath}")
                     sys.exit(1)
                 failed_tests += not pass_
-            dataframes .append(data)
+            dataframes.append(data)
         else:
             second_pass_tests.append((scenario, abstract_test))
     assert len(first_pass_runs) > 0 or os.path.exists(datapath),\

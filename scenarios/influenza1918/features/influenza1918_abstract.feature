@@ -48,12 +48,12 @@ Feature: Influenza1918 Abstract
   Scenario: P(Mortality) decrease
     When we decrease the MortalityProb
     Then the deceased should decrease
-    Then the recovered should decrease
+    Then the recovered should increase
 
   Scenario: P(Mortality) increase
     When we increase the MortalityProb
     Then the deceased should increase
-    Then the recovered should increase
+    Then the recovered should decrease
 
   Scenario: N(Infectious) decrease
     When we decrease the Infected
