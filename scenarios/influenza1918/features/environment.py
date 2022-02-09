@@ -133,7 +133,7 @@ def run_influenza1918(runs, outputs):
             params = ",".join([f"{col}={val}" for col, val in run.iteritems()])
             omc = OMCSessionZMQ()
             cmds = [
-                'loadFile("../../../influenza1918/model/influenza1918.mo")',
+                'loadFile("model/influenza1918.mo")',
                 f'simulate(influenza1918, startTime=0, stopTime=400, numberOfIntervals=400, outputFormat="csv", simflags="-override {params}")',
             ]
             for cmd in cmds:
@@ -187,7 +187,7 @@ def after_feature(context, feature):
     second_pass_tests = []
     failed_tests = 0
     dataframes = []
-    num_concrete = 10
+    num_concrete = 4
 
     for scenario, abstract_test in context.abstract_tests:
         print("=======================================")
