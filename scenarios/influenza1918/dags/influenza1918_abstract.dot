@@ -2,57 +2,57 @@ digraph "" {
 	graph [newrank=True,
 		rankdir=LR
 	];
-	subgraph cluster_outputs {
-		graph [label="Model outputs"];
-		deceased;
-		peak_infectious;
-		peak;
-		cases;
-		recovered;
-	}
 	subgraph cluster_inputs {
 		graph [label="Model inputs"];
+		RecoveryTime;
+		Infected;
+		MortalityTime;
 		MortalityProb;
 		IncubationTime;
-		RecoveryTime;
 		TransmissionProb;
-		MortalityTime;
 		EncounterRate;
-		Infected;
 	}
-	MortalityProb -> deceased;
-	MortalityProb -> peak_infectious;
-	MortalityProb -> peak;
-	MortalityProb -> cases;
-	MortalityProb -> recovered;
-	IncubationTime -> deceased;
-	IncubationTime -> peak_infectious;
-	IncubationTime -> peak;
-	IncubationTime -> cases;
-	IncubationTime -> recovered;
-	RecoveryTime -> deceased;
-	RecoveryTime -> peak_infectious;
-	RecoveryTime -> peak;
+	subgraph cluster_outputs {
+		graph [label="Model outputs"];
+		cases;
+		recovered;
+		peak;
+		deceased;
+		peak_infectious;
+	}
 	RecoveryTime -> cases;
 	RecoveryTime -> recovered;
-	TransmissionProb -> deceased;
-	TransmissionProb -> peak_infectious;
-	TransmissionProb -> peak;
-	TransmissionProb -> cases;
-	TransmissionProb -> recovered;
-	MortalityTime -> deceased;
-	MortalityTime -> peak_infectious;
-	MortalityTime -> peak;
-	MortalityTime -> cases;
-	MortalityTime -> recovered;
-	EncounterRate -> deceased;
-	EncounterRate -> peak_infectious;
-	EncounterRate -> peak;
-	EncounterRate -> cases;
-	EncounterRate -> recovered;
-	Infected -> deceased;
-	Infected -> peak_infectious;
-	Infected -> peak;
+	RecoveryTime -> peak;
+	RecoveryTime -> deceased;
+	RecoveryTime -> peak_infectious;
 	Infected -> cases;
 	Infected -> recovered;
+	Infected -> peak;
+	Infected -> deceased;
+	Infected -> peak_infectious;
+	MortalityTime -> cases;
+	MortalityTime -> recovered;
+	MortalityTime -> peak;
+	MortalityTime -> deceased;
+	MortalityTime -> peak_infectious;
+	MortalityProb -> cases;
+	MortalityProb -> recovered;
+	MortalityProb -> peak;
+	MortalityProb -> deceased;
+	MortalityProb -> peak_infectious;
+	IncubationTime -> cases;
+	IncubationTime -> recovered;
+	IncubationTime -> peak;
+	IncubationTime -> deceased;
+	IncubationTime -> peak_infectious;
+	TransmissionProb -> cases;
+	TransmissionProb -> recovered;
+	TransmissionProb -> peak;
+	TransmissionProb -> deceased;
+	TransmissionProb -> peak_infectious;
+	EncounterRate -> cases;
+	EncounterRate -> recovered;
+	EncounterRate -> peak;
+	EncounterRate -> deceased;
+	EncounterRate -> peak_infectious;
 }
