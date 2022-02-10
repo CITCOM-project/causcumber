@@ -2,13 +2,13 @@ Feature: Influenza1918 Abstract
   Background: IO spec
     Given a simulation with parameters
       | parameter        | type  | distribution                  |
-      | MortalityProb    | float | scipy.stats.norm(0.01, 0.005) |
-      | RecoveryTime     | float | scipy.stats.norm(2.5 , 1.25)  |
-      | MortalityTime    | float | scipy.stats.norm(1   , 0.5)   |
-      | TransmissionProb | float | scipy.stats.norm(0.1 , 0.05)  |
-      | IncubationTime   | float | scipy.stats.norm(3   , 1.5)   |
-      | EncounterRate    | float | scipy.stats.norm(4   , 2)     |
-      | Infected         | float | scipy.stats.norm(1000, 500)   |
+      | MortalityProb    | float | truncnorm(0.01, 0.005, 0, 1) |
+      | Infected         | float | truncnorm(1000, 100, 500, 1500)   |
+      | MortalityTime    | float | truncnorm(1   , 0.5, 1, 5)   |
+      | TransmissionProb | float | truncnorm(0.1 , 0.05, 0.01, 1)  |
+      | IncubationTime   | float | truncnorm(3   , 1.5, 1, 5)   |
+      | RecoveryTime     | float | truncnorm(2.5 , 1.25, 1, 5)  |
+      | EncounterRate    | float | truncnorm(4   , 2, 1, 10)     |
     And the following variables are recorded at the end of the simulation
       | variable        | type  |
       | deceased        | float |
@@ -17,13 +17,13 @@ Feature: Influenza1918 Abstract
       | peak            | int   |
       | peak_infectious | float |
 
-      And 0 <= MortalityProb >= 1
-      And RecoveryTime > 0
-      And MortalityTime > 0
-      And 0 <= TransmissionProb >= 1
-      And IncubationTime > 0
-      And EncounterRate > 0
-      And Infected > 0
+      # And 0 <= MortalityProb >= 1
+      # And RecoveryTime > 0
+      # And MortalityTime > 0
+      # And 0 <= TransmissionProb >= 1
+      # And IncubationTime > 0
+      # And EncounterRate > 0
+      # And Infected > 0
 
   @draw_dag
   Scenario: Draw DAG

@@ -3,7 +3,6 @@ import pandas as pd
 from behave import fixture, use_fixture
 import os
 import re
-import covasim
 import lhsmdu
 import numpy as np
 from allpairspy import AllPairs
@@ -32,9 +31,6 @@ sys.path.append("../../")  # This one's for running `behave` in `compare-inverve
 import logging
 
 logger = logging.getLogger(__name__)
-
-from covasim_utils import interventions, avg_age, household_size
-
 
 obs_tag_re = re.compile("observational\((\"|')(.+)(\"|')\)")
 
@@ -84,16 +80,6 @@ def before_feature(context, feature):
 
     if not os.path.exists(context.results_dir):
         os.makedirs(context.results_dir, exist_ok=True)
-
-    context.supported_countries = sorted(
-        [
-            h
-            for h in covasim.data.country_age_data.data
-            if h in covasim.data.household_size_data.data
-        ],
-        key=lambda x: avg_age(x),
-    )
-
 
 def before_scenario(context, scenario):
     # context.constraints[scenario.name] = set()
