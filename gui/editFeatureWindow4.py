@@ -16,9 +16,9 @@ from gui.mainWindow import displayResult
 import gui.editFeatureVariable
 ##################
 
-class EditFeatureWindow3(Screen):
+class EditFeatureWindow4(Screen):
     def __init__(self, **kwargs):
-        super(EditFeatureWindow3, self).__init__(**kwargs)
+        super(EditFeatureWindow4, self).__init__(**kwargs)
         Layout = BoxLayout(orientation = 'vertical')
         Layout.add_widget(Label(text='Causcumber', size_hint=(1, 0.1)))
 
@@ -37,19 +37,19 @@ class EditFeatureWindow3(Screen):
         self.inputLayout.add_widget(Label(text='Edit scenarios', size_hint=(1, 0.1))) # Title 
         
         self.outlineLayout = GridLayout(cols=2, size_hint=(1, 0.06))
-        self.outlineLayout.add_widget(Label(text='Scenario Outline: ', size_hint=(1, 0.1)))
+        self.outlineLayout.add_widget(Label(text='Scenario: ', size_hint=(1, 0.1)))
         self.outlineText = TextInput(text='', size_hint=(1, 0.15), multiline=False) 
         self.outlineLayout.add_widget(self.outlineText)
         self.inputLayout.add_widget(self.outlineLayout)
 
         self.givenLayout = GridLayout(cols=2, size_hint=(1, 0.06))
-        self.givenLayout.add_widget(Label(text='Given we run the model with ', size_hint=(1, 0.1)))
+        self.givenLayout.add_widget(Label(text='Given ', size_hint=(1, 0.1)))
         self.givenText = TextInput(text='', size_hint=(1, 0.15), multiline=False) 
         self.givenLayout.add_widget(self.givenText)
         self.inputLayout.add_widget(self.givenLayout)
 
         self.whenLayout = GridLayout(cols=2, size_hint=(1, 0.06))
-        self.whenLayout.add_widget(Label(text='When we run the model with ', size_hint=(1, 0.1)))
+        self.whenLayout.add_widget(Label(text='When ', size_hint=(1, 0.1)))
         self.whenText = TextInput(text='', size_hint=(1, 0.15), multiline=False)
         self.whenLayout.add_widget(self.whenText)
         self.inputLayout.add_widget(self.whenLayout)
@@ -64,8 +64,6 @@ class EditFeatureWindow3(Screen):
         thenLayout.add_widget(self.shouldText)
 
         self.inputLayout.add_widget(thenLayout)
-
-        self.inputLayout.add_widget(Label(text='Examples: ', size_hint=(1, 0.1)))
         
         self.exampleLayout = GridLayout(cols=1, size_hint_y=None)
         self.exampleLayout.bind(minimum_height=self.exampleLayout.setter("height"))
@@ -91,11 +89,11 @@ class EditFeatureWindow3(Screen):
         addRowButton.bind(on_press = self.remove_row)
         self.inputLayout.add_widget(addRowButton)
         
-        self.save_output = Button(text='Add scenario outline', size_hint=(1, 0.05)) # save input as new feature file
+        self.save_output = Button(text='Add scenario ', size_hint=(1, 0.05)) # save input as new feature file
         self.save_output.bind(on_press = self.add_new_scenario_outline)
         self.inputLayout.add_widget(self.save_output) 
         
-        undoOutput = Button(text='undo scenario outline', size_hint=(1, 0.05)) # save input as new feature file
+        undoOutput = Button(text='undo scenario ', size_hint=(1, 0.05)) # save input as new feature file
         undoOutput.bind(on_press = self.undo_output_parameter)
         self.inputLayout.add_widget(undoOutput)  
 
@@ -103,7 +101,7 @@ class EditFeatureWindow3(Screen):
 
         Layout.add_widget(displayLayout)
 
-        self.nextBtn = Button(text='Next', size_hint=(1, 0.1))
+        self.nextBtn = Button(text='Finish', size_hint=(1, 0.1))
         self.nextBtn.bind(on_press = self.next_step)
         Layout.add_widget(self.nextBtn)  
 
@@ -126,8 +124,8 @@ class EditFeatureWindow3(Screen):
 
     def add_row(self, instance):
         for x in range(self.exampleLayout.cols):
-            self.exampleText = TextInput(text='', size_hint=(1, None), multiline=False)
-            self.exampleLayout.add_widget(self.exampleText)
+            exampleText = TextInput(text='', size_hint=(1, None), multiline=False)
+            self.exampleLayout.add_widget(exampleText)
 
     def remove_row(self, instance):
         colCounter = 0
@@ -161,12 +159,12 @@ class EditFeatureWindow3(Screen):
 
         self.clear_screen()
 
-        self.manager.current = 'edit feature4'
+        self.manager.current = 'Main'
     
     def add_new_scenario_outline(self, instance):
         content = self.display_result.text
-        content += '  Scenario Outline: ' + self.outlineText.text + '\n    Given we run the model with ' + self.givenText.text 
-        content += '\n    When we run the model with ' + self.whenText.text + '\n    Then the ' + self.thenText.text + ' should be ' + self.shouldText.text + '\n    Examples:\n      ' 
+        content += '  Scenario: ' + self.outlineText.text + '\n    Given ' + self.givenText.text 
+        content += '\n    When ' + self.whenText.text + '\n    Then the ' + self.thenText.text + ' should be ' + self.shouldText.text + '\n      ' 
 
         elementList = []
         for elements in self.exampleLayout.children:
@@ -186,12 +184,13 @@ class EditFeatureWindow3(Screen):
 
         self.display_result.text = content
 
+        
+      
+
     def undo_output_parameter(self, instance):
-        self.display_result.text=self.display_result.text[:self.display_result.text.rfind('  Scenario Outline:')]
+        self.display_result.text=self.display_result.text[:self.display_result.text.rfind('  Scenario:')]
 
     def clear_screen(self):
-        self.exampleLayout.cols = 1
-        self.dropdownbutton.text = 'Select column amount: '+str(self.exampleLayout.cols)
         self.display_result.text = ''
         self.outlineText.text = ''
         self.givenText.text = ''

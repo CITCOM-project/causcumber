@@ -168,9 +168,10 @@ class EditFeatureWindow2(Screen):
         for x in range(len(s1List)):
             featureContent += "      | " + s1List[x] + " | " + s2List[x] + " | \n"
         
+        featureContent += "\n"
         f = open(filename,"r+", encoding="utf-8")
         f.write(featureContent)
-        
+        f.close()
         os.chdir('..')
 
         for file in [f for f in os.listdir('.') if os.path.isfile(f)]:
