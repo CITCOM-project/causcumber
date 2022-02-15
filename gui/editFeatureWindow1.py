@@ -127,31 +127,34 @@ class EditFeatureWindow1(Screen):
             x = x.replace(';', '')
             final_variableType.append(x)
 
-        content = "Feature: Compare " + self.feature_file_name.text + "\n  Background:\n    Given a simulation with parameters\n      | parameter     | value      | type |\n"
-        for x in range(len(final_parameterName)):
-            content += "      | " + final_parameterName[x] + "  | " + final_parameterValue[x] + "  | " + final_parameterType[x] + "  |\n"
-        content += "    And the following variables are recorded " + self.recordMode.text + "\n" + "      | variable          | type |\n"
-        for x in range(len(final_variableName)):
-            content += "      | " + final_variableName[x] + "  | " + final_variableType[x] + "  |\n"
-        
-        filename = "compare_" + self.feature_file_name.text+ ".feature"
-        gui.editFeatureVariable.targetFeatureFileName = filename
-        os.chdir('features')
-        f = open(filename, "w")
-        f.write(content)
-        f.close()
-        os.chdir('..')
+        if len(final_parameterName) == len(final_parameterValue) == len(final_parameterType):
+            content = "Feature: Compare " + self.feature_file_name.text + "\n  Background:\n    Given a simulation with parameters\n      | parameter     | value      | type |\n"
+            for x in range(len(final_parameterName)):
+                content += "      | " + final_parameterName[x] + "  | " + final_parameterValue[x] + "  | " + final_parameterType[x] + "  |\n"
+            content += "    And the following variables are recorded " + self.recordMode.text + "\n" + "      | variable          | type |\n"
+            for x in range(len(final_variableName)):
+                content += "      | " + final_variableName[x] + "  | " + final_variableType[x] + "  |\n"
+            
+            filename = "compare_" + self.feature_file_name.text+ ".feature"
+            gui.editFeatureVariable.targetFeatureFileName = filename
+            os.chdir('features')
+            f = open(filename, "w")
+            f.write(content)
+            f.close()
+            os.chdir('..')
 
-        self.feature_file_name.text = ''
-        self.paramterName.text = ''
-        self.paramterValue.text = ''
-        self.paramterType.text = ''
-        self.recordMode.text = ''
-        self.variableName.text = ''
-        self.variableType.text = ''
+            self.feature_file_name.text = ''
+            self.paramterName.text = ''
+            self.paramterValue.text = ''
+            self.paramterType.text = ''
+            self.recordMode.text = ''
+            self.variableName.text = ''
+            self.variableType.text = ''
 
-        self.manager.current = 'edit feature2' 
-
+            self.manager.current = 'edit feature2' 
+        else:
+            print("missing data")
+            
     def screen_transition(self, instance):
         self.feature_file_name.text = ''
         self.paramterName.text = ''
