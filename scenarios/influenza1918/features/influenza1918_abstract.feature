@@ -1,14 +1,19 @@
 Feature: Influenza1918 Abstract
   Background: IO spec
     Given a simulation with parameters
-      | parameter        | type  | distribution                  |
-      | MortalityProb    | float | truncnorm(0.01, 0.005, 0, 1) |
-      | Infected         | float | truncnorm(1000, 100, 500, 1500)   |
-      | MortalityTime    | float | truncnorm(1   , 0.5, 1, 5)   |
+      | parameter        | type  | distribution                    |
+      | MortalityProb    | float | truncnorm(0.01, 0.005, 0, 1)    |
+      | Infected         | float | truncnorm(1000, 100, 500, 1500) |
+      | MortalityTime    | float | truncnorm(1   , 0.5, 2, 6)      |
       | TransmissionProb | float | truncnorm(0.1 , 0.05, 0.01, 1)  |
-      | IncubationTime   | float | truncnorm(3   , 1.5, 1, 5)   |
-      | RecoveryTime     | float | truncnorm(2.5 , 1.25, 1, 5)  |
-      | EncounterRate    | float | truncnorm(4   , 2, 1, 10)     |
+      | IncubationTime   | float | truncnorm(3   , 1.5, 1, 5)      |
+      | RecoveryTime     | float | truncnorm(2.5 , 1.25, 1, 5)     |
+      | EncounterRate    | float | truncnorm(4   , 2, 1, 10)       |
+    And the following meta variables
+    # | pandemic_gets_going | bool |
+      | variable               | type    |
+      | MortalityProb_category | dag_steps.MP_cat  |
+      | pandemic_gets_going    | bool    |
     And the following variables are recorded at the end of the simulation
       | variable        | type  |
       | deceased        | float |
@@ -17,10 +22,13 @@ Feature: Influenza1918 Abstract
       | peak            | int   |
       | peak_infectious | float |
 
+    # And pandemic_gets_going
+    # And MortalityProb_med
+
       # And MortalityProb in [0.01, 0.02, 0.005]
       # And Infected in [1000, 500, 2000]
       # And RecoveryTime in [2.5, 1.25, 5]
-      # And MortalityTime in [1, 0.5, 1]
+      # And MortalityTime in [1, 0.5, 2]
       # And TransmissionProb in [0.15, 0.075, 0.3]
       # And EncounterRate in [4, 2, 8]
       # And IncubationTime in [3, 1.5, 6]
@@ -43,6 +51,17 @@ Feature: Influenza1918 Abstract
     | cases           | .* |
     | peak            | .* |
     | peak_infectious | .* |
+    And we add the following edges
+    | s1               | s2                     |
+    | MortalityProb    | MortalityProb_category |
+    | peak             | peak_infectious        |
+    | MortalityProb    | pandemic_gets_going    |
+    | Infected         | pandemic_gets_going    |
+    | MortalityTime    | pandemic_gets_going    |
+    | TransmissionProb | pandemic_gets_going    |
+    | IncubationTime   | pandemic_gets_going    |
+    | RecoveryTime     | pandemic_gets_going    |
+    | EncounterRate    | pandemic_gets_going    |
     Then we obtain the causal DAG
 
   @MortalityProb_decrease

@@ -120,6 +120,16 @@ def step_impl(context, v1, v2):
     )
 
 
+@given(u'pandemic_gets_going')
+def step_impl(context):
+    add_constraint(context, context.scenario.modelling_scenario.variables.get("pandemic_gets_going").z3)
+
+
+@given(u'MortalityProb_med')
+def step_impl(context):
+    add_constraint(context, context.scenario.modelling_scenario.variables.get("MortalityProb_med").z3)
+
+
 mutations = {
     "increase": lambda x, x_prime: x_prime == (x*2),
     "decrease": lambda x, x_prime: x_prime == (x/2),

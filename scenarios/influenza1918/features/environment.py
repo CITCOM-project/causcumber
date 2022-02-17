@@ -20,6 +20,7 @@ from causal_testing.data_collection.data_collector import ExperimentalDataCollec
 from causal_testing.testing.causal_test_case import CausalTestCase
 from causal_testing.testing.causal_test_engine import CausalTestEngine
 from causal_testing.testing.estimators import CausalForestEstimator, LinearRegressionEstimator
+from causal_testing.data_collection.data_collector import ObservationalDataCollector
 
 from causcumber.causcumber_utils import to_snake_case
 
@@ -107,13 +108,12 @@ def fit_distribution(data) -> stats.beta:
     return stats.beta(*params)
 
 
-def run_influenza1918(runs, outputs):
+def run_influenza1918(runs):
     from OMPython import ModelicaSystem, OMCSessionZMQ
     from shutil import move
     stats = []
 
-    repeats = 1
-    print(runs)
+    repeats = 2
     for i, run in runs.iterrows():
         for repeat in range(repeats):
             params = ",".join([f"{col}={val}" for col, val in run.iteritems()])
@@ -127,8 +127,8 @@ def run_influenza1918(runs, outputs):
                 if not answer:
                     raise ValueError("\n{}:\n{}".format(cmd, answer))
 
+            # influenza1918_res.csv is created automatically by the model when it runs
             df = pd.read_csv("influenza1918_res.csv")
-            # df.to_csv(f"results/influenza1918_abstract/influenza1918_res_{repeat}_{i}.csv")
             datum = run.to_dict()
             datum["deceased"]= df["Deceased"].iloc[-1]
             datum["recovered"]= df["Recovered"].iloc[-1]
@@ -139,13 +139,13 @@ def run_influenza1918(runs, outputs):
 
     data = pd.DataFrame(stats)
     assert len(data) == repeats * len(runs)
-    # df.to_csv("results/influenza1918_abstract/influenza1918_res_summary.csv")
     return data
 
 
 def execute_test(scenario, causal_dag, causal_test_case, observational_data_csv_path):
     causal_specification = CausalSpecification(scenario=scenario, causal_dag=causal_dag)
-    causal_test_engine = CausalTestEngine(causal_test_case, causal_specification)
+    data_collector = ObservationalDataCollector(scenario, observational_data_csv_path)
+    causal_test_engine = CausalTestEngine(causal_test_case, causal_specification, data_collector)
     minimal_adjustment_set = causal_test_engine.load_data(observational_data_csv_path, index_col=0)
     treatment_vars = list(causal_test_case.treatment_input_configuration)
     minimal_adjustment_set = minimal_adjustment_set - set([v.name for v in treatment_vars])
@@ -156,7 +156,8 @@ def execute_test(scenario, causal_dag, causal_test_case, observational_data_csv_
                                              [causal_test_case.control_input_configuration[v] for v in treatment_vars][0],
                                              minimal_adjustment_set,
                                              (list(causal_test_case.outcome_variables)[0].name,),
-                                             causal_test_engine.scenario_execution_data_df)
+                                             causal_test_engine.scenario_execution_data_df,
+                                             )
     causal_test_result = causal_test_engine.execute_test(estimation_model)
     test_passes = causal_test_case.expected_causal_effect.apply(causal_test_result)
     if not test_passes:
@@ -173,7 +174,9 @@ def after_feature(context, feature):
     second_pass_tests = []
     failed_tests = 0
     dataframes = []
-    num_concrete = 4
+    num_concrete = int(context.config.userdata['num_concrete'])
+
+    obs_datapath = context.config.userdata.get("datapath", None)
 
     for scenario, abstract_test in context.abstract_tests:
         print("=======================================")
@@ -187,17 +190,30 @@ def after_feature(context, feature):
             concrete_tests, runs = abstract_test.generate_concrete_tests(num_concrete)
             first_pass_tests += [(scenario, test) for test in concrete_tests]
             first_pass_runs.append(runs)
-            datapath = f"results/{context.feature_name}/{abstract_test.datapath()}"
-            if os.path.exists(datapath):
-                data = pd.read_csv(datapath, index_col=0)
-            else:
-                data = run_influenza1918(runs, context.outputs)
+            datapath = obs_datapath
+            if datapath is None:
+                datapath = f"results/{context.feature_name}/{abstract_test.datapath()}"
+                data = run_influenza1918(runs)
                 data.to_csv(datapath)
-            for test in concrete_tests:
+            else:
+                data = pd.read_csv(datapath)
+
+            for meta in scenario.metas():
+                meta.populate(data)
+            data.to_csv(datapath)
+
+
+            groups = {group: data for group, data in data.groupby("bin")}
+            for bin, test in enumerate(concrete_tests):
                 print("  =====")
+                if "rct" in context.config.userdata:
+                    groups[bin].to_csv(datapath.replace(".csv", f"_{int(bin)}.csv"))
+                    datapath = datapath.replace(".csv", f"_{int(bin)}.csv")
+                print(test)
+                print(pd.read_csv(datapath, index_col=0))
                 pass_ = execute_test(scenario, context.dag, test, datapath)
                 if not pass_ and context.config.stop:
-                    logger.warn(f"FAILURE\n{scenario}\n{test}\n{datapath}")
+                    logger.warn(f"FAILURE\n{scenario}\n{test}\n{bin_datapath}")
                     sys.exit(1)
                 failed_tests += not pass_
             dataframes.append(data)
@@ -213,7 +229,7 @@ def after_feature(context, feature):
     # if os.path.exists(observational_data_csv_path):
     #     data = pd.read_csv(observational_data_csv_path)
     # else:
-    #     data = run_influenza1918(first_pass_runs, context.outputs)
+    #     data = run_influenza1918(first_pass_runs)
     #     for column in data:
     #         data[column] = data[column].astype(context.types[column])
     #     data.to_csv(observational_data_csv_path)
