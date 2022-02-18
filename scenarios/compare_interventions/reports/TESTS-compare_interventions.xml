@@ -1,0 +1,1533 @@
+<testsuite name="compare_interventions.Compare interventions" tests="13" errors="0" failures="0" skipped="0" time="2.034675" timestamp="2022-02-18T16:27:32.398596" hostname="DESKTOP-CPB194U"><testcase classname="compare_interventions.Compare interventions" name="Draw DAG" status="passed" time="0.133615"><system-out>
+<![CDATA[
+@scenario.begin
+  Scenario: Draw DAG
+    Given a simulation with parameters ... passed in 0.005s
+      | parameter     | value          | type |
+      | quar_period   | 14             | int  |
+      | n_days        | 84             | int  |
+      | pop_type      | hybrid         | str  |
+      | pop_size      | 50000          | int  |
+      | pop_infected  | 100            | int  |
+      | location      | United Kingdom | str  |
+      | interventions | baseline       | str  |
+    And the following variables are recorded weekly ... passed in 0.006s
+      | variable        | type |
+      | cum_tests       | int  |
+      | n_quarantined   | int  |
+      | n_exposed       | int  |
+      | cum_infections  | int  |
+      | cum_symptomatic | int  |
+      | cum_severe      | int  |
+      | cum_critical    | int  |
+      | cum_deaths      | int  |
+    Given a connected repeating unit ... passed in 0.004s
+    When we prune the following edges ... passed in 0.101s
+      | s1                | s2                 |
+      | quar_period       | n_exposed_n        |
+      | quar_period       | cum_infections_n   |
+      | quar_period       | cum_symptomatic_n  |
+      | quar_period       | cum_severe_n       |
+      | quar_period       | cum_critical_n     |
+      | quar_period       | cum_deaths_n       |
+      | quar_period       | cum_tests_n        |
+      | interventions     | cum_infections_n   |
+      | interventions     | cum_symptomatic_n  |
+      | interventions     | cum_severe_n       |
+      | interventions     | cum_critical_n     |
+      | interventions     | cum_deaths_n       |
+      | pop_type          | cum_deaths_n       |
+      | pop_type          | cum_tests_n        |
+      | pop_size          | cum_deaths_n       |
+      | pop_size          | cum_tests_n        |
+      | location          | cum_deaths_n       |
+      | location          | cum_tests_n        |
+      | pop_infected      | n_quarantined_n    |
+      | pop_infected      | n_exposed_n        |
+      | pop_infected      | cum_deaths_n       |
+      | pop_infected      | cum_tests_n        |
+      | n_days            | n_quarantined_n    |
+      | n_days            | n_exposed_n        |
+      | n_days            | cum_infections_n   |
+      | n_days            | cum_symptomatic_n  |
+      | n_days            | cum_severe_n       |
+      | n_days            | cum_critical_n     |
+      | n_days            | cum_deaths_n       |
+      | n_days            | cum_tests_n        |
+      | n_quarantined_n   | cum_infections_n1  |
+      | n_quarantined_n   | cum_symptomatic_n1 |
+      | n_quarantined_n   | cum_severe_n1      |
+      | n_quarantined_n   | cum_critical_n1    |
+      | n_quarantined_n   | cum_tests_n1       |
+      | n_quarantined_n   | cum_deaths_n1      |
+      | n_exposed_n       | n_quarantined_n1   |
+      | n_exposed_n       | cum_symptomatic_n1 |
+      | n_exposed_n       | cum_severe_n1      |
+      | n_exposed_n       | cum_critical_n1    |
+      | n_exposed_n       | cum_deaths_n1      |
+      | n_exposed_n       | cum_tests_n1       |
+      | cum_infections_n  | cum_severe_n1      |
+      | cum_infections_n  | cum_critical_n1    |
+      | cum_infections_n  | cum_deaths_n1      |
+      | cum_infections_n  | cum_tests_n1       |
+      | cum_symptomatic_n | n_exposed_n1       |
+      | cum_symptomatic_n | cum_critical_n1    |
+      | cum_symptomatic_n | cum_deaths_n1      |
+      | cum_symptomatic_n | cum_tests_n1       |
+      | cum_severe_n      | n_quarantined_n1   |
+      | cum_severe_n      | n_exposed_n1       |
+      | cum_severe_n      | cum_infections_n1  |
+      | cum_severe_n      | cum_symptomatic_n1 |
+      | cum_severe_n      | cum_tests_n1       |
+      | cum_severe_n      | cum_deaths_n1      |
+      | cum_critical_n    | n_quarantined_n1   |
+      | cum_critical_n    | n_exposed_n1       |
+      | cum_critical_n    | cum_infections_n1  |
+      | cum_critical_n    | cum_symptomatic_n1 |
+      | cum_critical_n    | cum_severe_n1      |
+      | cum_critical_n    | cum_tests_n1       |
+      | cum_tests_n       | n_exposed_n1       |
+      | cum_tests_n       | cum_infections_n1  |
+      | cum_tests_n       | cum_symptomatic_n1 |
+      | cum_tests_n       | cum_severe_n1      |
+      | cum_tests_n       | cum_critical_n1    |
+      | cum_tests_n       | cum_deaths_n1      |
+      | cum_deaths_n      | n_quarantined_n1   |
+      | cum_deaths_n      | cum_infections_n1  |
+      | cum_deaths_n      | cum_symptomatic_n1 |
+      | cum_deaths_n      | cum_severe_n1      |
+      | cum_deaths_n      | cum_critical_n1    |
+    Then we obtain the causal DAG for 12 weeks ... passed in 0.018s
+
+@scenario.end
+--------------------------------------------------------------------------------
+
+Captured stdout:
+{'quar_period': 14, 'n_days': 84, 'pop_type': 'hybrid', 'pop_size': 50000, 'pop_infected': 100, 'location': 'United Kingdom', 'interventions': 'baseline'}
+
+]]>
+</system-out></testcase><testcase classname="compare_interventions.Compare interventions" name="Test and trace -- @1.1 " status="passed" time="0.55414"><system-out>
+<![CDATA[
+@scenario.begin
+  Scenario Outline: Test and trace -- @1.1 
+    Given a simulation with parameters ... passed in 0.005s
+      | parameter     | value          | type |
+      | quar_period   | 14             | int  |
+      | n_days        | 84             | int  |
+      | pop_type      | hybrid         | str  |
+      | pop_size      | 50000          | int  |
+      | pop_infected  | 100            | int  |
+      | location      | United Kingdom | str  |
+      | interventions | baseline       | str  |
+    And the following variables are recorded weekly ... passed in 0.006s
+      | variable        | type |
+      | cum_tests       | int  |
+      | n_quarantined   | int  |
+      | n_exposed       | int  |
+      | cum_infections  | int  |
+      | cum_symptomatic | int  |
+      | cum_severe      | int  |
+      | cum_critical    | int  |
+      | cum_deaths      | int  |
+    Given we run the model with interventions=baseline ... passed in 0.000s
+    When we run the model with interventions=standardTest ... passed in 0.001s
+    Then the cum_deaths_12 should be < baseline ... passed in 0.542s
+
+@scenario.end
+--------------------------------------------------------------------------------
+
+Captured stdout:
+{'quar_period': 14, 'n_days': 84, 'pop_type': 'hybrid', 'pop_size': 50000, 'pop_infected': 100, 'location': 'United Kingdom', 'interventions': 'baseline'}
+Looking for data in results/compare_interventions
+Running Do Why with params
+  graph: dags/compare_interventions.dot
+  treatment_var: ['interventions']
+  outcome_var: ['cum_deaths_12']
+  control_val: ['baseline']::<class 'numpy.ndarray'>
+  treatment_val: ['standardTest']::<class 'numpy.ndarray'>
+  identification: True
+  verbose: True
+  confidence_intervals: True
+  method_name: backdoor.linear_regression
+  kwargs: {}
+  effect_modifiers: {}
+CATEGORICAL TREATMENT interventions
+GROUPS: {'100000': 0, '50000': 1, 'Japan': 2, 'Rwanda': 3, 'United Kingdom': 4, 'baseline': 5, 'noTest': 6, 'noTrace': 7, 'optimalTest': 8, 'optimalTrace': 9, 'standardTest': 10, 'standardTrace': 11, 'traceNoTest': 12}
+Creating a causal model...
+  adjustment_set []
+Datatype of treatment ['interventions']: [CategoricalDtype(categories=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], ordered=False)]
+control_val [5.]
+treatment_val [10.]
+Identifying...
+Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+### Estimand : 2
+Estimand name: iv
+No such variable found!
+
+### Estimand : 3
+Estimand name: frontdoor
+No such variable found!
+
+Estimating...
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: -117.6
+95.0% confidence interval: [[-26.33283047 -20.70716953]]
+
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: -117.6
+95.0% confidence interval: [[-26.33283047 -20.70716953]]
+
+effect_estimate: -117.6
+
+]]>
+</system-out></testcase><testcase classname="compare_interventions.Compare interventions" name="Test and trace -- @1.2 " status="passed" time="0.122669"><system-out>
+<![CDATA[
+@scenario.begin
+  Scenario Outline: Test and trace -- @1.2 
+    Given a simulation with parameters ... passed in 0.005s
+      | parameter     | value          | type |
+      | quar_period   | 14             | int  |
+      | n_days        | 84             | int  |
+      | pop_type      | hybrid         | str  |
+      | pop_size      | 50000          | int  |
+      | pop_infected  | 100            | int  |
+      | location      | United Kingdom | str  |
+      | interventions | baseline       | str  |
+    And the following variables are recorded weekly ... passed in 0.006s
+      | variable        | type |
+      | cum_tests       | int  |
+      | n_quarantined   | int  |
+      | n_exposed       | int  |
+      | cum_infections  | int  |
+      | cum_symptomatic | int  |
+      | cum_severe      | int  |
+      | cum_critical    | int  |
+      | cum_deaths      | int  |
+    Given we run the model with interventions=baseline ... passed in 0.000s
+    When we run the model with interventions=noTest ... passed in 0.000s
+    Then the cum_deaths_12 should be = baseline ... passed in 0.112s
+
+@scenario.end
+--------------------------------------------------------------------------------
+
+Captured stdout:
+{'quar_period': 14, 'n_days': 84, 'pop_type': 'hybrid', 'pop_size': 50000, 'pop_infected': 100, 'location': 'United Kingdom', 'interventions': 'baseline'}
+Looking for data in results/compare_interventions
+Running Do Why with params
+  graph: dags/compare_interventions.dot
+  treatment_var: ['interventions']
+  outcome_var: ['cum_deaths_12']
+  control_val: ['baseline']::<class 'numpy.ndarray'>
+  treatment_val: ['noTest']::<class 'numpy.ndarray'>
+  identification: True
+  verbose: True
+  confidence_intervals: True
+  method_name: backdoor.linear_regression
+  kwargs: {}
+  effect_modifiers: {}
+CATEGORICAL TREATMENT interventions
+GROUPS: {'100000': 0, '50000': 1, 'Japan': 2, 'Rwanda': 3, 'United Kingdom': 4, 'baseline': 5, 'noTest': 6, 'noTrace': 7, 'optimalTest': 8, 'optimalTrace': 9, 'standardTest': 10, 'standardTrace': 11, 'traceNoTest': 12}
+Creating a causal model...
+  adjustment_set []
+Datatype of treatment ['interventions']: [CategoricalDtype(categories=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], ordered=False)]
+control_val [5.]
+treatment_val [6.]
+Identifying...
+Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+### Estimand : 2
+Estimand name: iv
+No such variable found!
+
+### Estimand : 3
+Estimand name: frontdoor
+No such variable found!
+
+Estimating...
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: -5.899999999999977
+95.0% confidence interval: [[-19.47675434   7.67675434]]
+
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: -5.899999999999977
+95.0% confidence interval: [[-19.47675434   7.67675434]]
+
+effect_estimate: -5.899999999999977
+
+]]>
+</system-out></testcase><testcase classname="compare_interventions.Compare interventions" name="Test and trace -- @1.3 " status="passed" time="0.121674"><system-out>
+<![CDATA[
+@scenario.begin
+  Scenario Outline: Test and trace -- @1.3 
+    Given a simulation with parameters ... passed in 0.005s
+      | parameter     | value          | type |
+      | quar_period   | 14             | int  |
+      | n_days        | 84             | int  |
+      | pop_type      | hybrid         | str  |
+      | pop_size      | 50000          | int  |
+      | pop_infected  | 100            | int  |
+      | location      | United Kingdom | str  |
+      | interventions | baseline       | str  |
+    And the following variables are recorded weekly ... passed in 0.006s
+      | variable        | type |
+      | cum_tests       | int  |
+      | n_quarantined   | int  |
+      | n_exposed       | int  |
+      | cum_infections  | int  |
+      | cum_symptomatic | int  |
+      | cum_severe      | int  |
+      | cum_critical    | int  |
+      | cum_deaths      | int  |
+    Given we run the model with interventions=standardTest ... passed in 0.000s
+    When we run the model with interventions=optimalTest ... passed in 0.000s
+    Then the cum_deaths_12 should be < standardTest ... passed in 0.111s
+
+@scenario.end
+--------------------------------------------------------------------------------
+
+Captured stdout:
+{'quar_period': 14, 'n_days': 84, 'pop_type': 'hybrid', 'pop_size': 50000, 'pop_infected': 100, 'location': 'United Kingdom', 'interventions': 'baseline'}
+Looking for data in results/compare_interventions
+Running Do Why with params
+  graph: dags/compare_interventions.dot
+  treatment_var: ['interventions']
+  outcome_var: ['cum_deaths_12']
+  control_val: ['standardTest']::<class 'numpy.ndarray'>
+  treatment_val: ['optimalTest']::<class 'numpy.ndarray'>
+  identification: True
+  verbose: True
+  confidence_intervals: True
+  method_name: backdoor.linear_regression
+  kwargs: {}
+  effect_modifiers: {}
+CATEGORICAL TREATMENT interventions
+GROUPS: {'100000': 0, '50000': 1, 'Japan': 2, 'Rwanda': 3, 'United Kingdom': 4, 'baseline': 5, 'noTest': 6, 'noTrace': 7, 'optimalTest': 8, 'optimalTrace': 9, 'standardTest': 10, 'standardTrace': 11, 'traceNoTest': 12}
+Creating a causal model...
+  adjustment_set []
+Datatype of treatment ['interventions']: [CategoricalDtype(categories=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], ordered=False)]
+control_val [10.]
+treatment_val [8.]
+Identifying...
+Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+### Estimand : 2
+Estimand name: iv
+No such variable found!
+
+### Estimand : 3
+Estimand name: frontdoor
+No such variable found!
+
+Estimating...
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: -65.00000000000001
+95.0% confidence interval: [[27.95716934 37.04283066]]
+
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: -65.00000000000001
+95.0% confidence interval: [[27.95716934 37.04283066]]
+
+effect_estimate: -65.00000000000001
+
+]]>
+</system-out></testcase><testcase classname="compare_interventions.Compare interventions" name="Test and trace -- @1.4 " status="passed" time="0.122659"><system-out>
+<![CDATA[
+@scenario.begin
+  Scenario Outline: Test and trace -- @1.4 
+    Given a simulation with parameters ... passed in 0.005s
+      | parameter     | value          | type |
+      | quar_period   | 14             | int  |
+      | n_days        | 84             | int  |
+      | pop_type      | hybrid         | str  |
+      | pop_size      | 50000          | int  |
+      | pop_infected  | 100            | int  |
+      | location      | United Kingdom | str  |
+      | interventions | baseline       | str  |
+    And the following variables are recorded weekly ... passed in 0.006s
+      | variable        | type |
+      | cum_tests       | int  |
+      | n_quarantined   | int  |
+      | n_exposed       | int  |
+      | cum_infections  | int  |
+      | cum_symptomatic | int  |
+      | cum_severe      | int  |
+      | cum_critical    | int  |
+      | cum_deaths      | int  |
+    Given we run the model with interventions=baseline ... passed in 0.000s
+    When we run the model with interventions=standardTrace ... passed in 0.001s
+    Then the cum_deaths_12 should be < baseline ... passed in 0.111s
+
+@scenario.end
+--------------------------------------------------------------------------------
+
+Captured stdout:
+{'quar_period': 14, 'n_days': 84, 'pop_type': 'hybrid', 'pop_size': 50000, 'pop_infected': 100, 'location': 'United Kingdom', 'interventions': 'baseline'}
+Looking for data in results/compare_interventions
+Running Do Why with params
+  graph: dags/compare_interventions.dot
+  treatment_var: ['interventions']
+  outcome_var: ['cum_deaths_12']
+  control_val: ['baseline']::<class 'numpy.ndarray'>
+  treatment_val: ['standardTrace']::<class 'numpy.ndarray'>
+  identification: True
+  verbose: True
+  confidence_intervals: True
+  method_name: backdoor.linear_regression
+  kwargs: {}
+  effect_modifiers: {}
+CATEGORICAL TREATMENT interventions
+GROUPS: {'100000': 0, '50000': 1, 'Japan': 2, 'Rwanda': 3, 'United Kingdom': 4, 'baseline': 5, 'noTest': 6, 'noTrace': 7, 'optimalTest': 8, 'optimalTrace': 9, 'standardTest': 10, 'standardTrace': 11, 'traceNoTest': 12}
+Creating a causal model...
+  adjustment_set []
+Datatype of treatment ['interventions']: [CategoricalDtype(categories=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], ordered=False)]
+control_val [5.]
+treatment_val [11.]
+Identifying...
+Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+### Estimand : 2
+Estimand name: iv
+No such variable found!
+
+### Estimand : 3
+Estimand name: frontdoor
+No such variable found!
+
+Estimating...
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: -170.50000000000006
+95.0% confidence interval: [[-30.29785349 -26.53547984]]
+
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: -170.50000000000006
+95.0% confidence interval: [[-30.29785349 -26.53547984]]
+
+effect_estimate: -170.50000000000006
+
+]]>
+</system-out></testcase><testcase classname="compare_interventions.Compare interventions" name="Test and trace -- @1.5 " status="passed" time="0.120677"><system-out>
+<![CDATA[
+@scenario.begin
+  Scenario Outline: Test and trace -- @1.5 
+    Given a simulation with parameters ... passed in 0.005s
+      | parameter     | value          | type |
+      | quar_period   | 14             | int  |
+      | n_days        | 84             | int  |
+      | pop_type      | hybrid         | str  |
+      | pop_size      | 50000          | int  |
+      | pop_infected  | 100            | int  |
+      | location      | United Kingdom | str  |
+      | interventions | baseline       | str  |
+    And the following variables are recorded weekly ... passed in 0.005s
+      | variable        | type |
+      | cum_tests       | int  |
+      | n_quarantined   | int  |
+      | n_exposed       | int  |
+      | cum_infections  | int  |
+      | cum_symptomatic | int  |
+      | cum_severe      | int  |
+      | cum_critical    | int  |
+      | cum_deaths      | int  |
+    Given we run the model with interventions=standardTest ... passed in 0.001s
+    When we run the model with interventions=standardTrace ... passed in 0.000s
+    Then the cum_deaths_12 should be < standardTest ... passed in 0.110s
+
+@scenario.end
+--------------------------------------------------------------------------------
+
+Captured stdout:
+{'quar_period': 14, 'n_days': 84, 'pop_type': 'hybrid', 'pop_size': 50000, 'pop_infected': 100, 'location': 'United Kingdom', 'interventions': 'baseline'}
+Looking for data in results/compare_interventions
+Running Do Why with params
+  graph: dags/compare_interventions.dot
+  treatment_var: ['interventions']
+  outcome_var: ['cum_deaths_12']
+  control_val: ['standardTest']::<class 'numpy.ndarray'>
+  treatment_val: ['standardTrace']::<class 'numpy.ndarray'>
+  identification: True
+  verbose: True
+  confidence_intervals: True
+  method_name: backdoor.linear_regression
+  kwargs: {}
+  effect_modifiers: {}
+CATEGORICAL TREATMENT interventions
+GROUPS: {'100000': 0, '50000': 1, 'Japan': 2, 'Rwanda': 3, 'United Kingdom': 4, 'baseline': 5, 'noTest': 6, 'noTrace': 7, 'optimalTest': 8, 'optimalTrace': 9, 'standardTest': 10, 'standardTrace': 11, 'traceNoTest': 12}
+Creating a causal model...
+  adjustment_set []
+Datatype of treatment ['interventions']: [CategoricalDtype(categories=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], ordered=False)]
+control_val [10.]
+treatment_val [11.]
+Identifying...
+Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+### Estimand : 2
+Estimand name: iv
+No such variable found!
+
+### Estimand : 3
+Estimand name: frontdoor
+No such variable found!
+
+Estimating...
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: -52.89999999999998
+95.0% confidence interval: [[-62.58274629 -43.21725371]]
+
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: -52.89999999999998
+95.0% confidence interval: [[-62.58274629 -43.21725371]]
+
+effect_estimate: -52.89999999999998
+
+]]>
+</system-out></testcase><testcase classname="compare_interventions.Compare interventions" name="Test and trace -- @1.6 " status="passed" time="0.120677"><system-out>
+<![CDATA[
+@scenario.begin
+  Scenario Outline: Test and trace -- @1.6 
+    Given a simulation with parameters ... passed in 0.005s
+      | parameter     | value          | type |
+      | quar_period   | 14             | int  |
+      | n_days        | 84             | int  |
+      | pop_type      | hybrid         | str  |
+      | pop_size      | 50000          | int  |
+      | pop_infected  | 100            | int  |
+      | location      | United Kingdom | str  |
+      | interventions | baseline       | str  |
+    And the following variables are recorded weekly ... passed in 0.006s
+      | variable        | type |
+      | cum_tests       | int  |
+      | n_quarantined   | int  |
+      | n_exposed       | int  |
+      | cum_infections  | int  |
+      | cum_symptomatic | int  |
+      | cum_severe      | int  |
+      | cum_critical    | int  |
+      | cum_deaths      | int  |
+    Given we run the model with interventions=standardTest ... passed in 0.000s
+    When we run the model with interventions=noTrace ... passed in 0.000s
+    Then the cum_deaths_12 should be = standardTest ... passed in 0.110s
+
+@scenario.end
+--------------------------------------------------------------------------------
+
+Captured stdout:
+{'quar_period': 14, 'n_days': 84, 'pop_type': 'hybrid', 'pop_size': 50000, 'pop_infected': 100, 'location': 'United Kingdom', 'interventions': 'baseline'}
+Looking for data in results/compare_interventions
+Running Do Why with params
+  graph: dags/compare_interventions.dot
+  treatment_var: ['interventions']
+  outcome_var: ['cum_deaths_12']
+  control_val: ['standardTest']::<class 'numpy.ndarray'>
+  treatment_val: ['noTrace']::<class 'numpy.ndarray'>
+  identification: True
+  verbose: True
+  confidence_intervals: True
+  method_name: backdoor.linear_regression
+  kwargs: {}
+  effect_modifiers: {}
+CATEGORICAL TREATMENT interventions
+GROUPS: {'100000': 0, '50000': 1, 'Japan': 2, 'Rwanda': 3, 'United Kingdom': 4, 'baseline': 5, 'noTest': 6, 'noTrace': 7, 'optimalTest': 8, 'optimalTrace': 9, 'standardTest': 10, 'standardTrace': 11, 'traceNoTest': 12}
+Creating a causal model...
+  adjustment_set []
+Datatype of treatment ['interventions']: [CategoricalDtype(categories=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], ordered=False)]
+control_val [10.]
+treatment_val [7.]
+Identifying...
+Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+### Estimand : 2
+Estimand name: iv
+No such variable found!
+
+### Estimand : 3
+Estimand name: frontdoor
+No such variable found!
+
+Estimating...
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: -2.842170943040401e-14
+95.0% confidence interval: [[-4.27079041  4.27079041]]
+
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: -2.842170943040401e-14
+95.0% confidence interval: [[-4.27079041  4.27079041]]
+
+effect_estimate: -2.842170943040401e-14
+
+]]>
+</system-out></testcase><testcase classname="compare_interventions.Compare interventions" name="Test and trace -- @1.7 " status="passed" time="0.122672"><system-out>
+<![CDATA[
+@scenario.begin
+  Scenario Outline: Test and trace -- @1.7 
+    Given a simulation with parameters ... passed in 0.005s
+      | parameter     | value          | type |
+      | quar_period   | 14             | int  |
+      | n_days        | 84             | int  |
+      | pop_type      | hybrid         | str  |
+      | pop_size      | 50000          | int  |
+      | pop_infected  | 100            | int  |
+      | location      | United Kingdom | str  |
+      | interventions | baseline       | str  |
+    And the following variables are recorded weekly ... passed in 0.006s
+      | variable        | type |
+      | cum_tests       | int  |
+      | n_quarantined   | int  |
+      | n_exposed       | int  |
+      | cum_infections  | int  |
+      | cum_symptomatic | int  |
+      | cum_severe      | int  |
+      | cum_critical    | int  |
+      | cum_deaths      | int  |
+    Given we run the model with interventions=standardTrace ... passed in 0.000s
+    When we run the model with interventions=optimalTrace ... passed in 0.000s
+    Then the cum_deaths_12 should be < standardTrace ... passed in 0.112s
+
+@scenario.end
+--------------------------------------------------------------------------------
+
+Captured stdout:
+{'quar_period': 14, 'n_days': 84, 'pop_type': 'hybrid', 'pop_size': 50000, 'pop_infected': 100, 'location': 'United Kingdom', 'interventions': 'baseline'}
+Looking for data in results/compare_interventions
+Running Do Why with params
+  graph: dags/compare_interventions.dot
+  treatment_var: ['interventions']
+  outcome_var: ['cum_deaths_12']
+  control_val: ['standardTrace']::<class 'numpy.ndarray'>
+  treatment_val: ['optimalTrace']::<class 'numpy.ndarray'>
+  identification: True
+  verbose: True
+  confidence_intervals: True
+  method_name: backdoor.linear_regression
+  kwargs: {}
+  effect_modifiers: {}
+CATEGORICAL TREATMENT interventions
+GROUPS: {'100000': 0, '50000': 1, 'Japan': 2, 'Rwanda': 3, 'United Kingdom': 4, 'baseline': 5, 'noTest': 6, 'noTrace': 7, 'optimalTest': 8, 'optimalTrace': 9, 'standardTest': 10, 'standardTrace': 11, 'traceNoTest': 12}
+Creating a causal model...
+  adjustment_set []
+Datatype of treatment ['interventions']: [CategoricalDtype(categories=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], ordered=False)]
+control_val [11.]
+treatment_val [9.]
+Identifying...
+Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+### Estimand : 2
+Estimand name: iv
+No such variable found!
+
+### Estimand : 3
+Estimand name: frontdoor
+No such variable found!
+
+Estimating...
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: -9.600000000000005
+95.0% confidence interval: [[2.98662312 6.61337688]]
+
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: -9.600000000000005
+95.0% confidence interval: [[2.98662312 6.61337688]]
+
+effect_estimate: -9.600000000000005
+
+]]>
+</system-out></testcase><testcase classname="compare_interventions.Compare interventions" name="Test and trace -- @1.8 " status="passed" time="0.119503"><system-out>
+<![CDATA[
+@scenario.begin
+  Scenario Outline: Test and trace -- @1.8 
+    Given a simulation with parameters ... passed in 0.005s
+      | parameter     | value          | type |
+      | quar_period   | 14             | int  |
+      | n_days        | 84             | int  |
+      | pop_type      | hybrid         | str  |
+      | pop_size      | 50000          | int  |
+      | pop_infected  | 100            | int  |
+      | location      | United Kingdom | str  |
+      | interventions | baseline       | str  |
+    And the following variables are recorded weekly ... passed in 0.006s
+      | variable        | type |
+      | cum_tests       | int  |
+      | n_quarantined   | int  |
+      | n_exposed       | int  |
+      | cum_infections  | int  |
+      | cum_symptomatic | int  |
+      | cum_severe      | int  |
+      | cum_critical    | int  |
+      | cum_deaths      | int  |
+    Given we run the model with interventions=baseline ... passed in 0.000s
+    When we run the model with interventions=traceNoTest ... passed in 0.001s
+    Then the cum_deaths_12 should be = baseline ... passed in 0.108s
+
+@scenario.end
+--------------------------------------------------------------------------------
+
+Captured stdout:
+{'quar_period': 14, 'n_days': 84, 'pop_type': 'hybrid', 'pop_size': 50000, 'pop_infected': 100, 'location': 'United Kingdom', 'interventions': 'baseline'}
+Looking for data in results/compare_interventions
+Running Do Why with params
+  graph: dags/compare_interventions.dot
+  treatment_var: ['interventions']
+  outcome_var: ['cum_deaths_12']
+  control_val: ['baseline']::<class 'numpy.ndarray'>
+  treatment_val: ['traceNoTest']::<class 'numpy.ndarray'>
+  identification: True
+  verbose: True
+  confidence_intervals: True
+  method_name: backdoor.linear_regression
+  kwargs: {}
+  effect_modifiers: {}
+CATEGORICAL TREATMENT interventions
+GROUPS: {'100000': 0, '50000': 1, 'Japan': 2, 'Rwanda': 3, 'United Kingdom': 4, 'baseline': 5, 'noTest': 6, 'noTrace': 7, 'optimalTest': 8, 'optimalTrace': 9, 'standardTest': 10, 'standardTrace': 11, 'traceNoTest': 12}
+Creating a causal model...
+  adjustment_set []
+Datatype of treatment ['interventions']: [CategoricalDtype(categories=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], ordered=False)]
+control_val [5.]
+treatment_val [12.]
+Identifying...
+Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+### Estimand : 2
+Estimand name: iv
+No such variable found!
+
+### Estimand : 3
+Estimand name: frontdoor
+No such variable found!
+
+Estimating...
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: 0.0
+95.0% confidence interval: [[-2.17332579  2.17332579]]
+
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+       d                                    
+────────────────(Expectation(cum_deaths_12))
+d[interventions]                            
+Estimand assumption 1, Unconfoundedness: If U→{interventions} and U→cum_deaths_12 then P(cum_deaths_12|interventions,,U) = P(cum_deaths_12|interventions,)
+
+## Realized estimand
+b: cum_deaths_12~interventions
+Target units: ate
+
+## Estimate
+Mean value: 0.0
+95.0% confidence interval: [[-2.17332579  2.17332579]]
+
+effect_estimate: 0.0
+
+]]>
+</system-out></testcase><testcase classname="compare_interventions.Compare interventions" name="Locations -- @1.1 " status="passed" time="0.121116"><system-out>
+<![CDATA[
+@scenario.begin
+  Scenario Outline: Locations -- @1.1 
+    Given a simulation with parameters ... passed in 0.004s
+      | parameter     | value          | type |
+      | quar_period   | 14             | int  |
+      | n_days        | 84             | int  |
+      | pop_type      | hybrid         | str  |
+      | pop_size      | 50000          | int  |
+      | pop_infected  | 100            | int  |
+      | location      | United Kingdom | str  |
+      | interventions | baseline       | str  |
+    And the following variables are recorded weekly ... passed in 0.005s
+      | variable        | type |
+      | cum_tests       | int  |
+      | n_quarantined   | int  |
+      | n_exposed       | int  |
+      | cum_infections  | int  |
+      | cum_symptomatic | int  |
+      | cum_severe      | int  |
+      | cum_critical    | int  |
+      | cum_deaths      | int  |
+    Given we run the model with location=United Kingdom ... passed in 0.001s
+    When we run the model with location=Japan ... passed in 0.000s
+    Then the cum_deaths_12 should be > United Kingdom ... passed in 0.111s
+
+@scenario.end
+--------------------------------------------------------------------------------
+
+Captured stdout:
+{'quar_period': 14, 'n_days': 84, 'pop_type': 'hybrid', 'pop_size': 50000, 'pop_infected': 100, 'location': 'United Kingdom', 'interventions': 'baseline'}
+Looking for data in results/compare_interventions
+Running Do Why with params
+  graph: dags/compare_interventions.dot
+  treatment_var: ['location']
+  outcome_var: ['cum_deaths_12']
+  control_val: ['United Kingdom']::<class 'numpy.ndarray'>
+  treatment_val: ['Japan']::<class 'numpy.ndarray'>
+  identification: True
+  verbose: True
+  confidence_intervals: True
+  method_name: backdoor.linear_regression
+  kwargs: {}
+  effect_modifiers: {}
+CATEGORICAL TREATMENT location
+GROUPS: {'Japan': 0, 'Rwanda': 1, 'United Kingdom': 2}
+Creating a causal model...
+  adjustment_set []
+Datatype of treatment ['location']: [CategoricalDtype(categories=[0, 1, 2], ordered=False)]
+control_val [2.]
+treatment_val [0.]
+Identifying...
+Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+     d                                 
+───────────(Expectation(cum_deaths_12))
+d[location]                            
+Estimand assumption 1, Unconfoundedness: If U→{location} and U→cum_deaths_12 then P(cum_deaths_12|location,,U) = P(cum_deaths_12|location,)
+
+### Estimand : 2
+Estimand name: iv
+No such variable found!
+
+### Estimand : 3
+Estimand name: frontdoor
+No such variable found!
+
+Estimating...
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+     d                                 
+───────────(Expectation(cum_deaths_12))
+d[location]                            
+Estimand assumption 1, Unconfoundedness: If U→{location} and U→cum_deaths_12 then P(cum_deaths_12|location,,U) = P(cum_deaths_12|location,)
+
+## Realized estimand
+b: cum_deaths_12~location
+Target units: ate
+
+## Estimate
+Mean value: 186.5090909090909
+95.0% confidence interval: [[-121.61636559  -64.89272532]]
+
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+     d                                 
+───────────(Expectation(cum_deaths_12))
+d[location]                            
+Estimand assumption 1, Unconfoundedness: If U→{location} and U→cum_deaths_12 then P(cum_deaths_12|location,,U) = P(cum_deaths_12|location,)
+
+## Realized estimand
+b: cum_deaths_12~location
+Target units: ate
+
+## Estimate
+Mean value: 186.5090909090909
+95.0% confidence interval: [[-121.61636559  -64.89272532]]
+
+effect_estimate: 186.5090909090909
+
+]]>
+</system-out></testcase><testcase classname="compare_interventions.Compare interventions" name="Locations -- @1.2 " status="passed" time="0.120674"><system-out>
+<![CDATA[
+@scenario.begin
+  Scenario Outline: Locations -- @1.2 
+    Given a simulation with parameters ... passed in 0.005s
+      | parameter     | value          | type |
+      | quar_period   | 14             | int  |
+      | n_days        | 84             | int  |
+      | pop_type      | hybrid         | str  |
+      | pop_size      | 50000          | int  |
+      | pop_infected  | 100            | int  |
+      | location      | United Kingdom | str  |
+      | interventions | baseline       | str  |
+    And the following variables are recorded weekly ... passed in 0.006s
+      | variable        | type |
+      | cum_tests       | int  |
+      | n_quarantined   | int  |
+      | n_exposed       | int  |
+      | cum_infections  | int  |
+      | cum_symptomatic | int  |
+      | cum_severe      | int  |
+      | cum_critical    | int  |
+      | cum_deaths      | int  |
+    Given we run the model with location=United Kingdom ... passed in 0.000s
+    When we run the model with location=Rwanda ... passed in 0.001s
+    Then the cum_deaths_12 should be < United Kingdom ... passed in 0.109s
+
+@scenario.end
+--------------------------------------------------------------------------------
+
+Captured stdout:
+{'quar_period': 14, 'n_days': 84, 'pop_type': 'hybrid', 'pop_size': 50000, 'pop_infected': 100, 'location': 'United Kingdom', 'interventions': 'baseline'}
+Looking for data in results/compare_interventions
+Running Do Why with params
+  graph: dags/compare_interventions.dot
+  treatment_var: ['location']
+  outcome_var: ['cum_deaths_12']
+  control_val: ['United Kingdom']::<class 'numpy.ndarray'>
+  treatment_val: ['Rwanda']::<class 'numpy.ndarray'>
+  identification: True
+  verbose: True
+  confidence_intervals: True
+  method_name: backdoor.linear_regression
+  kwargs: {}
+  effect_modifiers: {}
+CATEGORICAL TREATMENT location
+GROUPS: {'Japan': 0, 'Rwanda': 1, 'United Kingdom': 2}
+Creating a causal model...
+  adjustment_set []
+Datatype of treatment ['location']: [CategoricalDtype(categories=[0, 1, 2], ordered=False)]
+control_val [2.]
+treatment_val [1.]
+Identifying...
+Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+     d                                 
+───────────(Expectation(cum_deaths_12))
+d[location]                            
+Estimand assumption 1, Unconfoundedness: If U→{location} and U→cum_deaths_12 then P(cum_deaths_12|location,,U) = P(cum_deaths_12|location,)
+
+### Estimand : 2
+Estimand name: iv
+No such variable found!
+
+### Estimand : 3
+Estimand name: frontdoor
+No such variable found!
+
+Estimating...
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+     d                                 
+───────────(Expectation(cum_deaths_12))
+d[location]                            
+Estimand assumption 1, Unconfoundedness: If U→{location} and U→cum_deaths_12 then P(cum_deaths_12|location,,U) = P(cum_deaths_12|location,)
+
+## Realized estimand
+b: cum_deaths_12~location
+Target units: ate
+
+## Estimate
+Mean value: -86.6909090909094
+95.0% confidence interval: [[ 30.16295143 143.21886675]]
+
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+     d                                 
+───────────(Expectation(cum_deaths_12))
+d[location]                            
+Estimand assumption 1, Unconfoundedness: If U→{location} and U→cum_deaths_12 then P(cum_deaths_12|location,,U) = P(cum_deaths_12|location,)
+
+## Realized estimand
+b: cum_deaths_12~location
+Target units: ate
+
+## Estimate
+Mean value: -86.6909090909094
+95.0% confidence interval: [[ 30.16295143 143.21886675]]
+
+effect_estimate: -86.6909090909094
+
+]]>
+</system-out></testcase><testcase classname="compare_interventions.Compare interventions" name="Large population" status="passed" time="0.119567"><system-out>
+<![CDATA[
+@scenario.begin
+  Scenario: Large population
+    Given a simulation with parameters ... passed in 0.005s
+      | parameter     | value          | type |
+      | quar_period   | 14             | int  |
+      | n_days        | 84             | int  |
+      | pop_type      | hybrid         | str  |
+      | pop_size      | 50000          | int  |
+      | pop_infected  | 100            | int  |
+      | location      | United Kingdom | str  |
+      | interventions | baseline       | str  |
+    And the following variables are recorded weekly ... passed in 0.006s
+      | variable        | type |
+      | cum_tests       | int  |
+      | n_quarantined   | int  |
+      | n_exposed       | int  |
+      | cum_infections  | int  |
+      | cum_symptomatic | int  |
+      | cum_severe      | int  |
+      | cum_critical    | int  |
+      | cum_deaths      | int  |
+    Given we run the model with pop_size=50000 ... passed in 0.000s
+    When we run the model with pop_size=100000 ... passed in 0.000s
+    Then the cum_infections_12 should be > control ... passed in 0.109s
+
+@scenario.end
+--------------------------------------------------------------------------------
+
+Captured stdout:
+{'quar_period': 14, 'n_days': 84, 'pop_type': 'hybrid', 'pop_size': 50000, 'pop_infected': 100, 'location': 'United Kingdom', 'interventions': 'baseline'}
+Looking for data in results/compare_interventions
+Running Do Why with params
+  graph: dags/compare_interventions.dot
+  treatment_var: ['pop_size']
+  outcome_var: ['cum_infections_12']
+  control_val: [50000]::<class 'numpy.ndarray'>
+  treatment_val: [100000]::<class 'numpy.ndarray'>
+  identification: True
+  verbose: True
+  confidence_intervals: True
+  method_name: backdoor.linear_regression
+  kwargs: {}
+  effect_modifiers: {}
+Creating a causal model...
+  adjustment_set []
+Datatype of treatment ['pop_size']: [dtype('int64')]
+control_val [50000.]
+treatment_val [100000.]
+Identifying...
+Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+     d                                     
+───────────(Expectation(cum_infections_12))
+d[pop_size]                                
+Estimand assumption 1, Unconfoundedness: If U→{pop_size} and U→cum_infections_12 then P(cum_infections_12|pop_size,,U) = P(cum_infections_12|pop_size,)
+
+### Estimand : 2
+Estimand name: iv
+No such variable found!
+
+### Estimand : 3
+Estimand name: frontdoor
+No such variable found!
+
+Estimating...
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+     d                                     
+───────────(Expectation(cum_infections_12))
+d[pop_size]                                
+Estimand assumption 1, Unconfoundedness: If U→{pop_size} and U→cum_infections_12 then P(cum_infections_12|pop_size,,U) = P(cum_infections_12|pop_size,)
+
+## Realized estimand
+b: cum_infections_12~pop_size
+Target units: ate
+
+## Estimate
+Mean value: 45602.70833333333
+95.0% confidence interval: [[0.71766533 1.10644301]]
+
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+     d                                     
+───────────(Expectation(cum_infections_12))
+d[pop_size]                                
+Estimand assumption 1, Unconfoundedness: If U→{pop_size} and U→cum_infections_12 then P(cum_infections_12|pop_size,,U) = P(cum_infections_12|pop_size,)
+
+## Realized estimand
+b: cum_infections_12~pop_size
+Target units: ate
+
+## Estimate
+Mean value: 45602.70833333333
+95.0% confidence interval: [[0.71766533 1.10644301]]
+
+effect_estimate: 45602.70833333333
+
+]]>
+</system-out></testcase><testcase classname="compare_interventions.Compare interventions" name="Subsequent mortality (has confounding)" status="passed" time="0.135031"><system-out>
+<![CDATA[
+@scenario.begin
+  Scenario: Subsequent mortality (has confounding)
+    Given a simulation with parameters ... passed in 0.005s
+      | parameter     | value          | type |
+      | quar_period   | 14             | int  |
+      | n_days        | 84             | int  |
+      | pop_type      | hybrid         | str  |
+      | pop_size      | 50000          | int  |
+      | pop_infected  | 100            | int  |
+      | location      | United Kingdom | str  |
+      | interventions | baseline       | str  |
+    And the following variables are recorded weekly ... passed in 0.006s
+      | variable        | type |
+      | cum_tests       | int  |
+      | n_quarantined   | int  |
+      | n_exposed       | int  |
+      | cum_infections  | int  |
+      | cum_symptomatic | int  |
+      | cum_severe      | int  |
+      | cum_critical    | int  |
+      | cum_deaths      | int  |
+    Given a control scenario where cum_infections_7=4000 ... passed in 0.000s
+    When cum_infections_7=5000 ... passed in 0.000s
+    Then the cum_infections_12 should be > control ... passed in 0.124s
+
+@scenario.end
+--------------------------------------------------------------------------------
+
+Captured stdout:
+{'quar_period': 14, 'n_days': 84, 'pop_type': 'hybrid', 'pop_size': 50000, 'pop_infected': 100, 'location': 'United Kingdom', 'interventions': 'baseline'}
+Looking for data in results/compare_interventions
+Running Do Why with params
+  graph: dags/compare_interventions.dot
+  treatment_var: ['cum_infections_7']
+  outcome_var: ['cum_infections_12']
+  control_val: [4000.]::<class 'numpy.ndarray'>
+  treatment_val: [5000.]::<class 'numpy.ndarray'>
+  identification: True
+  verbose: True
+  confidence_intervals: True
+  method_name: backdoor.linear_regression
+  kwargs: {}
+  effect_modifiers: {}
+Creating a causal model...
+  adjustment_set ['cum_infections_6', 'cum_symptomatic_6', 'location', 'n_exposed_6', 'pop_infected', 'pop_size', 'pop_type']
+Datatype of treatment ['cum_infections_7']: [dtype('float64')]
+control_val [4000.]
+treatment_val [5000.]
+Identifying...
+Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+         d                                                                    
+───────────────────(Expectation(cum_infections_12|cum_infections_6,pop_type,po
+d[cum_infections_7]                                                           
+
+                                                            
+p_infected,pop_size,n_exposed_6,location,cum_symptomatic_6))
+                                                            
+Estimand assumption 1, Unconfoundedness: If U→{cum_infections_7} and U→cum_infections_12 then P(cum_infections_12|cum_infections_7,cum_infections_6,pop_type,pop_infected,pop_size,n_exposed_6,location,cum_symptomatic_6,U) = P(cum_infections_12|cum_infections_7,cum_infections_6,pop_type,pop_infected,pop_size,n_exposed_6,location,cum_symptomatic_6)
+
+### Estimand : 2
+Estimand name: iv
+No such variable found!
+
+### Estimand : 3
+Estimand name: frontdoor
+No such variable found!
+
+Estimating...
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+         d                                                                    
+───────────────────(Expectation(cum_infections_12|cum_infections_6,pop_type,po
+d[cum_infections_7]                                                           
+
+                                                            
+p_infected,pop_size,n_exposed_6,location,cum_symptomatic_6))
+                                                            
+Estimand assumption 1, Unconfoundedness: If U→{cum_infections_7} and U→cum_infections_12 then P(cum_infections_12|cum_infections_7,cum_infections_6,pop_type,pop_infected,pop_size,n_exposed_6,location,cum_symptomatic_6,U) = P(cum_infections_12|cum_infections_7,cum_infections_6,pop_type,pop_infected,pop_size,n_exposed_6,location,cum_symptomatic_6)
+
+## Realized estimand
+b: cum_infections_12~cum_infections_7+cum_infections_6+pop_type+pop_infected+pop_size+n_exposed_6+location+cum_symptomatic_6
+Target units: ate
+
+## Estimate
+Mean value: 43731.0865667403
+95.0% confidence interval: [[32.23653566 55.22563747]]
+
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: nonparametric-ate
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+         d                                                                    
+───────────────────(Expectation(cum_infections_12|cum_infections_6,pop_type,po
+d[cum_infections_7]                                                           
+
+                                                            
+p_infected,pop_size,n_exposed_6,location,cum_symptomatic_6))
+                                                            
+Estimand assumption 1, Unconfoundedness: If U→{cum_infections_7} and U→cum_infections_12 then P(cum_infections_12|cum_infections_7,cum_infections_6,pop_type,pop_infected,pop_size,n_exposed_6,location,cum_symptomatic_6,U) = P(cum_infections_12|cum_infections_7,cum_infections_6,pop_type,pop_infected,pop_size,n_exposed_6,location,cum_symptomatic_6)
+
+## Realized estimand
+b: cum_infections_12~cum_infections_7+cum_infections_6+pop_type+pop_infected+pop_size+n_exposed_6+location+cum_symptomatic_6
+Target units: ate
+
+## Estimate
+Mean value: 43731.0865667403
+95.0% confidence interval: [[32.23653566 55.22563747]]
+
+effect_estimate: 43731.0865667403
+
+]]>
+</system-out></testcase></testsuite>
