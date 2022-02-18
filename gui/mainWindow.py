@@ -229,13 +229,16 @@ class MainWindow(Screen):
         self.dismiss_popup()
 
     def screen_transition1(self, *args):
+        self.display_result.text = ''
         self.manager.current = 'edit dot1'
 
     def screen_transition2(self, *args):
+        self.display_result.text = ''
         self.manager.current = 'edit feature1'
 
     def exit_scenario(self, *args):
         os.chdir('..')
+        self.display_result.text = ''
         self.manager.current = 'home'
 
 Factory.register('LoadDialog', cls=LoadDialog)
