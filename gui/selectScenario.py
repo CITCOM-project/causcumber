@@ -18,6 +18,7 @@ from kivy.properties import ObjectProperty
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 
+
 import os.path
 from os import path
 
@@ -72,6 +73,7 @@ class SelectScenario(Screen):
         button_area = GridLayout(cols=1, size_hint_y=None)
         button_area.bind(minimum_height=button_area.setter("height"))
         for item in os.listdir(path='.'):
+
             os.chdir(item)
             isScenario = False
             
@@ -84,6 +86,7 @@ class SelectScenario(Screen):
                 button_area.add_widget(scenario_btn)
                 
             os.chdir('..')
+
         self.scrollview = ScrollView(size_hint=(0.5, 0.5),pos_hint={'center_y': 0.5, 'center_x': 0.5})
         self.scrollview.add_widget(button_area)
         self.layout.add_widget(self.scrollview)
