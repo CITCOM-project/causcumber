@@ -1,7 +1,0 @@
-quar_period(int);
-n_days(int) ;
-pop_type(str);
-pop_size(int);
-pop_infected(int);
-location(str);
-interventions(str);
