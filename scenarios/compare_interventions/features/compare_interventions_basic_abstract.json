@@ -24,6 +24,7 @@
       "mutations": [
         {"cum_infections": "Increase"}
       ],
+      "metric": "RiskRatio",
       "expectedEffect": {"cum_deaths": "Positive"}
     },
     {
