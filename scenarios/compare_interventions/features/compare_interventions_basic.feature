@@ -92,7 +92,7 @@ Feature: Compare interventions basic
   Scenario: Subsequent mortality (has confounding)
     Given a control scenario where cum_infections=4000
     When cum_infections=5000
-    Then the cum_infections should be > control
+    Then the cum_deaths should be > control
 
   Scenario Outline: Locations
     Given we run the model with location=<control>

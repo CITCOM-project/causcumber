@@ -1,0 +1,38 @@
+{
+  "inputs": [
+    {"name": "quar_period", "type": "int", "distribution": "scipy.stats.norm(14, 5)"},
+    {"name": "n_days", "type": "int", "distribution": "scipy.stats.norm(84, 10)"},
+    {"name": "pop_size", "type": "int", "distribution": "scipy.stats.norm(50000, 1000)"},
+    {"name": "pop_infected", "type": "int", "distribution": "scipy.stats.norm(100, 10)"},
+    {"name": "location", "type": "str", "distribution": "custom_countries"},
+    {"name": "interventions", "type": "str", "distribution": "custom_interventions"},
+  ],
+  "outputs": [
+    {"name": "cum_tests", "type": "int"}
+    {"name": "cum_quarantined", "type": "int"}
+    {"name": "cum_infections", "type": "int"}
+    {"name": "cum_symptomatic", "type": "int"}
+    {"name": "cum_severe", "type": "int"}
+    {"name": "cum_critical", "type": "int"}
+    {"name": "cum_deaths", "type": "int"}
+  ],
+  "metas": [],
+  "constraints": ["quar_period > 0", "n_days > 0"],
+  "dag": "dags/compare_interventions_basic.dot",
+  "tests": [
+    {
+      "mutations": [
+        {"cum_infections": "Increase"}
+      ],
+      "expectedEffect": {"cum_deaths": "Positive"}
+    },
+    {
+      "mutations": [
+        {"cum_infections": "ChangeByFactor(10)"}
+      ],
+      "metric": "RiskRatio",
+      "expectedEffect": "ChangeByFactor(10, tolerance=0.5)"
+    }
+  ]
+
+}

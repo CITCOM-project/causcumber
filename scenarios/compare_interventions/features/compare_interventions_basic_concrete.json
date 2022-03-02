@@ -1,0 +1,36 @@
+{
+  "inputs": [
+    {"name": "quar_period", "type": "int", "value": 14},
+    {"name": "n_days", "type": "int", "value": 84},
+    {"name": "pop_size", "type": "int", "value": 50000},
+    {"name": "pop_infected", "type": "int", "value": 100},
+    {"name": "location", "type": "str", "value": "United Kingdom"},
+    {"name": "interventions", "type": "str", "value": "baseline"},
+  ],
+  "outputs": [
+    {"name": "cum_tests", "type": "int"}
+    {"name": "cum_quarantined", "type": "int"}
+    {"name": "cum_infections", "type": "int"}
+    {"name": "cum_symptomatic", "type": "int"}
+    {"name": "cum_severe", "type": "int"}
+    {"name": "cum_critical", "type": "int"}
+    {"name": "cum_deaths", "type": "int"}
+  ],
+  "metas": [],
+  "constraints": ["quar_period > 0", "n_days > 0"],
+  "dag": "dags/compare_interventions_basic.dot",
+  "tests": [
+    {
+      "control": {"interventions": "baseline"},
+      "treatment": {"interventions": "standardTest"},
+      "metric": "ATE",
+      "expectedEffect": {"cum_infections": "Positive"}
+    },
+    {
+      "control": {"cum_infections": "4000"},
+      "treatment": {"cum_infections": "5000"},
+      "expectedEffect": {"cum_deaths": "ChangeByValue(100, tolerance=10)"}
+    }
+  ]
+
+}
