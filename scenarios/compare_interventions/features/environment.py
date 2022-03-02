@@ -34,6 +34,7 @@ def before_feature(context, feature):
     context.feature_name = to_snake_case(context.feature.name)
     context.dag_path = f"dags/{context.feature_name}.dot"
     context.results_dir = f"results/{context.feature_name}"
+    context.observational_data_csv_path = context.results_dir+"/data.csv"
     context.inputs = set()
     context.outputs = set()
     context.meta_variables = set()

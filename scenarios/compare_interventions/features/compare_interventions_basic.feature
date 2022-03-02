@@ -6,7 +6,6 @@ Feature: Compare interventions basic
       | parameter     | value          | type |
       | quar_period   | 14             | int  |
       | n_days        | 84             | int  |
-      | pop_type      | hybrid         | str  |
       | pop_size      | 50000          | int  |
       | pop_infected  | 100            | int  |
       | location      | United Kingdom | str  |
