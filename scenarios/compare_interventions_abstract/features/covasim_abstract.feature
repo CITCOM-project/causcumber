@@ -69,7 +69,7 @@ Feature: Compare interventions basic
     And 0.5 <= asymp_quar_prob <= 1
     And 0.1 <= trace_probs <= 0.3
     And quar_period <= 14
-    And 30 <= average_age <= 40
+    # And 30 <= average_age <= 40
 
   # TODO: this is a bit clunky. It might not be  reasonable to assume that a
   # domain expert would be able to list all edges that wouldn’t be present

@@ -1,5 +1,6 @@
 from functools import reduce as fold
 from behave import use_step_matcher
+from scipy import stats
 import numpy as np
 import z3
 from causal_testing.generation.abstract_causal_test_case import AbstractCausalTestCase
@@ -16,25 +17,25 @@ sys.path.append("../../../../")  # This one's for native running from within ste
 sys.path.append("../../../")  # This one's for running `behave` in `features`
 sys.path.append("../../")  # This one's for running `behave` in `compare-inverventions`
 
+import dag_steps
 from covasim_utils import avg_age, household_size
 
 
 def add_constraint(context, constraint):
+    print("Adding constraint", constraint)
     context.scenario.modelling_scenario.constraints.add(constraint)
-
-
-@given("{v1} in {set}")
-def step_impl(context, v1, set):
-    folded = fold(
-        lambda acc, x: z3.Or(acc, x),
-        [context.scenario.modelling_scenario.variables[v1].z3 == e for e in eval(set)],
-        False,
-    )
-    add_constraint(context, z3.simplify(folded))
 
 
 @given("average_age = average_ages(location)")
 def step_impl(context):
+    context.supported_countries = sorted(
+        [
+            h
+            for h in covasim.data.country_age_data.data
+            if h in covasim.data.household_size_data.data
+        ],
+        key=lambda x: avg_age(x),
+    )
     avg_ages = {x: avg_age(x) for x in context.supported_countries}
 
     age = context.scenario.modelling_scenario.variables["average_age"].z3
@@ -55,6 +56,30 @@ def step_impl(context):
         0,
     )
     add_constraint(context, size == folded)
+
+
+@given("{v1} in {set}")
+def step_impl(context, v1, set):
+    set = eval(set)
+    var = context.scenario.modelling_scenario.variables[v1]
+    # rel_probs = {x: var.distribution.pdf(x) for x in set}
+
+    class custm_gen(stats.rv_discrete):
+        vals = dict(enumerate(set))
+
+        def ppf(self, q, *args, **kwds):
+            return np.vectorize(self.vals.get)(
+                np.round(len(self.vals) * q)
+            )
+
+    var.distribution = custm_gen()
+
+    folded = fold(
+        lambda acc, x: z3.Or(acc, x),
+        [context.scenario.modelling_scenario.variables[v1].z3 == e for e in set],
+        False,
+    )
+    add_constraint(context, z3.simplify(folded))
 
 
 @given("{lower} <= {v} <= {upper}")
@@ -135,9 +160,19 @@ def step_impl(context, v1, v2):
     )
 
 
+@given(u'pandemic_gets_going')
+def step_impl(context):
+    add_constraint(context, context.scenario.modelling_scenario.variables.get("pandemic_gets_going").z3)
+
+
+@given(u'MortalityProb_med')
+def step_impl(context):
+    add_constraint(context, context.scenario.modelling_scenario.variables.get("MortalityProb_med").z3)
+
+
 mutations = {
-    "increase": lambda x, x_prime: z3.Or(x_prime > (x*3)/2, x_prime > x + 5),
-    "decrease": lambda x, x_prime: z3.Or(x < (x_prime*3)/2, x_prime < x - 5),
+    "increase": lambda x, x_prime: x_prime == (x*2),
+    "decrease": lambda x, x_prime: x_prime == (x/2),
 }
 
 use_step_matcher("re")
@@ -168,6 +203,8 @@ changes = {
     "increase": Positive(),
     "decrease": Negative(),
     "remain the same": NoEffect(),
+    "move to the right": Positive(),
+    "move to the left": Negative(),
 }
 
 

@@ -7,7 +7,15 @@ from covasim_utils import avg_age, household_size
 from causcumber.causcumber_utils import draw_connected_dag
 import re
 import numpy as np
+from behave import given, when, then
+import scipy
+from enum import Enum
+import z3
 
+class MP_cat(Enum):
+    LOW="LOW"
+    MED="MED"
+    HIGH="HIGH"
 
 class countries_gen(stats.rv_discrete):
     supported_countries = [
@@ -26,13 +34,45 @@ class countries_gen(stats.rv_discrete):
 
 countries = countries_gen()
 
-
 def populate_average_age(data):
     data["average_age"] = [avg_age(country) for country in data["location"]]
 
 
 def populate_household_size(data):
-    data["average_age"] = [household_size(country) for country in data["location"]]
+    data["household_size"] = [household_size(country) for country in data["location"]]
+
+def truncnorm(mu, sigma, lower, upper):
+    return stats.truncnorm(
+    (lower - mu) / sigma, (upper - mu) / sigma, loc=mu, scale=sigma)
+
+
+def populate_pandemic_gets_going(data):
+    data["pandemic_gets_going"] = data['peak_infectious'] > data['Infected']
+
+
+def populate_MortalityProb_low(data):
+    data["MortalityProb_low"] = [x < 0.001 for x in data['MortalityProb']]
+
+
+def populate_MortalityProb_med(data):
+    data["MortalityProb_med"] = [0.001 < x < 0.1 for x in data['MortalityProb']]
+
+
+def populate_MortalityProb_high(data):
+    data["MortalityProb_high"] = [x > 0.1 for x in data['MortalityProb']]
+
+
+def populate_MortalityProb_category(data):
+    def cat(x):
+        if x < 0.001:
+            return "LOW"
+        elif 0.001 <= x <= 0.1:
+            return "MED"
+        else:
+            return "HIGH"
+    data["MortalityProb_category"] = [cat(x) for x in data['MortalityProb']]
+    data["MortalityProb_category"] = data["MortalityProb_category"].astype("category")
+
 
 
 @given(u"a simulation with parameters")

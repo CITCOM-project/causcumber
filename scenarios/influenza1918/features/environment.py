@@ -146,7 +146,7 @@ def execute_test(scenario, causal_dag, causal_test_case, observational_data_csv_
     causal_specification = CausalSpecification(scenario=scenario, causal_dag=causal_dag)
     data_collector = ObservationalDataCollector(scenario, observational_data_csv_path)
     causal_test_engine = CausalTestEngine(causal_test_case, causal_specification, data_collector)
-    minimal_adjustment_set = causal_test_engine.load_data(observational_data_csv_path, index_col=0)
+    minimal_adjustment_set = causal_test_engine.load_data(index_col=0)
     treatment_vars = list(causal_test_case.treatment_input_configuration)
     minimal_adjustment_set = minimal_adjustment_set - set([v.name for v in treatment_vars])
     # @andrewc19, why can we only have atomic control/treatment values?
@@ -174,7 +174,7 @@ def after_feature(context, feature):
     second_pass_tests = []
     failed_tests = 0
     dataframes = []
-    num_concrete = int(context.config.userdata['num_concrete'])
+    num_concrete = int(context.config.userdata['num_concrete']) if "num_concrete" in context.config.userdata else 4
 
     obs_datapath = context.config.userdata.get("datapath", None)
 
@@ -213,7 +213,7 @@ def after_feature(context, feature):
                 print(pd.read_csv(datapath, index_col=0))
                 pass_ = execute_test(scenario, context.dag, test, datapath)
                 if not pass_ and context.config.stop:
-                    logger.warn(f"FAILURE\n{scenario}\n{test}\n{bin_datapath}")
+                    logger.warn(f"FAILURE\n{scenario}\n{test}\n{datapath}")
                     sys.exit(1)
                 failed_tests += not pass_
             dataframes.append(data)

@@ -3,7 +3,6 @@ import pandas as pd
 from behave import fixture, use_fixture
 import os
 import re
-import covasim
 import lhsmdu
 import numpy as np
 from allpairspy import AllPairs
@@ -12,6 +11,7 @@ import z3
 import pandas as pd
 from tabulate import tabulate
 from scipy import stats
+import sys
 
 from causal_testing.specification.causal_specification import CausalSpecification, Scenario
 from causal_testing.specification.variable import Input
@@ -20,6 +20,7 @@ from causal_testing.data_collection.data_collector import ExperimentalDataCollec
 from causal_testing.testing.causal_test_case import CausalTestCase
 from causal_testing.testing.causal_test_engine import CausalTestEngine
 from causal_testing.testing.estimators import CausalForestEstimator, LinearRegressionEstimator
+from causal_testing.data_collection.data_collector import ObservationalDataCollector
 
 from causcumber.causcumber_utils import to_snake_case
 
@@ -28,12 +29,11 @@ sys.path.append("../../../../")  # This one's for native running from within ste
 sys.path.append("../../../")  # This one's for running `behave` in `features`
 sys.path.append("../../")  # This one's for running `behave` in `compare-inverventions`
 
+from covasim_utils import avg_age, household_size # Needed for run_covasim
+
 import logging
 
 logger = logging.getLogger(__name__)
-
-from covasim_utils import interventions, avg_age, household_size
-
 
 obs_tag_re = re.compile("observational\((\"|')(.+)(\"|')\)")
 
@@ -84,16 +84,6 @@ def before_feature(context, feature):
     if not os.path.exists(context.results_dir):
         os.makedirs(context.results_dir, exist_ok=True)
 
-    context.supported_countries = sorted(
-        [
-            h
-            for h in covasim.data.country_age_data.data
-            if h in covasim.data.household_size_data.data
-        ],
-        key=lambda x: avg_age(x),
-    )
-
-
 def before_scenario(context, scenario):
     # context.constraints[scenario.name] = set()
     context.effect_modifiers = []
@@ -106,6 +96,18 @@ def after_scenario(context, scenario):
 
 def before_step(context, step):
     context.background_step = step in context.feature.background.steps
+
+
+def fit_distribution(data) -> stats.beta:
+    """Fits a SciPy distribution to a given set of values.
+
+    :param iterable data: A collection of data values.
+    :return: A Beta distribution fitted to the data. TODO: Make this configurable.
+    :rtype: stats.beta
+    """
+
+    params = stats.beta.fit(data)
+    return stats.beta(*params)
 
 
 def run_covasim(runs, desired_outputs, n_runs=3):
@@ -132,7 +134,7 @@ def run_covasim(runs, desired_outputs, n_runs=3):
             tracing = cv.contact_tracing(trace_probs=run_params["trace_probs"])
 
             filtered_run_params = {
-                k: run_params[k] for k in run_params if "_prob" not in k
+                k: run_params[k] for k in run_params if "_prob" not in k and k != "bin"
             }
 
             sim = cv.Sim(
@@ -157,27 +159,16 @@ def run_covasim(runs, desired_outputs, n_runs=3):
                 data[k] = [v for _ in range(1)]
             all_runs.append(data)
         data = pd.concat(all_runs)
-        data["average_age"] = [avg_age(c) for c in data["location"]]
-        data["household_size"] = [household_size(c) for c in data["location"]]
+        # data["average_age"] = [avg_age(c) for c in data["location"]]
+        # data["household_size"] = [household_size(c) for c in data["location"]]
     return data
-
-
-def fit_distribution(data) -> stats.beta:
-    """Fits a SciPy distribution to a given set of values.
-
-    :param iterable data: A collection of data values.
-    :return: A Beta distribution fitted to the data. TODO: Make this configurable.
-    :rtype: stats.beta
-    """
-
-    params = stats.beta.fit(data)
-    return stats.beta(*params)
 
 
 def execute_test(scenario, causal_dag, causal_test_case, observational_data_csv_path):
     causal_specification = CausalSpecification(scenario=scenario, causal_dag=causal_dag)
-    causal_test_engine = CausalTestEngine(causal_test_case, causal_specification)
-    minimal_adjustment_set = causal_test_engine.load_data(observational_data_csv_path, index_col=0)
+    data_collector = ObservationalDataCollector(scenario, observational_data_csv_path)
+    causal_test_engine = CausalTestEngine(causal_test_case, causal_specification, data_collector)
+    minimal_adjustment_set = causal_test_engine.load_data(index_col=0)
     treatment_vars = list(causal_test_case.treatment_input_configuration)
     minimal_adjustment_set = minimal_adjustment_set - set([v.name for v in treatment_vars])
     # @andrewc19, why can we only have atomic control/treatment values?
@@ -187,11 +178,13 @@ def execute_test(scenario, causal_dag, causal_test_case, observational_data_csv_
                                              [causal_test_case.control_input_configuration[v] for v in treatment_vars][0],
                                              minimal_adjustment_set,
                                              (list(causal_test_case.outcome_variables)[0].name,),
-                                             causal_test_engine.scenario_execution_data_df)
+                                             causal_test_engine.scenario_execution_data_df,
+                                             )
     causal_test_result = causal_test_engine.execute_test(estimation_model)
     test_passes = causal_test_case.expected_causal_effect.apply(causal_test_result)
     if not test_passes:
         logger.error(f"{causal_test_case}\n    FAILED - actual causal effect was {causal_test_result.ci_low()} < {causal_test_result.ate} < {causal_test_result.ci_high()}")
+        print(observational_data_csv_path)
     return test_passes
 
 def after_feature(context, feature):
@@ -203,8 +196,12 @@ def after_feature(context, feature):
     second_pass_tests = []
     failed_tests = 0
     dataframes = []
+    num_concrete = int(context.config.userdata['num_concrete']) if "num_concrete" in context.config.userdata else 4
+
+    obs_datapath = context.config.userdata.get("datapath", None)
 
     for scenario, abstract_test in context.abstract_tests:
+        print("=======================================")
         if all(
             [
                 # context.dag.depends_on_outputs(v.name, scenario)
@@ -212,18 +209,38 @@ def after_feature(context, feature):
                 for v in abstract_test.treatment_variables
             ]
         ):
-            concrete_tests, runs = abstract_test.generate_concrete_tests(4)
+            concrete_tests, runs = abstract_test.generate_concrete_tests(num_concrete)
             first_pass_tests += [(scenario, test) for test in concrete_tests]
             first_pass_runs.append(runs)
-            datapath = f"results/exp_data/{abstract_test.datapath()}"
-            if os.path.exists(datapath):
-                data = pd.read_csv(datapath, index_col=0)
-            else:
+            datapath = obs_datapath
+            if datapath is None:
+                datapath = f"results/{context.feature_name}/{abstract_test.datapath()}"
                 data = run_covasim(runs, context.outputs)
                 data.to_csv(datapath)
-            for test in concrete_tests:
-                failed_tests += not execute_test(scenario, context.dag, test, datapath)
-            dataframes .append(data)
+            else:
+                data = pd.read_csv(datapath)
+
+            for meta in scenario.metas():
+                meta.populate(data)
+            data.to_csv(datapath)
+            print(data)
+            print(datapath)
+
+
+            groups = {group: data for group, data in data.groupby("bin")}
+            for bin, test in enumerate(concrete_tests):
+                print("  =====")
+                if "rct" in context.config.userdata:
+                    groups[bin].to_csv(datapath.replace(".csv", f"_{int(bin)}.csv"))
+                    datapath = datapath.replace(".csv", f"_{int(bin)}.csv")
+                print(test)
+                print(pd.read_csv(datapath, index_col=0))
+                pass_ = execute_test(scenario, context.dag, test, datapath)
+                if not pass_ and context.config.stop:
+                    logger.warn(f"FAILURE\n{scenario}\n{test}\n{datapath}")
+                    sys.exit(1)
+                failed_tests += not pass_
+            dataframes.append(data)
         else:
             second_pass_tests.append((scenario, abstract_test))
     assert len(first_pass_runs) > 0 or os.path.exists(datapath),\
@@ -236,7 +253,7 @@ def after_feature(context, feature):
     # if os.path.exists(observational_data_csv_path):
     #     data = pd.read_csv(observational_data_csv_path)
     # else:
-    #     data = run_covasim(first_pass_runs, context.outputs)
+    #     data = run_influenza1918(first_pass_runs)
     #     for column in data:
     #         data[column] = data[column].astype(context.types[column])
     #     data.to_csv(observational_data_csv_path)
@@ -248,11 +265,14 @@ def after_feature(context, feature):
         for variable in scenario.variables.values():
             if variable.distribution is None:
                 variable.distribution = fit_distribution(data[variable.name])
-        concrete_tests, _ = abstract_test.generate_concrete_tests(4)
+        concrete_tests, _ = abstract_test.generate_concrete_tests(num_concrete)
         for test in concrete_tests:
-            failed_tests += not execute_test(scenario, context.dag, test, observational_data_csv_path)
-    print("Results:")
-    print(f"{failed_tests} out of {len(first_pass_tests) + len(second_pass_tests)} failed.")
+            pass_ = execute_test(scenario, context.dag, test, observational_data_csv_path)
+            if not pass_ and context.config.stop:
+                logger.warn(f"FAILURE\n{scenario}\n{test}\n{datapath}")
+                sys.exit(1)
+            failed_tests += not pass_
+    print(f"Results:\n  {failed_tests} out of {len(first_pass_tests) + len(second_pass_tests)} failed.")
 
 
 def before_tag(context, tag):

@@ -31,7 +31,7 @@ def step_impl(context, v1, set):
     set = eval(set)
     var = context.scenario.modelling_scenario.variables[v1]
     # rel_probs = {x: var.distribution.pdf(x) for x in set}
-    custm = stats.rv_discrete(name='custm', values=(set, np.repeat(1/len(set), len(set))))
+    custm = stats.rv_discrete(name='custm', values=(list(set), np.repeat(1/len(set), len(set))))
     var.distribution = custm
 
     folded = fold(
