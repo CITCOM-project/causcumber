@@ -23,6 +23,7 @@ import os.path
 from os import path
 
 import os
+import errno
 
 class ScreenManagement(ScreenManager):
     def __init__(self, **kwargs):
@@ -108,7 +109,7 @@ class NewScenario(Screen):
         layout = FloatLayout()
 
         input_area = BoxLayout(orientation = 'vertical',size_hint=(0.5, 0.5),pos_hint={'center_y': 0.5, 'center_x': 0.5})
-        input_area.add_widget(Label(text='Enter compare variable', font_size='30sp',size_hint=(1, 0.2)))
+        input_area.add_widget(Label(text='Enter scenario name', font_size='30sp',size_hint=(1, 0.2)))
         self.variable_name = TextInput(text='', font_size='20sp',size_hint=(1, 0.04), multiline=False)
         input_area.add_widget(self.variable_name)
         input_area.add_widget(Label(text='',size_hint=(1, 0.07)))
@@ -125,25 +126,40 @@ class NewScenario(Screen):
         self.add_widget(layout)
 
     def create_scenario(self, instance):
-        new_directory = "compare_" + self.variable_name.text
+        new_directory = self.variable_name.text
         current_dir = os.getcwd()
-        
         path = os.path.join(current_dir, new_directory)
+        print(current_dir)
+        os.chdir('..')
+        os.chdir('gui')
+        f = open("environmentPyTemplate.txt", "r")
+        content = f.read()
+        f.close()
+        os.chdir('..')
+        os.chdir('scenarios')
         
-        os.mkdir(path)
+        if not os.path.exists(path):
+            os.mkdir(path)
+            os.chdir(new_directory)
 
-        os.chdir(new_directory)
+            basic_folders = ["dags","features","models","reports","results"]
+            for folder_name in basic_folders:
+                os.mkdir(os.path.join(path, folder_name))
+                if folder_name == 'features':
+                    os.chdir('features')
+                    content = content.replace('<tested_model_name>', new_directory)
+                    f = open("environment.py", "w")
+                    f.write(content)
+                    f.close()
+                    os.mkdir(os.path.join(os.getcwd(), "steps"))
+                    os.chdir('..')
 
-        basic_folders = ["dags","features","reports","results"]
-        for folder_name in basic_folders:
-            os.mkdir(os.path.join(path, folder_name))
-            if folder_name == 'features':
-                os.chdir('features')
-                os.mkdir(os.path.join(os.getcwd(), "steps"))
-                os.chdir('..')
+            self.variable_name.text = ''
+            self.manager.current = 'Main'
+        else:
+            print("A scenarios with same name is already created")
 
-        self.variable_name.text = ''
-        self.manager.current = 'Main'
+        
 
     def cancel_create(self, instance):
         self.variable_name.text = ''

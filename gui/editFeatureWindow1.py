@@ -33,19 +33,22 @@ class EditFeatureWindow1(Screen):
         givenLayout = GridLayout(cols=3,  width="600dp")
 
         parameterLayout = BoxLayout(orientation = 'vertical')
-        parameterLayout.add_widget(Label(text='parameter', size_hint=(1, 0.1)))
-        self.paramterName = TextInput(text='', size_hint=(1, 0.7), multiline=True) 
-        parameterLayout.add_widget(self.paramterName)
+        self.column1Name = TextInput(text='parameter', size_hint=(1, 0.1), multiline=False) 
+        parameterLayout.add_widget(self.column1Name)
+        self.column1Value = TextInput(text='', size_hint=(1, 0.7), multiline=True) 
+        parameterLayout.add_widget(self.column1Value)
 
         valueLayout = BoxLayout(orientation = 'vertical')
-        valueLayout.add_widget(Label(text='value', size_hint=(1, 0.1)))
-        self.paramterValue = TextInput(text='', size_hint=(1, 0.7), multiline=True) 
-        valueLayout.add_widget(self.paramterValue)
+        self.column2Name = TextInput(text='value', size_hint=(1, 0.1), multiline=False)
+        valueLayout.add_widget(self.column2Name) 
+        self.column2Value = TextInput(text='', size_hint=(1, 0.7), multiline=True) 
+        valueLayout.add_widget(self.column2Value)
 
         typeLayout = BoxLayout(orientation = 'vertical')
-        typeLayout.add_widget(Label(text='type', size_hint=(1, 0.1)))
-        self.paramterType = TextInput(text='', size_hint=(1, 0.7), multiline=True) 
-        typeLayout.add_widget(self.paramterType)
+        self.column3Name = TextInput(text='type', size_hint=(1, 0.1), multiline=False)
+        typeLayout.add_widget(self.column3Name)
+        self.column3Value = TextInput(text='', size_hint=(1, 0.7), multiline=True) 
+        typeLayout.add_widget(self.column3Value)
 
         givenLayout.add_widget(parameterLayout)
         givenLayout.add_widget(valueLayout)
@@ -90,7 +93,7 @@ class EditFeatureWindow1(Screen):
         gui.editFeatureVariable.targetFeatureFileName = '' 
         gui.editFeatureVariable.parameterNames = []
 
-        split_parameterName = self.paramterName.text.split()    #parameter
+        split_parameterName = self.column1Value.text.split()    #parameter
         final_parameterName = []
         for x in split_parameterName:
             x = x.replace('\n', '')
@@ -98,14 +101,14 @@ class EditFeatureWindow1(Screen):
             final_parameterName.append(x)
             gui.editFeatureVariable.parameterNames.append(x)
 
-        split_parameterValue = self.paramterValue.text.split()  #value
+        split_parameterValue = self.column2Value.text.split()  #value
         final_parameterValue = []
         for x in split_parameterValue:
             x = x.replace('\n', '')
             x = x.replace(';', '')
             final_parameterValue.append(x)
 
-        split_parameterType = self.paramterType.text.split()  #type
+        split_parameterType = self.column3Value.text.split()  #type
         final_parameterType = []
         for x in split_parameterType:
             x = x.replace('\n', '')
@@ -128,7 +131,7 @@ class EditFeatureWindow1(Screen):
             final_variableType.append(x)
 
         if len(final_parameterName) == len(final_parameterValue) == len(final_parameterType):
-            content = "Feature: Compare " + self.feature_file_name.text + "\n  Background:\n    Given a simulation with parameters\n      | parameter     | value      | type |\n"
+            content = "Feature: Compare " + self.feature_file_name.text + "\n  Background:\n    Given a simulation with parameters\n      | " + self.column1Name.text + "     | " + self.column2Name.text + "      | " + self.column3Name.text + " |\n"
             for x in range(len(final_parameterName)):
                 content += "      | " + final_parameterName[x] + "  | " + final_parameterValue[x] + "  | " + final_parameterType[x] + "  |\n"
             content += "    And the following variables are recorded " + self.recordMode.text + "\n" + "      | variable          | type |\n"
@@ -143,27 +146,25 @@ class EditFeatureWindow1(Screen):
             f.close()
             os.chdir('..')
 
-            self.feature_file_name.text = ''
-            self.paramterName.text = ''
-            self.paramterValue.text = ''
-            self.paramterType.text = ''
-            self.recordMode.text = ''
-            self.variableName.text = ''
-            self.variableType.text = ''
+            self.clean_screen()
 
             self.manager.current = 'edit feature2' 
         else:
             print("missing data")
             
     def screen_transition(self, instance):
-        self.feature_file_name.text = ''
-        self.paramterName.text = ''
-        self.paramterValue.text = ''
-        self.paramterType.text = ''
-        self.recordMode.text = ''
-        self.variableName.text = ''
-        self.variableType.text = ''
+        self.clean_screen()
 
         self.manager.current = 'Main'
 
-    
+    def clean_screen(self):
+        self.feature_file_name.text = ''
+        self.column1Name.text = ''
+        self.column1Value.text = ''
+        self.column2Name.text = ''
+        self.column2Value.text = ''
+        self.column3Name.text = ''
+        self.column3Value.text = ''
+        self.recordMode.text = ''
+        self.variableName.text = ''
+        self.variableType.text = ''

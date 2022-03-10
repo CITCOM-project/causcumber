@@ -26,13 +26,53 @@ def add_constraint(context, constraint):
     context.scenario.modelling_scenario.constraints.add(constraint)
 
 
+@given("average_age = average_ages(location)")
+def step_impl(context):
+    context.supported_countries = sorted(
+        [
+            h
+            for h in covasim.data.country_age_data.data
+            if h in covasim.data.household_size_data.data
+        ],
+        key=lambda x: avg_age(x),
+    )
+    avg_ages = {x: avg_age(x) for x in context.supported_countries}
+
+    age = context.scenario.modelling_scenario.variables["average_age"].z3
+    loc = context.scenario.modelling_scenario.variables["location"].z3
+    folded = fold(
+        lambda acc, x: z3.If(loc == x[0], x[1], acc), list(avg_ages.items()), 0
+    )
+    add_constraint(context, age == folded)
+
+
+@given("household_size = household_sizes(location)")
+def step_impl(context):
+    size = context.scenario.modelling_scenario.variables["household_size"].z3
+    loc = context.scenario.modelling_scenario.variables["location"].z3
+    folded = fold(
+        lambda acc, x: z3.If(loc == x, household_size(x), acc),
+        context.supported_countries,
+        0,
+    )
+    add_constraint(context, size == folded)
+
+
 @given("{v1} in {set}")
 def step_impl(context, v1, set):
     set = eval(set)
     var = context.scenario.modelling_scenario.variables[v1]
     # rel_probs = {x: var.distribution.pdf(x) for x in set}
-    custm = stats.rv_discrete(name='custm', values=(set, np.repeat(1/len(set), len(set))))
-    var.distribution = custm
+
+    class custm_gen(stats.rv_discrete):
+        vals = dict(enumerate(set))
+
+        def ppf(self, q, *args, **kwds):
+            return np.vectorize(self.vals.get)(
+                np.round(len(self.vals) * q)
+            )
+
+    var.distribution = custm_gen()
 
     folded = fold(
         lambda acc, x: z3.Or(acc, x),
@@ -120,6 +160,16 @@ def step_impl(context, v1, v2):
     )
 
 
+@given(u'pandemic_gets_going')
+def step_impl(context):
+    add_constraint(context, context.scenario.modelling_scenario.variables.get("pandemic_gets_going").z3)
+
+
+@given(u'MortalityProb_med')
+def step_impl(context):
+    add_constraint(context, context.scenario.modelling_scenario.variables.get("MortalityProb_med").z3)
+
+
 mutations = {
     "increase": lambda x, x_prime: x_prime == (x*2),
     "decrease": lambda x, x_prime: x_prime == (x/2),
@@ -153,7 +203,7 @@ changes = {
     "increase": Positive(),
     "decrease": Negative(),
     "remain the same": NoEffect(),
-    "move to the right": Positive(),   #can be coustom changed
+    "move to the right": Positive(),
     "move to the left": Negative(),
 }
 

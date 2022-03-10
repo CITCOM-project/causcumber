@@ -1,4 +1,5 @@
 from re import L, template
+from tkinter import font
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
@@ -27,6 +28,7 @@ from kivy_garden.graph import Graph, MeshLinePlot
 from gui.removeFile import created_file_feature
 from gui.removeFile import created_file_xml
 from gui.readFile import read_parameter_file
+import gui.helpWindow   
 ##################
 
 Builder.load_string('''
@@ -34,6 +36,13 @@ Builder.load_string('''
     Label:
         text: root.text
         font_size: 15
+        text_size: self.width, None
+        size_hint_y: None
+        height: self.texture_size[1]
+<displayHelp>:
+    Label:
+        text: root.text
+        font_size: 25
         text_size: self.width, None
         size_hint_y: None
         height: self.texture_size[1]
@@ -64,7 +73,10 @@ class ScreenManagement(ScreenManager):
 
 class displayResult(ScrollView):
     text = StringProperty('')
-            
+
+class displayHelp(ScrollView):
+    text = StringProperty('')
+
 class LoadDialog(FloatLayout):
     load = ObjectProperty(None)
     cancel = ObjectProperty(None)
@@ -78,9 +90,12 @@ class MainWindow(Screen):
         
         layout = BoxLayout(orientation = 'vertical')
 
-        bannerLayout = GridLayout(cols=2, size_hint=(1, 0.05))
+        bannerLayout = GridLayout(cols=3, size_hint=(1, 0.05))
+        exit_scenario_btn = Button(text='Help', size_hint_x = None, width = 100) # Go to help page
+        exit_scenario_btn.bind(on_press=self.help_button)
+        bannerLayout.add_widget(exit_scenario_btn) 
         bannerLayout.add_widget(Label(text='Causcumber'))
-        exit_scenario_btn = Button(text='Exit', size_hint_x = None, width = 100) # Choose feature file to run
+        exit_scenario_btn = Button(text='Exit', size_hint_x = None, width = 100) # Exit scenario
         exit_scenario_btn.bind(on_press=self.exit_scenario)
         bannerLayout.add_widget(exit_scenario_btn) 
 
@@ -235,6 +250,21 @@ class MainWindow(Screen):
     def screen_transition2(self, *args):
         self.display_result.text = ''
         self.manager.current = 'edit feature1'
+
+    def help_button(self, *args):      
+        contentLayout = BoxLayout(orientation = 'vertical')
+
+        helpInfo = displayHelp(text=gui.helpWindow.helpinformation.replace('[model name]',os.path.split(os.getcwd())[1]))
+        contentLayout.add_widget(helpInfo)
+
+        popup = Popup(title='Steps to test a module',content=contentLayout, auto_dismiss=False)
+
+        exitButton = Button(text='Exit', size_hint=(1, 0.04)) 
+        exitButton.bind(on_press=popup.dismiss)
+        contentLayout.add_widget(exitButton) 
+
+        popup.open()
+        
 
     def exit_scenario(self, *args):
         os.chdir('..')

@@ -1,10 +1,10 @@
-<testsuite name="influenza1918_abstract.Influenza1918 Abstract" tests="15" errors="0" failures="0" skipped="0" time="0.314185" timestamp="2022-02-21T15:34:19.980643" hostname="DESKTOP-CPB194U"><testcase classname="influenza1918_abstract.Influenza1918 Abstract" name="Draw DAG" status="passed" time="0.028951"><system-out>
+<testsuite name="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" tests="15" errors="0" failures="14" skipped="0" time="0.341221" timestamp="2022-02-26T15:41:20.615330" hostname="DESKTOP-CPB194U"><testcase classname="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" name="Draw DAG" status="passed" time="0.048915"><system-out>
 <![CDATA[
 @scenario.begin
 
   @draw_dag
   Scenario: Draw DAG
-    Given a simulation with parameters ... passed in 0.016s
+    Given a simulation with parameters ... passed in 0.035s
       | parameter        | type  | distribution                    |
       | MortalityProb    | float | truncnorm(0.01, 0.005, 0, 1)    |
       | Infected         | float | truncnorm(1000, 100, 500, 1500) |
@@ -28,16 +28,19 @@
       | cases           | .* |
       | peak            | .* |
       | peak_infectious | .* |
-    Then we obtain the causal DAG ... passed in 0.000s
+    Then we obtain the causal DAG ... passed in 0.001s
 
 @scenario.end
 --------------------------------------------------------------------------------
 ]]>
-</system-out></testcase><testcase classname="influenza1918_abstract.Influenza1918 Abstract" name="P(Mortality) decrease" status="passed" time="0.018956"><system-out>
+</system-out></testcase><testcase classname="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" name="P(Mortality) decrease" status="failed" time="0.020975"><failure type="NoneType" message="None">
+<![CDATA[
+Failing step: When we decrease P(Mortality) by a factor of n ... undefined in 0.000s
+Location: features/influenza1918_abstract_risk_ratio.feature:41
+None]]>
+</failure><system-out>
 <![CDATA[
 @scenario.begin
-
-  @MortalityProb_decrease
   Scenario: P(Mortality) decrease
     Given a simulation with parameters ... passed in 0.013s
       | parameter        | type  | distribution                    |
@@ -48,25 +51,28 @@
       | IncubationTime   | float | truncnorm(3   , 1.5, 1, 5)      |
       | RecoveryTime     | float | truncnorm(2.5 , 1.25, 1, 5)     |
       | EncounterRate    | float | truncnorm(4   , 2, 1, 10)       |
-    And the following variables are recorded at the end of the simulation ... passed in 0.006s
+    And the following variables are recorded at the end of the simulation ... passed in 0.008s
       | variable        | type  |
       | deceased        | float |
       | recovered       | float |
       | cases           | float |
       | peak            | int   |
       | peak_infectious | float |
-    When we decrease the MortalityProb ... passed in 0.000s
-    Then the deceased should decrease ... passed in 0.000s
-    Then the recovered should increase ... passed in 0.000s
+    When we decrease P(Mortality) by a factor of n ... undefined in 0.000s
+    Then decreases the Deceased by less than *n ... undefined in 0.000s
+    And decreases the Recovered by more than 1/n ... undefined in 0.000s
 
 @scenario.end
 --------------------------------------------------------------------------------
 ]]>
-</system-out></testcase><testcase classname="influenza1918_abstract.Influenza1918 Abstract" name="P(Mortality) increase" status="passed" time="0.019916"><system-out>
+</system-out></testcase><testcase classname="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" name="P(Mortality) increase" status="failed" time="0.018945"><failure type="NoneType" message="None">
+<![CDATA[
+Failing step: When we increase P(Mortality) by a factor of n ... undefined in 0.000s
+Location: features/influenza1918_abstract_risk_ratio.feature:46
+None]]>
+</failure><system-out>
 <![CDATA[
 @scenario.begin
-
-  @MortalityProb_increase
   Scenario: P(Mortality) increase
     Given a simulation with parameters ... passed in 0.013s
       | parameter        | type  | distribution                    |
@@ -84,20 +90,23 @@
       | cases           | float |
       | peak            | int   |
       | peak_infectious | float |
-    When we increase the MortalityProb ... passed in 0.000s
-    Then the deceased should increase ... passed in 0.001s
-    Then the recovered should decrease ... passed in 0.000s
+    When we increase P(Mortality) by a factor of n ... undefined in 0.000s
+    Then decreases the Deceased by less than *n ... undefined in 0.000s
+    And decreases the Recovered by more than 1/n ... undefined in 0.000s
 
 @scenario.end
 --------------------------------------------------------------------------------
 ]]>
-</system-out></testcase><testcase classname="influenza1918_abstract.Influenza1918 Abstract" name="N(Infectious) decrease" status="passed" time="0.019947"><system-out>
+</system-out></testcase><testcase classname="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" name="N(Infectious) decrease" status="failed" time="0.020946"><failure type="NoneType" message="None">
+<![CDATA[
+Failing step: When we decrease N(Infectious) by a factor of n ... undefined in 0.000s
+Location: features/influenza1918_abstract_risk_ratio.feature:51
+None]]>
+</failure><system-out>
 <![CDATA[
 @scenario.begin
-
-  @Infected_decrease
   Scenario: N(Infectious) decrease
-    Given a simulation with parameters ... passed in 0.012s
+    Given a simulation with parameters ... passed in 0.014s
       | parameter        | type  | distribution                    |
       | MortalityProb    | float | truncnorm(0.01, 0.005, 0, 1)    |
       | Infected         | float | truncnorm(1000, 100, 500, 1500) |
@@ -106,25 +115,28 @@
       | IncubationTime   | float | truncnorm(3   , 1.5, 1, 5)      |
       | RecoveryTime     | float | truncnorm(2.5 , 1.25, 1, 5)     |
       | EncounterRate    | float | truncnorm(4   , 2, 1, 10)       |
-    And the following variables are recorded at the end of the simulation ... passed in 0.006s
+    And the following variables are recorded at the end of the simulation ... passed in 0.007s
       | variable        | type  |
       | deceased        | float |
       | recovered       | float |
       | cases           | float |
       | peak            | int   |
       | peak_infectious | float |
-    When we decrease the Infected ... passed in 0.001s
-    Then the peak should move to the right ... passed in 0.000s
-    And the peak_infectious should remain the same ... passed in 0.001s
+    When we decrease N(Infectious) by a factor of n ... undefined in 0.000s
+    Then moves the peak to the right ... undefined in 0.000s
+    And the peak_infectious does not change ... undefined in 0.000s
 
 @scenario.end
 --------------------------------------------------------------------------------
 ]]>
-</system-out></testcase><testcase classname="influenza1918_abstract.Influenza1918 Abstract" name="N(Infectious) increase" status="passed" time="0.019946"><system-out>
+</system-out></testcase><testcase classname="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" name="N(Infectious) increase" status="failed" time="0.020944"><failure type="NoneType" message="None">
+<![CDATA[
+Failing step: When we increase N(Infectious) by a factor of n ... undefined in 0.000s
+Location: features/influenza1918_abstract_risk_ratio.feature:57
+None]]>
+</failure><system-out>
 <![CDATA[
 @scenario.begin
-
-  @Infected_increase
   Scenario: N(Infectious) increase
     Given a simulation with parameters ... passed in 0.014s
       | parameter        | type  | distribution                    |
@@ -135,27 +147,30 @@
       | IncubationTime   | float | truncnorm(3   , 1.5, 1, 5)      |
       | RecoveryTime     | float | truncnorm(2.5 , 1.25, 1, 5)     |
       | EncounterRate    | float | truncnorm(4   , 2, 1, 10)       |
-    And the following variables are recorded at the end of the simulation ... passed in 0.006s
+    And the following variables are recorded at the end of the simulation ... passed in 0.007s
       | variable        | type  |
       | deceased        | float |
       | recovered       | float |
       | cases           | float |
       | peak            | int   |
       | peak_infectious | float |
-    When we increase the Infected ... passed in 0.000s
-    Then the peak should move to the left ... passed in 0.000s
-    And the peak_infectious should remain the same ... passed in 0.000s
+    When we increase N(Infectious) by a factor of n ... undefined in 0.000s
+    Then moves the peak to the left ... undefined in 0.000s
+    And the peak_infectious does not change ... undefined in 0.000s
 
 @scenario.end
 --------------------------------------------------------------------------------
 ]]>
-</system-out></testcase><testcase classname="influenza1918_abstract.Influenza1918 Abstract" name="T(Die) decrease" status="passed" time="0.021941"><system-out>
+</system-out></testcase><testcase classname="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" name="T(Die) decrease" status="failed" time="0.021944"><failure type="NoneType" message="None">
+<![CDATA[
+Failing step: When we decrease T(Die) by a factor of n ... undefined in 0.000s
+Location: features/influenza1918_abstract_risk_ratio.feature:63
+None]]>
+</failure><system-out>
 <![CDATA[
 @scenario.begin
-
-  @MortalityTime_decrease
   Scenario: T(Die) decrease
-    Given a simulation with parameters ... passed in 0.013s
+    Given a simulation with parameters ... passed in 0.014s
       | parameter        | type  | distribution                    |
       | MortalityProb    | float | truncnorm(0.01, 0.005, 0, 1)    |
       | Infected         | float | truncnorm(1000, 100, 500, 1500) |
@@ -164,25 +179,28 @@
       | IncubationTime   | float | truncnorm(3   , 1.5, 1, 5)      |
       | RecoveryTime     | float | truncnorm(2.5 , 1.25, 1, 5)     |
       | EncounterRate    | float | truncnorm(4   , 2, 1, 10)       |
-    And the following variables are recorded at the end of the simulation ... passed in 0.007s
+    And the following variables are recorded at the end of the simulation ... passed in 0.008s
       | variable        | type  |
       | deceased        | float |
       | recovered       | float |
       | cases           | float |
       | peak            | int   |
       | peak_infectious | float |
-    When we decrease the MortalityTime ... passed in 0.001s
-    Then the cases should decrease ... passed in 0.000s
-    And the deceased should decrease ... passed in 0.001s
+    When we decrease T(Die) by a factor of n ... undefined in 0.000s
+    Then decreases the cases ... undefined in 0.000s
+    And decreases the deceased ... undefined in 0.000s
 
 @scenario.end
 --------------------------------------------------------------------------------
 ]]>
-</system-out></testcase><testcase classname="influenza1918_abstract.Influenza1918 Abstract" name="T(Die) increase" status="passed" time="0.019947"><system-out>
+</system-out></testcase><testcase classname="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" name="T(Die) increase" status="failed" time="0.019946"><failure type="NoneType" message="None">
+<![CDATA[
+Failing step: When we increase T(Die) by a factor of n ... undefined in 0.000s
+Location: features/influenza1918_abstract_risk_ratio.feature:70
+None]]>
+</failure><system-out>
 <![CDATA[
 @scenario.begin
-
-  @MortalityTime_increase
   Scenario: T(Die) increase
     Given a simulation with parameters ... passed in 0.013s
       | parameter        | type  | distribution                    |
@@ -193,27 +211,30 @@
       | IncubationTime   | float | truncnorm(3   , 1.5, 1, 5)      |
       | RecoveryTime     | float | truncnorm(2.5 , 1.25, 1, 5)     |
       | EncounterRate    | float | truncnorm(4   , 2, 1, 10)       |
-    And the following variables are recorded at the end of the simulation ... passed in 0.006s
+    And the following variables are recorded at the end of the simulation ... passed in 0.007s
       | variable        | type  |
       | deceased        | float |
       | recovered       | float |
       | cases           | float |
       | peak            | int   |
       | peak_infectious | float |
-    When we increase the MortalityTime ... passed in 0.000s
-    Then the cases should increase ... passed in 0.001s
-    And the deceased should increase ... passed in 0.000s
+    When we increase T(Die) by a factor of n ... undefined in 0.000s
+    Then increases the people infected ... undefined in 0.000s
+    And increases the deceased ... undefined in 0.000s
 
 @scenario.end
 --------------------------------------------------------------------------------
 ]]>
-</system-out></testcase><testcase classname="influenza1918_abstract.Influenza1918 Abstract" name="P(Transmission) decrease" status="passed" time="0.01895"><system-out>
+</system-out></testcase><testcase classname="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" name="P(Transmission) decrease" status="failed" time="0.019975"><failure type="NoneType" message="None">
+<![CDATA[
+Failing step: When we decrease P(Transmission) by a factor of n ... undefined in 0.000s
+Location: features/influenza1918_abstract_risk_ratio.feature:75
+None]]>
+</failure><system-out>
 <![CDATA[
 @scenario.begin
-
-  @TransmissionProb_decrease
   Scenario: P(Transmission) decrease
-    Given a simulation with parameters ... passed in 0.012s
+    Given a simulation with parameters ... passed in 0.013s
       | parameter        | type  | distribution                    |
       | MortalityProb    | float | truncnorm(0.01, 0.005, 0, 1)    |
       | Infected         | float | truncnorm(1000, 100, 500, 1500) |
@@ -222,28 +243,30 @@
       | IncubationTime   | float | truncnorm(3   , 1.5, 1, 5)      |
       | RecoveryTime     | float | truncnorm(2.5 , 1.25, 1, 5)     |
       | EncounterRate    | float | truncnorm(4   , 2, 1, 10)       |
-    And the following variables are recorded at the end of the simulation ... passed in 0.006s
+    And the following variables are recorded at the end of the simulation ... passed in 0.007s
       | variable        | type  |
       | deceased        | float |
       | recovered       | float |
       | cases           | float |
       | peak            | int   |
       | peak_infectious | float |
-    When we decrease the TransmissionProb ... passed in 0.000s
-    Then the cases should decrease ... passed in 0.001s
-    And the deceased should decrease ... passed in 0.000s
-    And the recovered should decrease ... passed in 0.000s
+    When we decrease P(Transmission) by a factor of n ... undefined in 0.000s
+    Then decreases the people infected ... undefined in 0.000s
+    And decreases the numbers of deceased and recovered ... undefined in 0.000s
 
 @scenario.end
 --------------------------------------------------------------------------------
 ]]>
-</system-out></testcase><testcase classname="influenza1918_abstract.Influenza1918 Abstract" name="P(Transmission) increase" status="passed" time="0.019947"><system-out>
+</system-out></testcase><testcase classname="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" name="P(Transmission) increase" status="failed" time="0.019947"><failure type="NoneType" message="None">
+<![CDATA[
+Failing step: When we increase P(Transmission) by a factor of n ... undefined in 0.000s
+Location: features/influenza1918_abstract_risk_ratio.feature:80
+None]]>
+</failure><system-out>
 <![CDATA[
 @scenario.begin
-
-  @TransmissionProb_increase
   Scenario: P(Transmission) increase
-    Given a simulation with parameters ... passed in 0.012s
+    Given a simulation with parameters ... passed in 0.013s
       | parameter        | type  | distribution                    |
       | MortalityProb    | float | truncnorm(0.01, 0.005, 0, 1)    |
       | Infected         | float | truncnorm(1000, 100, 500, 1500) |
@@ -259,21 +282,23 @@
       | cases           | float |
       | peak            | int   |
       | peak_infectious | float |
-    When we increase the TransmissionProb ... passed in 0.000s
-    Then the cases should increase ... passed in 0.001s
-    And the deceased should increase ... passed in 0.000s
-    And the recovered should increase ... passed in 0.000s
+    When we increase P(Transmission) by a factor of n ... undefined in 0.000s
+    Then increases the people infected, ... undefined in 0.000s
+    And increases the numbers of Deceased and Recovered ... undefined in 0.000s
 
 @scenario.end
 --------------------------------------------------------------------------------
 ]]>
-</system-out></testcase><testcase classname="influenza1918_abstract.Influenza1918 Abstract" name="T(Incubate) decrease" status="passed" time="0.018949"><system-out>
+</system-out></testcase><testcase classname="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" name="T(Incubate) decrease" status="failed" time="0.020944"><failure type="NoneType" message="None">
+<![CDATA[
+Failing step: When we decrease T(Incubate) by a factor of n ... undefined in 0.000s
+Location: features/influenza1918_abstract_risk_ratio.feature:85
+None]]>
+</failure><system-out>
 <![CDATA[
 @scenario.begin
-
-  @IncubationTime_decrease
   Scenario: T(Incubate) decrease
-    Given a simulation with parameters ... passed in 0.012s
+    Given a simulation with parameters ... passed in 0.014s
       | parameter        | type  | distribution                    |
       | MortalityProb    | float | truncnorm(0.01, 0.005, 0, 1)    |
       | Infected         | float | truncnorm(1000, 100, 500, 1500) |
@@ -289,18 +314,21 @@
       | cases           | float |
       | peak            | int   |
       | peak_infectious | float |
-    When we decrease the IncubationTime ... passed in 0.000s
-    Then the peak should move to the left ... passed in 0.000s
-    And the peak_infectious should increase ... passed in 0.000s
+    When we decrease T(Incubate) by a factor of n ... undefined in 0.000s
+    Then moves the peak to the left ... undefined in 0.000s
+    And increases the peak_infectious ... undefined in 0.000s
 
 @scenario.end
 --------------------------------------------------------------------------------
 ]]>
-</system-out></testcase><testcase classname="influenza1918_abstract.Influenza1918 Abstract" name="T(Incubate) increase" status="passed" time="0.021942"><system-out>
+</system-out></testcase><testcase classname="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" name="T(Incubate) increase" status="failed" time="0.020974"><failure type="NoneType" message="None">
+<![CDATA[
+Failing step: When we increase T(Incubate) by a factor of n ... undefined in 0.000s
+Location: features/influenza1918_abstract_risk_ratio.feature:92
+None]]>
+</failure><system-out>
 <![CDATA[
 @scenario.begin
-
-  @IncubationTime_increase
   Scenario: T(Incubate) increase
     Given a simulation with parameters ... passed in 0.014s
       | parameter        | type  | distribution                    |
@@ -318,18 +346,21 @@
       | cases           | float |
       | peak            | int   |
       | peak_infectious | float |
-    When we increase the IncubationTime ... passed in 0.001s
-    Then the peak should move to the right ... passed in 0.000s
-    And the peak_infectious should decrease ... passed in 0.000s
+    When we increase T(Incubate) by a factor of n ... undefined in 0.000s
+    Then moves the peak to the right ... undefined in 0.000s
+    And decreases the peak_infectious ... undefined in 0.000s
 
 @scenario.end
 --------------------------------------------------------------------------------
 ]]>
-</system-out></testcase><testcase classname="influenza1918_abstract.Influenza1918 Abstract" name="T(Recovery) decrease" status="passed" time="0.021941"><system-out>
+</system-out></testcase><testcase classname="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" name="T(Recovery) decrease" status="failed" time="0.020952"><failure type="NoneType" message="None">
+<![CDATA[
+Failing step: When we decrease T(Recovery) by a factor of n ... undefined in 0.000s
+Location: features/influenza1918_abstract_risk_ratio.feature:97
+None]]>
+</failure><system-out>
 <![CDATA[
 @scenario.begin
-
-  @RecoveryTime_decrease
   Scenario: T(Recovery) decrease
     Given a simulation with parameters ... passed in 0.014s
       | parameter        | type  | distribution                    |
@@ -347,20 +378,23 @@
       | cases           | float |
       | peak            | int   |
       | peak_infectious | float |
-    When we decrease the RecoveryTime ... passed in 0.001s
-    Then the peak should move to the right ... passed in 0.000s
-    And the peak_infectious should decrease ... passed in 0.000s
+    When we decrease T(Recovery) by a factor of n ... undefined in 0.000s
+    Then moves the peak to the right ... undefined in 0.000s
+    And decreases the peak_infectious ... undefined in 0.000s
 
 @scenario.end
 --------------------------------------------------------------------------------
 ]]>
-</system-out></testcase><testcase classname="influenza1918_abstract.Influenza1918 Abstract" name="T(Recovery) increase" status="passed" time="0.020944"><system-out>
+</system-out></testcase><testcase classname="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" name="T(Recovery) increase" status="failed" time="0.021964"><failure type="NoneType" message="None">
+<![CDATA[
+Failing step: When we increase T(Recovery) by a factor of n ... undefined in 0.000s
+Location: features/influenza1918_abstract_risk_ratio.feature:102
+None]]>
+</failure><system-out>
 <![CDATA[
 @scenario.begin
-
-  @RecoveryTime_increase
   Scenario: T(Recovery) increase
-    Given a simulation with parameters ... passed in 0.013s
+    Given a simulation with parameters ... passed in 0.014s
       | parameter        | type  | distribution                    |
       | MortalityProb    | float | truncnorm(0.01, 0.005, 0, 1)    |
       | Infected         | float | truncnorm(1000, 100, 500, 1500) |
@@ -369,27 +403,30 @@
       | IncubationTime   | float | truncnorm(3   , 1.5, 1, 5)      |
       | RecoveryTime     | float | truncnorm(2.5 , 1.25, 1, 5)     |
       | EncounterRate    | float | truncnorm(4   , 2, 1, 10)       |
-    And the following variables are recorded at the end of the simulation ... passed in 0.007s
+    And the following variables are recorded at the end of the simulation ... passed in 0.008s
       | variable        | type  |
       | deceased        | float |
       | recovered       | float |
       | cases           | float |
       | peak            | int   |
       | peak_infectious | float |
-    When we increase the RecoveryTime ... passed in 0.001s
-    Then the peak should move to the left ... passed in 0.000s
-    And the peak_infectious should increase ... passed in 0.000s
+    When we increase T(Recovery) by a factor of n ... undefined in 0.000s
+    Then moves the peak to the left ... undefined in 0.000s
+    And increases the peak_infectious ... undefined in 0.000s
 
 @scenario.end
 --------------------------------------------------------------------------------
 ]]>
-</system-out></testcase><testcase classname="influenza1918_abstract.Influenza1918 Abstract" name="Rate(Encounter) decrease" status="passed" time="0.02197"><system-out>
+</system-out></testcase><testcase classname="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" name="Rate(Encounter) decrease" status="failed" time="0.022935"><failure type="NoneType" message="None">
+<![CDATA[
+Failing step: When we decrease Rate(Encounter) by a factor of n ... undefined in 0.000s
+Location: features/influenza1918_abstract_risk_ratio.feature:107
+None]]>
+</failure><system-out>
 <![CDATA[
 @scenario.begin
-
-  @EncounterRate_decrease
   Scenario: Rate(Encounter) decrease
-    Given a simulation with parameters ... passed in 0.013s
+    Given a simulation with parameters ... passed in 0.016s
       | parameter        | type  | distribution                    |
       | MortalityProb    | float | truncnorm(0.01, 0.005, 0, 1)    |
       | Infected         | float | truncnorm(1000, 100, 500, 1500) |
@@ -405,20 +442,23 @@
       | cases           | float |
       | peak            | int   |
       | peak_infectious | float |
-    When we decrease the EncounterRate ... passed in 0.001s
-    Then the cases should decrease ... passed in 0.001s
-    And the deceased should decrease ... passed in 0.000s
+    When we decrease Rate(Encounter) by a factor of n ... undefined in 0.000s
+    Then decreases the cases ... undefined in 0.000s
+    And decreases the Deceased ... undefined in 0.000s
 
 @scenario.end
 --------------------------------------------------------------------------------
 ]]>
-</system-out></testcase><testcase classname="influenza1918_abstract.Influenza1918 Abstract" name="Rate(Encounter) increase" status="passed" time="0.019938"><system-out>
+</system-out></testcase><testcase classname="influenza1918_abstract_risk_ratio.Influenza1918 Abstract" name="Rate(Encounter) increase" status="failed" time="0.020915"><failure type="NoneType" message="None">
+<![CDATA[
+Failing step: When we increase Rate(Encounter) by a factor of n ... undefined in 0.000s
+Location: features/influenza1918_abstract_risk_ratio.feature:112
+None]]>
+</failure><system-out>
 <![CDATA[
 @scenario.begin
-
-  @EncounterRate_increase
   Scenario: Rate(Encounter) increase
-    Given a simulation with parameters ... passed in 0.013s
+    Given a simulation with parameters ... passed in 0.014s
       | parameter        | type  | distribution                    |
       | MortalityProb    | float | truncnorm(0.01, 0.005, 0, 1)    |
       | Infected         | float | truncnorm(1000, 100, 500, 1500) |
@@ -427,16 +467,16 @@
       | IncubationTime   | float | truncnorm(3   , 1.5, 1, 5)      |
       | RecoveryTime     | float | truncnorm(2.5 , 1.25, 1, 5)     |
       | EncounterRate    | float | truncnorm(4   , 2, 1, 10)       |
-    And the following variables are recorded at the end of the simulation ... passed in 0.006s
+    And the following variables are recorded at the end of the simulation ... passed in 0.007s
       | variable        | type  |
       | deceased        | float |
       | recovered       | float |
       | cases           | float |
       | peak            | int   |
       | peak_infectious | float |
-    When we increase the EncounterRate ... passed in 0.000s
-    Then the cases should decrease ... passed in 0.001s
-    And the deceased should increase ... passed in 0.000s
+    When we increase Rate(Encounter) by a factor of n ... undefined in 0.000s
+    Then decreases the cases ... undefined in 0.000s
+    And incrases the Deceased ... undefined in 0.000s
 
 @scenario.end
 --------------------------------------------------------------------------------
