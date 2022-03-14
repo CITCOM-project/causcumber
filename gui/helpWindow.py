@@ -8,7 +8,7 @@ Edit the run_[model name] function in feature/environment.py in order to exectue
 Step three:
 Edit the files feature/steps to process the parameters from the tested model
 
-Custom Distributions                                          |
+Custom Distributions                                          
 User needs to define custom distrubutions for parameters. This is done in `dag_steps.py`.
 
 Metavariables

@@ -255,6 +255,7 @@ class MainWindow(Screen):
         contentLayout = BoxLayout(orientation = 'vertical')
 
         helpInfo = displayHelp(text=gui.helpWindow.helpinformation.replace('[model name]',os.path.split(os.getcwd())[1]))
+        print(os.path.split(os.getcwd())[1])
         contentLayout.add_widget(helpInfo)
 
         popup = Popup(title='Steps to test a module',content=contentLayout, auto_dismiss=False)

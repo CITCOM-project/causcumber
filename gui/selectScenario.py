@@ -165,7 +165,7 @@ class NewScenario(Screen):
                     f = open("abstract.py", "w")
                     f.write(abstract_content)
                     f.close()
-                    os.chdir('\..\..')
+                    os.chdir('..\..')
 
             self.variable_name.text = ''
             self.manager.current = 'Main'

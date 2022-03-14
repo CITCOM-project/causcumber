@@ -108,9 +108,6 @@ def fit_distribution(data) -> stats.beta:
 
 
 def run_influenza_1918(runs, outputs):
-    # Edit this function to run the tested model, see help page for example
-################################
-"""Example:
     from OMPython import ModelicaSystem, OMCSessionZMQ
     from shutil import move
     stats = []
@@ -143,8 +140,7 @@ def run_influenza_1918(runs, outputs):
     data = pd.DataFrame(stats)
     assert len(data) == repeats * len(runs)
     # df.to_csv("results/influenza1918_abstract/influenza1918_res_summary.csv")
-    return data"""
-################################
+    return data
 
 def execute_test(scenario, causal_dag, causal_test_case, observational_data_csv_path):
     causal_specification = CausalSpecification(scenario=scenario, causal_dag=causal_dag)
