@@ -148,7 +148,7 @@ class NewScenario(Screen):
             os.mkdir(path)
             os.chdir(new_directory)
 
-            basic_folders = ["dags","features","models","reports","results"]
+            basic_folders = ["dags","features","model","reports","results"]
             for folder_name in basic_folders:
                 os.mkdir(os.path.join(path, folder_name))
                 if folder_name == 'features':
