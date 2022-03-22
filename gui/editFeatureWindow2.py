@@ -104,7 +104,12 @@ class EditFeatureWindow2(Screen):
             self.output_parameters.add_widget(globals()[f"self.output_parameter{x}"])
             globals()[f"self.output_parameter_chk{x}"] = CheckBox(active  = True)
             self.output_parameters.add_widget(globals()[f"self.output_parameter_chk{x}"])
-        
+
+        self.output_parameter_star = Label(text=".*", size_hint=(1, 1)) 
+        self.output_parameters.add_widget(self.output_parameter_star)
+        self.output_parameter_star_chk = CheckBox(active  = True)
+        self.output_parameters.add_widget(self.output_parameter_star_chk)
+
         os.system("dot -Tpng temp.dot -o graphviz_graph.png")
         self.img.reload()
 
@@ -128,6 +133,8 @@ class EditFeatureWindow2(Screen):
         for x in range(len(self.output_parameter_list)):
             if globals()[f"self.output_parameter_chk{x}"].active == True:
                 content += "    " + instance.text.replace(';', '') + "->" + self.output_parameter_list[x].strip() + "\n"
+        if self.output_parameter_star_chk.active ==True:
+            content += "    " + instance.text.replace(';', '') + "->.*\n"
         
         content += "}"
         f.close()

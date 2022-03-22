@@ -31,10 +31,6 @@ def truncnorm(mu, sigma, lower, upper):
     return stats.truncnorm(
     (lower - mu) / sigma, (upper - mu) / sigma, loc=mu, scale=sigma)
 
-#Define metavariables in the Background
-################################
-#Examples below
-"""
 def populate_pandemic_gets_going(data):
     data["pandemic_gets_going"] = data['peak_infectious'] > data['Infected']
 
@@ -51,9 +47,6 @@ def populate_MortalityProb_category(data):
             return "HIGH"
     data["MortalityProb_category"] = [cat(x) for x in data['MortalityProb']]
     data["MortalityProb_category"] = data["MortalityProb_category"].astype("category")
-"""
-################################
-
 
 @given(u"a simulation with parameters")
 def step_impl(context):

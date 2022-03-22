@@ -130,8 +130,8 @@ class EditFeatureWindow1(Screen):
             x = x.replace(';', '')
             final_variableType.append(x)
 
-        if len(final_parameterName) == len(final_parameterValue) == len(final_parameterType):
-            content = "Feature: Compare " + self.feature_file_name.text + "\n  Background:\n    Given a simulation with parameters\n      | " + self.column1Name.text + "     | " + self.column2Name.text + "      | " + self.column3Name.text + " |\n"
+        if len(final_parameterName) == len(final_parameterValue) and len(final_parameterName) == len(final_parameterType):
+            content = "Feature: Compare " + self.feature_file_name.text + "\n  Background: IO spec\n    Given a simulation with parameters\n      | " + self.column1Name.text + "     | " + self.column2Name.text + "      | " + self.column3Name.text + " |\n"
             for x in range(len(final_parameterName)):
                 content += "      | " + final_parameterName[x] + "  | " + final_parameterValue[x] + "  | " + final_parameterType[x] + "  |\n"
             content += "    And the following variables are recorded " + self.recordMode.text + "\n" + "      | variable          | type |\n"

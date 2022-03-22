@@ -24,11 +24,7 @@ def add_constraint(context, constraint):
     print("Adding constraint", constraint)
     context.scenario.modelling_scenario.constraints.add(constraint)
 
-#Define custom constraints
-################################
-#Examples below
 
-"""
 @given("{v1} in {set}")
 def step_impl(context, v1, set):
     set = eval(set)
@@ -47,9 +43,7 @@ def step_impl(context, v1, set):
 @given(u'pandemic_gets_going')
 def step_impl(context):
     add_constraint(context, context.scenario.modelling_scenario.variables.get("pandemic_gets_going").z3)
-"""
 
-################################
 
 @given("{lower} <= {v} <= {upper}")
 def step_impl(context, lower, v, upper):
