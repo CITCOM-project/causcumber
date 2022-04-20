@@ -36,6 +36,12 @@ class EditFeatureWindow4(Screen):
 
         self.inputLayout.add_widget(Label(text='Edit scenarios', size_hint=(1, 0.1))) # Title 
         
+        self.tagLayout = GridLayout(cols=2, size_hint=(1, 0.06))
+        self.tagLayout.add_widget(Label(text='Scenario tag: ', size_hint=(1, 0.1)))
+        self.tagText = TextInput(text='', size_hint=(1, 0.15), multiline=False) 
+        self.tagLayout.add_widget(self.tagText)
+        self.inputLayout.add_widget(self.tagLayout)
+
         self.outlineLayout = GridLayout(cols=2, size_hint=(1, 0.06))
         self.outlineLayout.add_widget(Label(text='Scenario: ', size_hint=(1, 0.1)))
         self.outlineText = TextInput(text='', size_hint=(1, 0.15), multiline=False) 
@@ -65,27 +71,17 @@ class EditFeatureWindow4(Screen):
 
         self.inputLayout.add_widget(thenLayout)
         
-        self.exampleLayout = GridLayout(cols=1, size_hint_y=None)
-        self.exampleLayout.bind(minimum_height=self.exampleLayout.setter("height"))
-
-        self.dropdownbutton = Button(text='Select column amount: '+str(self.exampleLayout.cols), size_hint=(1, 0.05))
-        self.inputLayout.add_widget(self.dropdownbutton)
-        self.dropdown = DropDown()
-        self.dropdownbutton.bind(on_release=self.dropdown.open)
-
-        for x in range(1, 6):
-            globals()[f"self.column_num_btn{x}"] = Button(text=str(x), size_hint_y=None, height=44)
-            globals()[f"self.column_num_btn{x}"].bind(on_release=self.change_column_num)
-            self.dropdown.add_widget(globals()[f"self.column_num_btn{x}"])
+        self.andsLayout = GridLayout(cols=1, size_hint_y=None)
+        self.andsLayout.bind(minimum_height=self.andsLayout.setter("height"))
 
         self.scrollview = ScrollView(size_hint=(1, 0.3),pos_hint={'center_y': 0.5, 'center_x': 0.5})
-        self.scrollview.add_widget(self.exampleLayout)
+        self.scrollview.add_widget(self.andsLayout)
         self.inputLayout.add_widget(self.scrollview)
 
-        addRowButton = Button(text='Add row', size_hint=(1, 0.05))
+        addRowButton = Button(text='Add "And"', size_hint=(1, 0.05))
         addRowButton.bind(on_press = self.add_row)
         self.inputLayout.add_widget(addRowButton)
-        addRowButton = Button(text='Remove row', size_hint=(1, 0.05))
+        addRowButton = Button(text='Remove "And"', size_hint=(1, 0.05))
         addRowButton.bind(on_press = self.remove_row)
         self.inputLayout.add_widget(addRowButton)
         
@@ -116,24 +112,30 @@ class EditFeatureWindow4(Screen):
         os.startfile("graphviz_graph.png")
         os.chdir('..')
 
-    def change_column_num(self, instance):
-        self.exampleLayout.cols = int(instance.text)
-        self.dropdownbutton.text = 'Select column amount: '+str(self.exampleLayout.cols)
-        self.exampleLayout.clear_widgets()
-        self.dropdown.dismiss()
-
     def add_row(self, instance):
-        for x in range(self.exampleLayout.cols):
-            exampleText = TextInput(text='', size_hint=(1, None), multiline=False)
-            self.exampleLayout.add_widget(exampleText)
+
+        self.andLayout = GridLayout(cols=4, size_hint_y=None)
+
+        self.temp = Label(text='And the ', size_hint=(1, None))
+        self.andLayout.add_widget(self.temp) 
+        self.andText = TextInput(text='', size_hint=(1, None), multiline=False) 
+        self.andLayout.add_widget(self.andText)
+        
+        self.temp = Label(text='should be ', size_hint=(1, None))
+        self.andLayout.add_widget(self.temp) 
+        self.andShouldText = TextInput(text='', size_hint=(1, None), multiline=False) 
+        self.andLayout.add_widget(self.andShouldText)
+
+        self.andsLayout.add_widget(self.andLayout)
+
 
     def remove_row(self, instance):
         colCounter = 0
-        for elements in self.exampleLayout.children:
-            self.exampleLayout.remove_widget(elements)
-            colCounter +=1
-            if colCounter == self.exampleLayout.cols:
-                break
+        for element in self.andsLayout.children:
+            if colCounter == 1:
+                break            
+            self.andsLayout.remove_widget(element)
+            colCounter +=1       
 
     def screen_transition(self, instance):
         self.clear_screen()
@@ -162,39 +164,41 @@ class EditFeatureWindow4(Screen):
         self.manager.current = 'Main'
     
     def add_new_scenario_outline(self, instance):
-        content = self.display_result.text
-        content += '  Scenario: ' + self.outlineText.text + '\n    Given ' + self.givenText.text 
-        content += '\n    When ' + self.whenText.text + '\n    Then the ' + self.thenText.text + ' should be ' + self.shouldText.text + '\n      ' 
+        if len(self.tagText.text) != 0 and len(self.outlineText.text) != 0:
+            content = self.display_result.text
+            content += '  @' + self.tagText.text +'\n  Scenario: ' + self.outlineText.text 
 
-        elementList = []
-        for elements in self.exampleLayout.children:
-            elementList.append(elements.text)
-        
-        elementList.reverse()
-        colCounter = 0   
-        for x in elementList:           
-            content += '| ' + x
-            colCounter += 1
-            if colCounter == self.exampleLayout.cols:
-                content +=' |\n      '
-                colCounter = 0
-        content+='\n'
+            if len(self.givenText.text) != 0:
+                content += '\n    Given ' + self.givenText.text
+                
+            content += '\n    When ' + self.whenText.text + '\n    Then the ' + self.thenText.text + ' should be ' + self.shouldText.text + '\n' 
 
-        self.clear_screen()
+            elementList = []
+            for element in self.andsLayout.children:
+                for item in element.children:
+                    if item.text != 'And the ' and item.text != 'should be ':
+                        elementList.append(item.text)
+            
+            elementList.reverse()
+            for x in range(0,len(elementList),2): 
+                content += '    And the ' + elementList[x] + ' should be ' + elementList[x+1] + '\n'         
+            content+='\n'
 
-        self.display_result.text = content
+            self.clear_screen()
 
-        
-      
+            self.display_result.text = content
+        else:
+            print("missing info")
 
     def undo_output_parameter(self, instance):
-        self.display_result.text=self.display_result.text[:self.display_result.text.rfind('  Scenario:')]
+        self.display_result.text=self.display_result.text[:self.display_result.text.rfind('  @')]
 
     def clear_screen(self):
         self.display_result.text = ''
+        self.tagText.text = ''
         self.outlineText.text = ''
         self.givenText.text = ''
         self.whenText.text = ''
         self.thenText.text = ''
         self.shouldText.text = ''
-        self.exampleLayout.clear_widgets()
+        self.andsLayout.clear_widgets()

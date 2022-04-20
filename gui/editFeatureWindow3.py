@@ -36,6 +36,12 @@ class EditFeatureWindow3(Screen):
 
         self.inputLayout.add_widget(Label(text='Edit scenarios', size_hint=(1, 0.1))) # Title 
         
+        self.tagLayout = GridLayout(cols=2, size_hint=(1, 0.06))
+        self.tagLayout.add_widget(Label(text='Scenario tag: ', size_hint=(1, 0.1)))
+        self.tagText = TextInput(text='', size_hint=(1, 0.15), multiline=False) 
+        self.tagLayout.add_widget(self.tagText)
+        self.inputLayout.add_widget(self.tagLayout)
+
         self.outlineLayout = GridLayout(cols=2, size_hint=(1, 0.06))
         self.outlineLayout.add_widget(Label(text='Scenario Outline: ', size_hint=(1, 0.1)))
         self.outlineText = TextInput(text='', size_hint=(1, 0.15), multiline=False) 
@@ -131,8 +137,8 @@ class EditFeatureWindow3(Screen):
 
     def remove_row(self, instance):
         colCounter = 0
-        for elements in self.exampleLayout.children:
-            self.exampleLayout.remove_widget(elements)
+        for element in self.exampleLayout.children:
+            self.exampleLayout.remove_widget(element)
             colCounter +=1
             if colCounter == self.exampleLayout.cols:
                 break
@@ -164,35 +170,46 @@ class EditFeatureWindow3(Screen):
         self.manager.current = 'edit feature4'
     
     def add_new_scenario_outline(self, instance):
-        content = self.display_result.text
-        content += '  Scenario Outline: ' + self.outlineText.text + '\n    Given we run the model with ' + self.givenText.text 
-        content += '\n    When we run the model with ' + self.whenText.text + '\n    Then the ' + self.thenText.text + ' should be ' + self.shouldText.text + '\n    Examples:\n      ' 
+        if len(self.tagText.text) != 0 and len(self.outlineText.text) != 0:
+            content = self.display_result.text
+            content += '  @' + self.tagText.text +'\n  Scenario Outline: ' + self.outlineText.text 
 
-        elementList = []
-        for elements in self.exampleLayout.children:
-            elementList.append(elements.text)
-        
-        elementList.reverse()
-        colCounter = 0   
-        for x in elementList:           
-            content += '| ' + x
-            colCounter += 1
-            if colCounter == self.exampleLayout.cols:
-                content +=' |\n      '
-                colCounter = 0
-        content+='\n'
+            if len(self.givenText.text) != 0:
+                content += '\n    Given we run the model with ' + self.givenText.text
 
-        self.clear_screen()
+            content += '\n    When we run the model with ' + self.whenText.text + '\n    Then the ' + self.thenText.text + ' should be ' + self.shouldText.text 
 
-        self.display_result.text = content
+            elementList = []
+            for elements in self.exampleLayout.children:
+                elementList.append(elements.text)
+            
+            if len(elementList) != 0:
+                content += '\n    Examples:\n      '
+                elementList.reverse()
+                colCounter = 0   
+                for x in elementList:           
+                    content += '| ' + x
+                    colCounter += 1
+                    if colCounter == self.exampleLayout.cols:
+                        content +=' |\n      '
+                        colCounter = 0
+            
+            content+='\n'
+
+            self.clear_screen()
+
+            self.display_result.text = content
+        else:
+            print("missing info")
 
     def undo_output_parameter(self, instance):
-        self.display_result.text=self.display_result.text[:self.display_result.text.rfind('  Scenario Outline:')]
+        self.display_result.text=self.display_result.text[:self.display_result.text.rfind('  @')]
 
     def clear_screen(self):
         self.exampleLayout.cols = 1
         self.dropdownbutton.text = 'Select column amount: '+str(self.exampleLayout.cols)
         self.display_result.text = ''
+        self.tagText.text = ''
         self.outlineText.text = ''
         self.givenText.text = ''
         self.whenText.text = ''

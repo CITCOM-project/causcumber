@@ -8,6 +8,8 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.screenmanager import Screen
 
 import os
+import os.path
+from os import path
 import re
 
 from kivy.uix.image import Image
@@ -57,7 +59,7 @@ class EditFeatureWindow2(Screen):
         self.inputLayout.add_widget(Label(text='When we prune the following edges ', size_hint=(1, 0.1))) 
 
 
-        self.startBtn = Button(text='Prune edges', size_hint=(1, 0.1))
+        self.startBtn = Button(text='Update edges', size_hint=(1, 0.1))
         self.startBtn.bind(on_press = self.update_parameter_list)
         self.inputLayout.add_widget(self.startBtn) 
 
@@ -149,52 +151,55 @@ class EditFeatureWindow2(Screen):
         self.img.reload()
 
     def next_step(self, instance):
-        f = open('temp.dot',"r+", encoding="utf-8")
-        parameter_filter = ["digraph", "rankdir", "{", "}", "graph [", "label", "]", "subgraph"]
-        s1List = []
-        s2List = []
-        content = f.read().split("\n")
-        for line in content:
-            if not any(filter in line for filter in parameter_filter):
-                splitLine = line.split("->")
-                s1List.append(splitLine[0].strip())
-                s2List.append(splitLine[1].strip())
-        f.close()
+        if path.exists("temp.dot"):
+            f = open('temp.dot',"r+", encoding="utf-8")
+            parameter_filter = ["digraph", "rankdir", "{", "}", "graph [", "label", "]", "subgraph"]
+            s1List = []
+            s2List = []
+            content = f.read().split("\n")
+            for line in content:
+                if not any(filter in line for filter in parameter_filter):
+                    splitLine = line.split("->")
+                    s1List.append(splitLine[0].strip())
+                    s2List.append(splitLine[1].strip())
+            f.close()
 
-        filename = gui.editFeatureVariable.targetFeatureFileName
+            filename = gui.editFeatureVariable.targetFeatureFileName
 
-        os.chdir('features')
-        f = open(filename,"r+", encoding="utf-8")
-        featureContent = f.read()
-        f.close()
+            os.chdir('features')
+            f = open(filename,"r+", encoding="utf-8")
+            featureContent = f.read()
+            f.close()
 
-        with open(filename, 'r+') as f:   #empty file
-            f.truncate(0)
+            with open(filename, 'r+') as f:   #empty file
+                f.truncate(0)
 
-        featureContent += "\n  Scenario: Draw DAG\n    Given a connected " + self.connectedItem.text + "\n    When we prune the following edges\n      | s1                | s2                 |\n"
-        for x in range(len(s1List)):
-            featureContent += "      | " + s1List[x] + " | " + s2List[x] + " | \n"
-        
-        featureContent += "\n"
-        f = open(filename,"r+", encoding="utf-8")
-        f.write(featureContent)
-        f.close()
-        os.chdir('..')
+            featureContent += "\n  @draw_dag\n  Scenario: Draw DAG\n    Given a connected " + self.connectedItem.text + "\n    When we prune the following edges\n      | s1                | s2                 |\n"
+            for x in range(len(s1List)):
+                featureContent += "      | " + s1List[x] + " | " + s2List[x] + " | \n"
+            
+            featureContent += '    Then we obtain the causal DAG\n'
+            featureContent += "\n"
+            f = open(filename,"r+", encoding="utf-8")
+            f.write(featureContent)
+            f.close()
+            os.chdir('..')
 
-        for file in [f for f in os.listdir('.') if os.path.isfile(f)]:
-            if file.endswith('.png'):
-                os.remove(file)
-            elif file == 'temp.dot':
-                os.remove(file)
-        self.img.reload()
+            for file in [f for f in os.listdir('.') if os.path.isfile(f)]:
+                if file.endswith('.png'):
+                    os.remove(file)
+                elif file == 'temp.dot':
+                    os.remove(file)
+            self.img.reload()
 
-        self.output_parameter_list = []
+            self.output_parameter_list = []
 
-        self.dropdown.clear_widgets()
-        self.output_parameters.clear_widgets()
+            self.dropdown.clear_widgets()
+            self.output_parameters.clear_widgets()
 
-        self.manager.current = 'edit feature3'
-
+            self.manager.current = 'edit feature3'
+        else:
+            print("relation is not edited")
 
 
     def screen_transition(self, instance):

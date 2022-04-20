@@ -21,7 +21,7 @@ class EditFeatureWindow1(Screen):
 
         self.inputLayout = BoxLayout(orientation = 'vertical')
         
-        self.inputLayout.add_widget(Label(text='Enter file name', size_hint=(1, 0.1))) # Title
+        self.inputLayout.add_widget(Label(text='Enter file name', size_hint=(1, 0.11))) # Title
         self.feature_file_name = TextInput(text='', size_hint=(1, 0.11), multiline=False) 
         self.inputLayout.add_widget(self.feature_file_name)
         
@@ -35,19 +35,19 @@ class EditFeatureWindow1(Screen):
         parameterLayout = BoxLayout(orientation = 'vertical')
         self.column1Name = TextInput(text='parameter', size_hint=(1, 0.1), multiline=False) 
         parameterLayout.add_widget(self.column1Name)
-        self.column1Value = TextInput(text='', size_hint=(1, 0.7), multiline=True) 
+        self.column1Value = TextInput(text='', size_hint=(1, 0.5), multiline=True) 
         parameterLayout.add_widget(self.column1Value)
 
         valueLayout = BoxLayout(orientation = 'vertical')
         self.column2Name = TextInput(text='value', size_hint=(1, 0.1), multiline=False)
         valueLayout.add_widget(self.column2Name) 
-        self.column2Value = TextInput(text='', size_hint=(1, 0.7), multiline=True) 
+        self.column2Value = TextInput(text='', size_hint=(1, 0.5), multiline=True) 
         valueLayout.add_widget(self.column2Value)
 
         typeLayout = BoxLayout(orientation = 'vertical')
         self.column3Name = TextInput(text='type', size_hint=(1, 0.1), multiline=False)
         typeLayout.add_widget(self.column3Name)
-        self.column3Value = TextInput(text='', size_hint=(1, 0.7), multiline=True) 
+        self.column3Value = TextInput(text='', size_hint=(1, 0.5), multiline=True) 
         typeLayout.add_widget(self.column3Value)
 
         givenLayout.add_widget(parameterLayout)
@@ -58,36 +58,41 @@ class EditFeatureWindow1(Screen):
         andLayout = GridLayout(cols=2,  width="600dp")
 
         andLayout.add_widget(Label(text='And the following variables are recorded ', size_hint=(1, 0.1))) 
-        self.recordMode = TextInput(text='', size_hint=(1, 0.11), multiline=False) 
+        self.recordMode = TextInput(text='', size_hint=(1, 0.15), multiline=False) 
         andLayout.add_widget(self.recordMode)
 
         variableLayout = BoxLayout(orientation = 'vertical')
         variableLayout.add_widget(Label(text='variable', size_hint=(1, 0.1)))
-        self.variableName = TextInput(text='', size_hint=(1, 0.7), multiline=True) 
+        self.variableName = TextInput(text='', size_hint=(1, 0.5), multiline=True) 
         variableLayout.add_widget(self.variableName)
 
         variableTypeLayout = BoxLayout(orientation = 'vertical')
         variableTypeLayout.add_widget(Label(text='type', size_hint=(1, 0.1)))
-        self.variableType = TextInput(text='', size_hint=(1, 0.7), multiline=True) 
+        self.variableType = TextInput(text='', size_hint=(1, 0.5), multiline=True) 
         variableTypeLayout.add_widget(self.variableType)
 
         andLayout.add_widget(variableLayout)
         andLayout.add_widget(variableTypeLayout)
         self.inputLayout.add_widget(andLayout)
 
+        self.inputLayout.add_widget(Label(text='More condition (Leave empty if not need)', size_hint=(1, 0.1)))
+
+        self.extraCondition = TextInput(text='', size_hint=(1, 0.5), multiline=True) 
+        self.inputLayout.add_widget(self.extraCondition)  
+
         displayLayout.add_widget(self.inputLayout)
 
         Layout.add_widget(displayLayout)
 
-        self.nextBtn = Button(text='Next', size_hint=(1, 0.1))
+        self.nextBtn = Button(text='Next', size_hint=(1, 0.08))
         self.nextBtn.bind(on_press = self.next_step)
         Layout.add_widget(self.nextBtn)  
 
-        self.returnBtn = Button(text='Back', size_hint=(1, 0.1))
+        self.returnBtn = Button(text='Back', size_hint=(1, 0.08))
         self.returnBtn.bind(on_press = self.screen_transition)
         Layout.add_widget(self.returnBtn)    
  
-        self.add_widget(Layout)    
+        self.add_widget(Layout)           
 
     def next_step(self, instance):
         gui.editFeatureVariable.targetFeatureFileName = '' 
@@ -130,7 +135,7 @@ class EditFeatureWindow1(Screen):
             x = x.replace(';', '')
             final_variableType.append(x)
 
-        if len(final_parameterName) == len(final_parameterValue) and len(final_parameterName) == len(final_parameterType):
+        if len(final_parameterName) == len(final_parameterValue) and len(final_parameterName) == len(final_parameterType) and len(final_variableName)==len(final_variableType):
             content = "Feature: Compare " + self.feature_file_name.text + "\n  Background: IO spec\n    Given a simulation with parameters\n      | " + self.column1Name.text + "     | " + self.column2Name.text + "      | " + self.column3Name.text + " |\n"
             for x in range(len(final_parameterName)):
                 content += "      | " + final_parameterName[x] + "  | " + final_parameterValue[x] + "  | " + final_parameterType[x] + "  |\n"
@@ -138,6 +143,16 @@ class EditFeatureWindow1(Screen):
             for x in range(len(final_variableName)):
                 content += "      | " + final_variableName[x] + "  | " + final_variableType[x] + "  |\n"
             
+            if len(self.extraCondition.text) != 0:
+                split_extraCondition = self.extraCondition.text.split()
+                final_extraCondition = []
+                for x in split_extraCondition:
+                    x = x.replace('\n', '')
+                    x = x.replace(';', '')
+                    final_extraCondition.append(x)
+                for x in range(len(final_extraCondition)):
+                    content += "    And " + final_extraCondition[x] + "\n"
+
             filename = "compare_" + self.feature_file_name.text+ ".feature"
             gui.editFeatureVariable.targetFeatureFileName = filename
             os.chdir('features')
@@ -154,17 +169,17 @@ class EditFeatureWindow1(Screen):
             
     def screen_transition(self, instance):
         self.clean_screen()
-
         self.manager.current = 'Main'
 
     def clean_screen(self):
         self.feature_file_name.text = ''
-        self.column1Name.text = ''
+        self.column1Name.text = 'parameter'
         self.column1Value.text = ''
-        self.column2Name.text = ''
+        self.column2Name.text = 'value'
         self.column2Value.text = ''
-        self.column3Name.text = ''
+        self.column3Name.text = 'type'
         self.column3Value.text = ''
         self.recordMode.text = ''
         self.variableName.text = ''
         self.variableType.text = ''
+        self.extraCondition.text = ''
