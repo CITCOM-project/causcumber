@@ -22,7 +22,7 @@ class EditFeatureWindow1(Screen):
         self.inputLayout = BoxLayout(orientation = 'vertical')
         
         self.inputLayout.add_widget(Label(text='Enter file name', size_hint=(1, 0.11))) # Title
-        self.feature_file_name = TextInput(text='', size_hint=(1, 0.11), multiline=False) 
+        self.feature_file_name = TextInput(text='', size_hint=(1, 0.15), multiline=False) 
         self.inputLayout.add_widget(self.feature_file_name)
         
 

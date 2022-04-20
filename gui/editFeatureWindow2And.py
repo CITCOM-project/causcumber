@@ -17,9 +17,9 @@ from kivy.uix.dropdown import DropDown
 import gui.editFeatureVariable
 ##################
 
-class EditFeatureWindow2(Screen):
+class EditFeatureWindow2And(Screen):
     def __init__(self, **kwargs):
-        super(EditFeatureWindow2, self).__init__(**kwargs)
+        super(EditFeatureWindow2And, self).__init__(**kwargs)
         Layout = BoxLayout(orientation = 'vertical')
         Layout.add_widget(Label(text='Causcumber', size_hint=(1, 0.1)))
         
@@ -46,17 +46,7 @@ class EditFeatureWindow2(Screen):
     
         self.inputLayout = BoxLayout(orientation = 'vertical')
 
-        self.inputLayout.add_widget(Label(text='Scenario: Draw DAG', size_hint=(1, 0.1))) # Title
-
-        givenLayout = GridLayout(cols=2, size_hint=(1, 0.06))
-
-        givenLayout.add_widget(Label(text='Given a connected ', size_hint=(1, 0.1))) 
-        self.connectedItem = TextInput(text='', size_hint=(1, 0.11), multiline=False) 
-        givenLayout.add_widget(self.connectedItem)
-
-        self.inputLayout.add_widget(givenLayout)
-
-        self.inputLayout.add_widget(Label(text='When we prune the following edges ', size_hint=(1, 0.1))) 
+        self.inputLayout.add_widget(Label(text='And we add the following edges', size_hint=(1, 0.1))) 
 
 
         self.startBtn = Button(text='Update edges', size_hint=(1, 0.1))
@@ -77,10 +67,6 @@ class EditFeatureWindow2(Screen):
         displayLayout.add_widget(self.inputLayout) 
 
         Layout.add_widget(displayLayout)         
-
-        self.addEdgesBtn = Button(text='And add edges', size_hint=(1, 0.1))
-        self.addEdgesBtn.bind(on_press = self.add_edges)
-        Layout.add_widget(self.addEdgesBtn)  
 
         self.nextBtn = Button(text='Next', size_hint=(1, 0.1))
         self.nextBtn.bind(on_press = self.next_step)
@@ -154,67 +140,56 @@ class EditFeatureWindow2(Screen):
         os.system("dot -Tpng temp.dot -o graphviz_graph.png")
         self.img.reload()
 
-    def add_edges(self, instance):
-        if path.exists("temp.dot"):
-            self.process_files(False,'edit feature2 and')
-        else:
-            print("relation is not edited")
-
     def next_step(self, instance):
         if path.exists("temp.dot"):
-            self.process_files(True,'edit feature3')
-        else:
-            print("relation is not edited")
+            f = open('temp.dot',"r+", encoding="utf-8")
+            parameter_filter = ["digraph", "rankdir", "{", "}", "graph [", "label", "]", "subgraph"]
+            s1List = []
+            s2List = []
+            content = f.read().split("\n")
+            for line in content:
+                if not any(filter in line for filter in parameter_filter):
+                    splitLine = line.split("->")
+                    s1List.append(splitLine[0].strip())
+                    s2List.append(splitLine[1].strip())
+            f.close()
 
-    def process_files(self, isNext, targetScreen):
-        f = open('temp.dot',"r+", encoding="utf-8")
-        parameter_filter = ["digraph", "rankdir", "{", "}", "graph [", "label", "]", "subgraph"]
-        s1List = []
-        s2List = []
-        content = f.read().split("\n")
-        for line in content:
-            if not any(filter in line for filter in parameter_filter):
-                splitLine = line.split("->")
-                s1List.append(splitLine[0].strip())
-                s2List.append(splitLine[1].strip())
-        f.close()
+            filename = gui.editFeatureVariable.targetFeatureFileName
 
-        filename = gui.editFeatureVariable.targetFeatureFileName
+            os.chdir('features')
+            f = open(filename,"r+", encoding="utf-8")
+            featureContent = f.read()
+            f.close()
 
-        os.chdir('features')
-        f = open(filename,"r+", encoding="utf-8")
-        featureContent = f.read()
-        f.close()
+            with open(filename, 'r+') as f:   #empty file
+                f.truncate(0)
 
-        with open(filename, 'r+') as f:   #empty file
-            f.truncate(0)
-
-        featureContent += "\n  @draw_dag\n  Scenario: Draw DAG\n    Given a connected " + self.connectedItem.text + "\n    When we prune the following edges\n      | s1                | s2                 |\n"
-        for x in range(len(s1List)):
-            featureContent += "      | " + s1List[x] + " | " + s2List[x] + " | \n"
-        
-        if isNext == True:
+            featureContent += "    And we add the following edges\n      | s1                | s2                 |\n"
+            for x in range(len(s1List)):
+                featureContent += "      | " + s1List[x] + " | " + s2List[x] + " | \n"
+            
             featureContent += '    Then we obtain the causal DAG\n'
             featureContent += "\n"
+            f = open(filename,"r+", encoding="utf-8")
+            f.write(featureContent)
+            f.close()
+            os.chdir('..')
 
-        f = open(filename,"r+", encoding="utf-8")
-        f.write(featureContent)
-        f.close()
-        os.chdir('..')
+            for file in [f for f in os.listdir('.') if os.path.isfile(f)]:
+                if file.endswith('.png'):
+                    os.remove(file)
+                elif file == 'temp.dot':
+                    os.remove(file)
+            self.img.reload()
 
-        for file in [f for f in os.listdir('.') if os.path.isfile(f)]:
-            if file.endswith('.png'):
-                os.remove(file)
-            elif file == 'temp.dot':
-                os.remove(file)
-        self.img.reload()
+            self.output_parameter_list = []
 
-        self.output_parameter_list = []
+            self.dropdown.clear_widgets()
+            self.output_parameters.clear_widgets()
 
-        self.dropdown.clear_widgets()
-        self.output_parameters.clear_widgets()
-
-        self.manager.current = targetScreen
+            self.manager.current = 'edit feature3'
+        else:
+            print("relation is not edited")
 
 
     def screen_transition(self, instance):

@@ -16,6 +16,7 @@ from gui.editDotWindow1 import EditDotWindow1
 from gui.editDotWindow2 import EditDotWindow2
 from gui.editFeatureWindow1 import EditFeatureWindow1
 from gui.editFeatureWindow2 import EditFeatureWindow2
+from gui.editFeatureWindow2And import EditFeatureWindow2And
 from gui.editFeatureWindow3 import EditFeatureWindow3
 from gui.editFeatureWindow4 import EditFeatureWindow4
 ##################
@@ -39,6 +40,7 @@ class Application(App):
         sm.add_widget(EditDotWindow2(name='edit dot2')) 
         sm.add_widget(EditFeatureWindow1(name='edit feature1'))      
         sm.add_widget(EditFeatureWindow2(name='edit feature2'))
+        sm.add_widget(EditFeatureWindow2And(name='edit feature2 and'))
         sm.add_widget(EditFeatureWindow3(name='edit feature3'))
         sm.add_widget(EditFeatureWindow4(name='edit feature4'))
         return sm
