@@ -17,6 +17,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 
 import os
+import subprocess, platform
 import xml.etree.ElementTree as ET
 
 ##################
@@ -130,6 +131,16 @@ class MainWindow(Screen):
         editDotFile = Button(text='Edit dot files', size_hint=(1, 0.5)) # create dot files
         editDotFile.bind(on_press=self.screen_transition1)
         inputLayout.add_widget(editDotFile) 
+        ############################
+        editEnvironmetnFile = Button(text='Edit environment.py', size_hint=(1, 0.5)) # create dot files
+        editEnvironmetnFile.bind(on_press=self.open_file)
+        inputLayout.add_widget(editEnvironmetnFile) 
+        editDagStepsFile = Button(text='Edit dag_steps files', size_hint=(1, 0.5)) # create dot files
+        editDagStepsFile.bind(on_press=self.open_file)
+        inputLayout.add_widget(editDagStepsFile) 
+        editAbstractFile = Button(text='Edit abstract files', size_hint=(1, 0.5)) # create dot files
+        editAbstractFile.bind(on_press=self.open_file)
+        inputLayout.add_widget(editAbstractFile)
         ############################
         editFeatureFile = Button(text='Edit feature files', size_hint=(1, 0.5)) # save input as new feature file
         editFeatureFile.bind(on_press=self.screen_transition2)
@@ -251,6 +262,23 @@ class MainWindow(Screen):
         self.display_result.text = ''
         self.manager.current = 'edit feature1'
 
+    def open_file(self, instance):
+        if 'environment' in instance.text: 
+            filename = 'features\environment.py'
+        elif 'dag_steps' in instance.text:
+            filename = 'features\steps\dag_steps.py'
+        elif 'abstract' in instance.text:
+            filename = r'features\steps\abstract.py'
+
+        if platform.system() == 'Darwin':       # macOS
+            subprocess.call(('open', filename))
+        elif platform.system() == 'Windows':    # Windows
+            os.startfile(filename)
+        else:                                   # linux variants
+            subprocess.call(('xdg-open', filename))
+
+
+
     def help_button(self, *args):      
         contentLayout = BoxLayout(orientation = 'vertical')
 
@@ -266,7 +294,6 @@ class MainWindow(Screen):
 
         popup.open()
         
-
     def exit_scenario(self, *args):
         os.chdir('..')
         self.display_result.text = ''
