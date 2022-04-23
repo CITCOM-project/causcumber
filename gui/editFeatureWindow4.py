@@ -65,7 +65,7 @@ class EditFeatureWindow4(Screen):
         self.thenText = TextInput(text='', size_hint=(1, 0.11), multiline=False) 
         thenLayout.add_widget(self.thenText)
         
-        thenLayout.add_widget(Label(text='should be ', size_hint=(1, 0.1))) 
+        thenLayout.add_widget(Label(text='should ', size_hint=(1, 0.1))) 
         self.shouldText = TextInput(text='', size_hint=(1, 0.1), multiline=False) 
         thenLayout.add_widget(self.shouldText)
 
@@ -121,7 +121,7 @@ class EditFeatureWindow4(Screen):
         self.andText = TextInput(text='', size_hint=(1, None), multiline=False) 
         self.andLayout.add_widget(self.andText)
         
-        self.temp = Label(text='should be ', size_hint=(1, None))
+        self.temp = Label(text='should ', size_hint=(1, None))
         self.andLayout.add_widget(self.temp) 
         self.andShouldText = TextInput(text='', size_hint=(1, None), multiline=False) 
         self.andLayout.add_widget(self.andShouldText)
@@ -171,17 +171,17 @@ class EditFeatureWindow4(Screen):
             if len(self.givenText.text) != 0:
                 content += '\n    Given ' + self.givenText.text
                 
-            content += '\n    When ' + self.whenText.text + '\n    Then the ' + self.thenText.text + ' should be ' + self.shouldText.text + '\n' 
+            content += '\n    When ' + self.whenText.text + '\n    Then the ' + self.thenText.text + ' should ' + self.shouldText.text + '\n' 
 
             elementList = []
             for element in self.andsLayout.children:
                 for item in element.children:
-                    if item.text != 'And the ' and item.text != 'should be ':
+                    if item.text != 'And the ' and item.text != 'should ':
                         elementList.append(item.text)
             
             elementList.reverse()
             for x in range(0,len(elementList),2): 
-                content += '    And the ' + elementList[x] + ' should be ' + elementList[x+1] + '\n'         
+                content += '    And the ' + elementList[x] + ' should ' + elementList[x+1] + '\n'         
             content+='\n'
 
             self.clear_screen()

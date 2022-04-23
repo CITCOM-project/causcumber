@@ -55,7 +55,7 @@ class EditFeatureWindow3(Screen):
         self.inputLayout.add_widget(self.givenLayout)
 
         self.whenLayout = GridLayout(cols=2, size_hint=(1, 0.06))
-        self.whenLayout.add_widget(Label(text='When we run the model with ', size_hint=(1, 0.1)))
+        self.whenLayout.add_widget(Label(text='When we ', size_hint=(1, 0.1)))
         self.whenText = TextInput(text='', size_hint=(1, 0.15), multiline=False)
         self.whenLayout.add_widget(self.whenText)
         self.inputLayout.add_widget(self.whenLayout)
@@ -177,7 +177,7 @@ class EditFeatureWindow3(Screen):
             if len(self.givenText.text) != 0:
                 content += '\n    Given we run the model with ' + self.givenText.text
 
-            content += '\n    When we run the model with ' + self.whenText.text + '\n    Then the ' + self.thenText.text + ' should be ' + self.shouldText.text 
+            content += '\n    When we ' + self.whenText.text + '\n    Then the ' + self.thenText.text + ' should be ' + self.shouldText.text 
 
             elementList = []
             for elements in self.exampleLayout.children:
