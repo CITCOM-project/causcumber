@@ -33,21 +33,21 @@ class EditFeatureWindow1(Screen):
         givenLayout = GridLayout(cols=3,  width="600dp")
 
         parameterLayout = BoxLayout(orientation = 'vertical')
-        self.column1Name = TextInput(text='parameter', size_hint=(1, 0.1), multiline=False) 
+        self.column1Name = TextInput(text='parameter', size_hint=(1, 0.05), multiline=False) 
         parameterLayout.add_widget(self.column1Name)
-        self.column1Value = TextInput(text='', size_hint=(1, 0.5), multiline=True) 
+        self.column1Value = TextInput(text='', size_hint=(1, 0.3), multiline=True) 
         parameterLayout.add_widget(self.column1Value)
 
         valueLayout = BoxLayout(orientation = 'vertical')
-        self.column2Name = TextInput(text='value', size_hint=(1, 0.1), multiline=False)
+        self.column2Name = TextInput(text='value', size_hint=(1, 0.05), multiline=False)
         valueLayout.add_widget(self.column2Name) 
-        self.column2Value = TextInput(text='', size_hint=(1, 0.5), multiline=True) 
+        self.column2Value = TextInput(text='', size_hint=(1, 0.3), multiline=True) 
         valueLayout.add_widget(self.column2Value)
 
         typeLayout = BoxLayout(orientation = 'vertical')
-        self.column3Name = TextInput(text='type', size_hint=(1, 0.1), multiline=False)
+        self.column3Name = TextInput(text='type', size_hint=(1, 0.05), multiline=False)
         typeLayout.add_widget(self.column3Name)
-        self.column3Value = TextInput(text='', size_hint=(1, 0.5), multiline=True) 
+        self.column3Value = TextInput(text='', size_hint=(1, 0.3), multiline=True) 
         typeLayout.add_widget(self.column3Value)
 
         givenLayout.add_widget(parameterLayout)
@@ -56,9 +56,22 @@ class EditFeatureWindow1(Screen):
         self.inputLayout.add_widget(givenLayout)
 
         andLayout = GridLayout(cols=2,  width="600dp")
+        
+        metaVariableLayout = BoxLayout(orientation = 'vertical')
+        metaVariableLayout.add_widget(Label(text='Meta variable', size_hint=(1, 0.1)))
+        self.metaVariableName = TextInput(text='', size_hint=(1, 0.5), multiline=True) 
+        metaVariableLayout.add_widget(self.metaVariableName)
 
-        andLayout.add_widget(Label(text='And the following variables are recorded ', size_hint=(1, 0.1))) 
-        self.recordMode = TextInput(text='', size_hint=(1, 0.15), multiline=False) 
+        metaVariableTypeLayout = BoxLayout(orientation = 'vertical')
+        metaVariableTypeLayout.add_widget(Label(text='Meta variable type', size_hint=(1, 0.1)))
+        self.metaVariableType = TextInput(text='', size_hint=(1, 0.5), multiline=True) 
+        metaVariableTypeLayout.add_widget(self.metaVariableType)
+
+        andLayout.add_widget(metaVariableLayout)
+        andLayout.add_widget(metaVariableTypeLayout)
+
+        andLayout.add_widget(Label(text='And the following variables are recorded ', size_hint=(1, 0.2))) 
+        self.recordMode = TextInput(text='', size_hint=(1, 0.3), multiline=False) 
         andLayout.add_widget(self.recordMode)
 
         variableLayout = BoxLayout(orientation = 'vertical')
@@ -120,6 +133,21 @@ class EditFeatureWindow1(Screen):
             x = x.replace(';', '')
             final_parameterType.append(x)
 
+        split_metaVariableName = self.metaVariableName.text.split()    #meta variable name
+        final_metaVariableName = []
+        for x in split_metaVariableName:
+            x = x.replace('\n', '')
+            x = x.replace(';', '')
+            final_metaVariableName.append(x)
+            gui.editFeatureVariable.parameterNames.append(x)
+
+        split_metaVariableType = self.metaVariableType.text.split()    #meta variable type
+        final_metaVariableType = []
+        for x in split_metaVariableType:
+            x = x.replace('\n', '')
+            x = x.replace(';', '')
+            final_metaVariableType.append(x)
+
         split_variableName = self.variableName.text.split()    #variable name
         final_variableName = []
         for x in split_variableName:
@@ -135,10 +163,16 @@ class EditFeatureWindow1(Screen):
             x = x.replace(';', '')
             final_variableType.append(x)
 
-        if len(final_parameterName) == len(final_parameterValue) and len(final_parameterName) == len(final_parameterType) and len(final_variableName)==len(final_variableType):
+        if len(final_parameterName) == len(final_parameterValue) and len(final_parameterName) == len(final_parameterType) and len(final_metaVariableName)==len(final_metaVariableType) and len(final_variableName)==len(final_variableType):
             content = "Feature: Compare " + self.feature_file_name.text + "\n  Background: IO spec\n    Given a simulation with parameters\n      | " + self.column1Name.text + "     | " + self.column2Name.text + "      | " + self.column3Name.text + " |\n"
             for x in range(len(final_parameterName)):
                 content += "      | " + final_parameterName[x] + "  | " + final_parameterValue[x] + "  | " + final_parameterType[x] + "  |\n"
+            
+            if len(final_metaVariableName) > 0:
+                content += "    And the following meta variables\n      | variable          | type |\n"
+                for x in range(len(final_metaVariableName)):
+                    content += "      | " + final_metaVariableName[x] + "  | " + final_metaVariableType[x] + "  |\n"
+
             content += "    And the following variables are recorded " + self.recordMode.text + "\n" + "      | variable          | type |\n"
             for x in range(len(final_variableName)):
                 content += "      | " + final_variableName[x] + "  | " + final_variableType[x] + "  |\n"

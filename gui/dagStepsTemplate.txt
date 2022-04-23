@@ -10,6 +10,10 @@ import numpy as np
 from behave import given, when, then
 import scipy
 
+#Define custom Distributions in the Background
+################################
+#Examples below
+"""
 class countries_gen(stats.rv_discrete):
     supported_countries = [
         h
@@ -26,6 +30,8 @@ class countries_gen(stats.rv_discrete):
 
 
 countries = countries_gen()
+"""
+################################
 
 def truncnorm(mu, sigma, lower, upper):
     return stats.truncnorm(

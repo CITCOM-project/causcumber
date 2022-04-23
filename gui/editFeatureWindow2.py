@@ -172,50 +172,53 @@ class EditFeatureWindow2(Screen):
         s1List = []
         s2List = []
         content = f.read().split("\n")
-        for line in content:
-            if not any(filter in line for filter in parameter_filter):
-                splitLine = line.split("->")
-                s1List.append(splitLine[0].strip())
-                s2List.append(splitLine[1].strip())
         f.close()
-
-        filename = gui.editFeatureVariable.targetFeatureFileName
-
-        os.chdir('features')
-        f = open(filename,"r+", encoding="utf-8")
-        featureContent = f.read()
-        f.close()
-
-        with open(filename, 'r+') as f:   #empty file
-            f.truncate(0)
-
-        featureContent += "\n  @draw_dag\n  Scenario: Draw DAG\n    Given a connected " + self.connectedItem.text + "\n    When we prune the following edges\n      | s1                | s2                 |\n"
-        for x in range(len(s1List)):
-            featureContent += "      | " + s1List[x] + " | " + s2List[x] + " | \n"
+        if len(content) > 0 : 
+            for line in content:
+                if not any(filter in line for filter in parameter_filter):
+                    splitLine = line.split("->")
+                    s1List.append(splitLine[0].strip())
+                    s2List.append(splitLine[1].strip())
         
-        if isNext == True:
-            featureContent += '    Then we obtain the causal DAG\n'
-            featureContent += "\n"
 
-        f = open(filename,"r+", encoding="utf-8")
-        f.write(featureContent)
-        f.close()
-        os.chdir('..')
+            filename = gui.editFeatureVariable.targetFeatureFileName
 
-        for file in [f for f in os.listdir('.') if os.path.isfile(f)]:
-            if file.endswith('.png'):
-                os.remove(file)
-            elif file == 'temp.dot':
-                os.remove(file)
-        self.img.reload()
+            os.chdir('features')
+            f = open(filename,"r+", encoding="utf-8")
+            featureContent = f.read()
+            f.close()
 
-        self.output_parameter_list = []
+            with open(filename, 'r+') as f:   #empty file
+                f.truncate(0)
 
-        self.dropdown.clear_widgets()
-        self.output_parameters.clear_widgets()
+            featureContent += "\n  @draw_dag\n  Scenario: Draw DAG\n    Given a connected " + self.connectedItem.text + "\n    When we prune the following edges\n      | s1                | s2                 |\n"
+            for x in range(len(s1List)):
+                featureContent += "      | " + s1List[x] + " | " + s2List[x] + " | \n"
+            
+            if isNext == True:
+                featureContent += '    Then we obtain the causal DAG\n'
+                featureContent += "\n"
 
-        self.manager.current = targetScreen
+            f = open(filename,"r+", encoding="utf-8")
+            f.write(featureContent)
+            f.close()
+            os.chdir('..')
 
+            for file in [f for f in os.listdir('.') if os.path.isfile(f)]:
+                if file.endswith('.png'):
+                    os.remove(file)
+                elif file == 'temp.dot':
+                    os.remove(file)
+            self.img.reload()
+
+            self.output_parameter_list = []
+
+            self.dropdown.clear_widgets()
+            self.output_parameters.clear_widgets()
+
+            self.manager.current = targetScreen
+        else:
+            print("Relation not define")
 
     def screen_transition(self, instance):
         for file in [f for f in os.listdir('.') if os.path.isfile(f)]:

@@ -46,11 +46,11 @@ class EditDotWindow2(Screen):
         self.dot_file_name = TextInput(text='', size_hint=(1, 0.05), multiline=False) 
         self.inputLayout.add_widget(self.dot_file_name)
 
-        self.startBtn = Button(text='Update parameter relationship', size_hint=(1, 0.05))
+        self.startBtn = Button(text='Update parameter relation', size_hint=(1, 0.05))
         self.startBtn.bind(on_press = self.update_parameter_list)
         self.inputLayout.add_widget(self.startBtn) 
 
-        self.dropdownbutton = Button(text='Select parameters', size_hint=(1, 0.05))
+        self.dropdownbutton = Button(text='Select parameter', size_hint=(1, 0.05))
         self.inputLayout.add_widget(self.dropdownbutton)
         self.dropdown = DropDown()
         self.dropdownbutton.bind(on_release=self.dropdown.open)
