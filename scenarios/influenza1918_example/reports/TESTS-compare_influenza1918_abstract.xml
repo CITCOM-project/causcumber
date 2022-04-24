@@ -1,0 +1,444 @@
+<testsuite name="compare_influenza1918_abstract.Compare influenza1918_abstract" tests="15" errors="0" failures="0" skipped="0" time="0.348204" timestamp="2022-04-24T23:45:32.708784" hostname="DESKTOP-CPB194U"><testcase classname="compare_influenza1918_abstract.Compare influenza1918_abstract" name="Draw DAG" status="passed" time="0.054938"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @draw_dag
+  Scenario: Draw DAG
+    Given a simulation with parameters ... passed in 0.041s
+      | parameter        | type  | distribution                 |
+      | MortalityProb    | float | truncnorm(0.01,0.005,0,1)    |
+      | Infected         | float | truncnorm(1000,100,500,1500) |
+      | MortalityTime    | float | truncnorm(1,0.5,1,5)         |
+      | TransmissionProb | float | truncnorm(0.1,0.05,0.01,1)   |
+      | IncubationTime   | float | truncnorm(3,1.5,1,5)         |
+      | RecoveryTime     | float | truncnorm(2.5,1.25,1,5)      |
+      | EncounterRate    | float | truncnorm(4,2,1,10)          |
+    And the following variables are recorded at the end of the simulation ... passed in 0.007s
+      | variable        | type  |
+      | deceased        | float |
+      | recovered       | float |
+      | cases           | float |
+      | peak            | int   |
+      | peak_infectious | float |
+    Given a connected DAG ... passed in 0.002s
+    When we prune the following edges ... passed in 0.004s
+      | s1              | s2 |
+      | deceased        | .* |
+      | recovered       | .* |
+      | cases           | .* |
+      | peak            | .* |
+      | peak_infectious | .* |
+    Then we obtain the causal DAG ... passed in 0.001s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase><testcase classname="compare_influenza1918_abstract.Compare influenza1918_abstract" name="P(Mortality) decrease" status="passed" time="0.022967"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @MortalityProb_decrease
+  Scenario: P(Mortality) decrease
+    Given a simulation with parameters ... passed in 0.013s
+      | parameter        | type  | distribution                 |
+      | MortalityProb    | float | truncnorm(0.01,0.005,0,1)    |
+      | Infected         | float | truncnorm(1000,100,500,1500) |
+      | MortalityTime    | float | truncnorm(1,0.5,1,5)         |
+      | TransmissionProb | float | truncnorm(0.1,0.05,0.01,1)   |
+      | IncubationTime   | float | truncnorm(3,1.5,1,5)         |
+      | RecoveryTime     | float | truncnorm(2.5,1.25,1,5)      |
+      | EncounterRate    | float | truncnorm(4,2,1,10)          |
+    And the following variables are recorded at the end of the simulation ... passed in 0.007s
+      | variable        | type  |
+      | deceased        | float |
+      | recovered       | float |
+      | cases           | float |
+      | peak            | int   |
+      | peak_infectious | float |
+    When we decrease the MortalityProb ... passed in 0.002s
+    Then the deceased should decrease ... passed in 0.000s
+    And the recovered should increase ... passed in 0.001s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase><testcase classname="compare_influenza1918_abstract.Compare influenza1918_abstract" name="P(Mortality) increase" status="passed" time="0.020944"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @MortalityProb_increase
+  Scenario: P(Mortality) increase
+    Given a simulation with parameters ... passed in 0.014s
+      | parameter        | type  | distribution                 |
+      | MortalityProb    | float | truncnorm(0.01,0.005,0,1)    |
+      | Infected         | float | truncnorm(1000,100,500,1500) |
+      | MortalityTime    | float | truncnorm(1,0.5,1,5)         |
+      | TransmissionProb | float | truncnorm(0.1,0.05,0.01,1)   |
+      | IncubationTime   | float | truncnorm(3,1.5,1,5)         |
+      | RecoveryTime     | float | truncnorm(2.5,1.25,1,5)      |
+      | EncounterRate    | float | truncnorm(4,2,1,10)          |
+    And the following variables are recorded at the end of the simulation ... passed in 0.006s
+      | variable        | type  |
+      | deceased        | float |
+      | recovered       | float |
+      | cases           | float |
+      | peak            | int   |
+      | peak_infectious | float |
+    When we increase the MortalityProb ... passed in 0.001s
+    Then the deceased should increase ... passed in 0.000s
+    And the recovered should decrease ... passed in 0.000s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase><testcase classname="compare_influenza1918_abstract.Compare influenza1918_abstract" name="N(Infectious) decrease" status="passed" time="0.01994"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @Infected_decrease
+  Scenario: N(Infectious) decrease
+    Given a simulation with parameters ... passed in 0.013s
+      | parameter        | type  | distribution                 |
+      | MortalityProb    | float | truncnorm(0.01,0.005,0,1)    |
+      | Infected         | float | truncnorm(1000,100,500,1500) |
+      | MortalityTime    | float | truncnorm(1,0.5,1,5)         |
+      | TransmissionProb | float | truncnorm(0.1,0.05,0.01,1)   |
+      | IncubationTime   | float | truncnorm(3,1.5,1,5)         |
+      | RecoveryTime     | float | truncnorm(2.5,1.25,1,5)      |
+      | EncounterRate    | float | truncnorm(4,2,1,10)          |
+    And the following variables are recorded at the end of the simulation ... passed in 0.006s
+      | variable        | type  |
+      | deceased        | float |
+      | recovered       | float |
+      | cases           | float |
+      | peak            | int   |
+      | peak_infectious | float |
+    When we decrease the Infected ... passed in 0.001s
+    Then the peak should move to the right ... passed in 0.000s
+    And the peak_infectious should remain the same ... passed in 0.000s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase><testcase classname="compare_influenza1918_abstract.Compare influenza1918_abstract" name="N(Infectious) increase" status="passed" time="0.021941"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @Infected_increase
+  Scenario: N(Infectious) increase
+    Given a simulation with parameters ... passed in 0.014s
+      | parameter        | type  | distribution                 |
+      | MortalityProb    | float | truncnorm(0.01,0.005,0,1)    |
+      | Infected         | float | truncnorm(1000,100,500,1500) |
+      | MortalityTime    | float | truncnorm(1,0.5,1,5)         |
+      | TransmissionProb | float | truncnorm(0.1,0.05,0.01,1)   |
+      | IncubationTime   | float | truncnorm(3,1.5,1,5)         |
+      | RecoveryTime     | float | truncnorm(2.5,1.25,1,5)      |
+      | EncounterRate    | float | truncnorm(4,2,1,10)          |
+    And the following variables are recorded at the end of the simulation ... passed in 0.007s
+      | variable        | type  |
+      | deceased        | float |
+      | recovered       | float |
+      | cases           | float |
+      | peak            | int   |
+      | peak_infectious | float |
+    When we increase the Infected ... passed in 0.001s
+    Then the peak should move to the left ... passed in 0.000s
+    And the peak_infectious should remain the same ... passed in 0.000s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase><testcase classname="compare_influenza1918_abstract.Compare influenza1918_abstract" name="T(Die) decrease" status="passed" time="0.019943"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @MortalityTime_decrease
+  Scenario: T(Die) decrease
+    Given a simulation with parameters ... passed in 0.013s
+      | parameter        | type  | distribution                 |
+      | MortalityProb    | float | truncnorm(0.01,0.005,0,1)    |
+      | Infected         | float | truncnorm(1000,100,500,1500) |
+      | MortalityTime    | float | truncnorm(1,0.5,1,5)         |
+      | TransmissionProb | float | truncnorm(0.1,0.05,0.01,1)   |
+      | IncubationTime   | float | truncnorm(3,1.5,1,5)         |
+      | RecoveryTime     | float | truncnorm(2.5,1.25,1,5)      |
+      | EncounterRate    | float | truncnorm(4,2,1,10)          |
+    And the following variables are recorded at the end of the simulation ... passed in 0.006s
+      | variable        | type  |
+      | deceased        | float |
+      | recovered       | float |
+      | cases           | float |
+      | peak            | int   |
+      | peak_infectious | float |
+    When we decrease the MortalityTime ... passed in 0.000s
+    Then the cases should decrease ... passed in 0.001s
+    And the deceased should decrease ... passed in 0.000s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase><testcase classname="compare_influenza1918_abstract.Compare influenza1918_abstract" name="T(Die) increase" status="passed" time="0.019947"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @MortalityTime_increase
+  Scenario: T(Die) increase
+    Given a simulation with parameters ... passed in 0.013s
+      | parameter        | type  | distribution                 |
+      | MortalityProb    | float | truncnorm(0.01,0.005,0,1)    |
+      | Infected         | float | truncnorm(1000,100,500,1500) |
+      | MortalityTime    | float | truncnorm(1,0.5,1,5)         |
+      | TransmissionProb | float | truncnorm(0.1,0.05,0.01,1)   |
+      | IncubationTime   | float | truncnorm(3,1.5,1,5)         |
+      | RecoveryTime     | float | truncnorm(2.5,1.25,1,5)      |
+      | EncounterRate    | float | truncnorm(4,2,1,10)          |
+    And the following variables are recorded at the end of the simulation ... passed in 0.007s
+      | variable        | type  |
+      | deceased        | float |
+      | recovered       | float |
+      | cases           | float |
+      | peak            | int   |
+      | peak_infectious | float |
+    When we increase the MortalityTime ... passed in 0.000s
+    Then the cases should increase ... passed in 0.000s
+    And the deceased should increase ... passed in 0.000s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase><testcase classname="compare_influenza1918_abstract.Compare influenza1918_abstract" name="P(Transmission) decrease" status="passed" time="0.020941"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @TransmissionProb_decrease
+  Scenario: P(Transmission) decrease
+    Given a simulation with parameters ... passed in 0.013s
+      | parameter        | type  | distribution                 |
+      | MortalityProb    | float | truncnorm(0.01,0.005,0,1)    |
+      | Infected         | float | truncnorm(1000,100,500,1500) |
+      | MortalityTime    | float | truncnorm(1,0.5,1,5)         |
+      | TransmissionProb | float | truncnorm(0.1,0.05,0.01,1)   |
+      | IncubationTime   | float | truncnorm(3,1.5,1,5)         |
+      | RecoveryTime     | float | truncnorm(2.5,1.25,1,5)      |
+      | EncounterRate    | float | truncnorm(4,2,1,10)          |
+    And the following variables are recorded at the end of the simulation ... passed in 0.007s
+      | variable        | type  |
+      | deceased        | float |
+      | recovered       | float |
+      | cases           | float |
+      | peak            | int   |
+      | peak_infectious | float |
+    When we decrease the TransmissionProb ... passed in 0.001s
+    Then the cases should decrease ... passed in 0.000s
+    And the deceased should decrease ... passed in 0.000s
+    And the recovered should decrease ... passed in 0.000s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase><testcase classname="compare_influenza1918_abstract.Compare influenza1918_abstract" name="P(Transmission) increase" status="passed" time="0.020943"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @TransmissionProb_increase
+  Scenario: P(Transmission) increase
+    Given a simulation with parameters ... passed in 0.013s
+      | parameter        | type  | distribution                 |
+      | MortalityProb    | float | truncnorm(0.01,0.005,0,1)    |
+      | Infected         | float | truncnorm(1000,100,500,1500) |
+      | MortalityTime    | float | truncnorm(1,0.5,1,5)         |
+      | TransmissionProb | float | truncnorm(0.1,0.05,0.01,1)   |
+      | IncubationTime   | float | truncnorm(3,1.5,1,5)         |
+      | RecoveryTime     | float | truncnorm(2.5,1.25,1,5)      |
+      | EncounterRate    | float | truncnorm(4,2,1,10)          |
+    And the following variables are recorded at the end of the simulation ... passed in 0.007s
+      | variable        | type  |
+      | deceased        | float |
+      | recovered       | float |
+      | cases           | float |
+      | peak            | int   |
+      | peak_infectious | float |
+    When we increase the TransmissionProb ... passed in 0.000s
+    Then the cases should increase ... passed in 0.001s
+    And the deceased should increase ... passed in 0.000s
+    And the recovered should increase ... passed in 0.000s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase><testcase classname="compare_influenza1918_abstract.Compare influenza1918_abstract" name="T(Incubate) decrease" status="passed" time="0.021941"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @IncubationTime_decrease
+  Scenario: T(Incubate) decrease
+    Given a simulation with parameters ... passed in 0.013s
+      | parameter        | type  | distribution                 |
+      | MortalityProb    | float | truncnorm(0.01,0.005,0,1)    |
+      | Infected         | float | truncnorm(1000,100,500,1500) |
+      | MortalityTime    | float | truncnorm(1,0.5,1,5)         |
+      | TransmissionProb | float | truncnorm(0.1,0.05,0.01,1)   |
+      | IncubationTime   | float | truncnorm(3,1.5,1,5)         |
+      | RecoveryTime     | float | truncnorm(2.5,1.25,1,5)      |
+      | EncounterRate    | float | truncnorm(4,2,1,10)          |
+    And the following variables are recorded at the end of the simulation ... passed in 0.007s
+      | variable        | type  |
+      | deceased        | float |
+      | recovered       | float |
+      | cases           | float |
+      | peak            | int   |
+      | peak_infectious | float |
+    When we decrease the IncubationTime ... passed in 0.001s
+    Then the peak should move to the left ... passed in 0.000s
+    And the peak_infectious should increase ... passed in 0.001s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase><testcase classname="compare_influenza1918_abstract.Compare influenza1918_abstract" name="T(Incubate) increase" status="passed" time="0.019982"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @IncubationTime_increase
+  Scenario: T(Incubate) increase
+    Given a simulation with parameters ... passed in 0.013s
+      | parameter        | type  | distribution                 |
+      | MortalityProb    | float | truncnorm(0.01,0.005,0,1)    |
+      | Infected         | float | truncnorm(1000,100,500,1500) |
+      | MortalityTime    | float | truncnorm(1,0.5,1,5)         |
+      | TransmissionProb | float | truncnorm(0.1,0.05,0.01,1)   |
+      | IncubationTime   | float | truncnorm(3,1.5,1,5)         |
+      | RecoveryTime     | float | truncnorm(2.5,1.25,1,5)      |
+      | EncounterRate    | float | truncnorm(4,2,1,10)          |
+    And the following variables are recorded at the end of the simulation ... passed in 0.006s
+      | variable        | type  |
+      | deceased        | float |
+      | recovered       | float |
+      | cases           | float |
+      | peak            | int   |
+      | peak_infectious | float |
+    When we increase the IncubationTime ... passed in 0.000s
+    Then the peak should move to the right ... passed in 0.001s
+    And the peak_infectious should decrease ... passed in 0.000s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase><testcase classname="compare_influenza1918_abstract.Compare influenza1918_abstract" name="T(Recovery) decrease" status="passed" time="0.020944"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @RecoveryTime_decrease
+  Scenario: T(Recovery) decrease
+    Given a simulation with parameters ... passed in 0.013s
+      | parameter        | type  | distribution                 |
+      | MortalityProb    | float | truncnorm(0.01,0.005,0,1)    |
+      | Infected         | float | truncnorm(1000,100,500,1500) |
+      | MortalityTime    | float | truncnorm(1,0.5,1,5)         |
+      | TransmissionProb | float | truncnorm(0.1,0.05,0.01,1)   |
+      | IncubationTime   | float | truncnorm(3,1.5,1,5)         |
+      | RecoveryTime     | float | truncnorm(2.5,1.25,1,5)      |
+      | EncounterRate    | float | truncnorm(4,2,1,10)          |
+    And the following variables are recorded at the end of the simulation ... passed in 0.008s
+      | variable        | type  |
+      | deceased        | float |
+      | recovered       | float |
+      | cases           | float |
+      | peak            | int   |
+      | peak_infectious | float |
+    When we decrease the RecoveryTime ... passed in 0.000s
+    Then the peak should move to the right ... passed in 0.000s
+    And the peak_infectious should decrease ... passed in 0.000s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase><testcase classname="compare_influenza1918_abstract.Compare influenza1918_abstract" name="T(Recovery) increase" status="passed" time="0.020944"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @RecoveryTime_increase
+  Scenario: T(Recovery) increase
+    Given a simulation with parameters ... passed in 0.013s
+      | parameter        | type  | distribution                 |
+      | MortalityProb    | float | truncnorm(0.01,0.005,0,1)    |
+      | Infected         | float | truncnorm(1000,100,500,1500) |
+      | MortalityTime    | float | truncnorm(1,0.5,1,5)         |
+      | TransmissionProb | float | truncnorm(0.1,0.05,0.01,1)   |
+      | IncubationTime   | float | truncnorm(3,1.5,1,5)         |
+      | RecoveryTime     | float | truncnorm(2.5,1.25,1,5)      |
+      | EncounterRate    | float | truncnorm(4,2,1,10)          |
+    And the following variables are recorded at the end of the simulation ... passed in 0.007s
+      | variable        | type  |
+      | deceased        | float |
+      | recovered       | float |
+      | cases           | float |
+      | peak            | int   |
+      | peak_infectious | float |
+    When we increase the RecoveryTime ... passed in 0.001s
+    Then the peak should move to the left ... passed in 0.000s
+    And the peak_infectious should increase ... passed in 0.000s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase><testcase classname="compare_influenza1918_abstract.Compare influenza1918_abstract" name="Rate(Encounter) decrease" status="passed" time="0.020944"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @EncounterRate_decrease
+  Scenario: Rate(Encounter) decrease
+    Given a simulation with parameters ... passed in 0.013s
+      | parameter        | type  | distribution                 |
+      | MortalityProb    | float | truncnorm(0.01,0.005,0,1)    |
+      | Infected         | float | truncnorm(1000,100,500,1500) |
+      | MortalityTime    | float | truncnorm(1,0.5,1,5)         |
+      | TransmissionProb | float | truncnorm(0.1,0.05,0.01,1)   |
+      | IncubationTime   | float | truncnorm(3,1.5,1,5)         |
+      | RecoveryTime     | float | truncnorm(2.5,1.25,1,5)      |
+      | EncounterRate    | float | truncnorm(4,2,1,10)          |
+    And the following variables are recorded at the end of the simulation ... passed in 0.007s
+      | variable        | type  |
+      | deceased        | float |
+      | recovered       | float |
+      | cases           | float |
+      | peak            | int   |
+      | peak_infectious | float |
+    When we decrease the EncounterRate ... passed in 0.001s
+    Then the cases should decrease ... passed in 0.000s
+    And the deceased should decrease ... passed in 0.000s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase><testcase classname="compare_influenza1918_abstract.Compare influenza1918_abstract" name="Rate(Encounter) increase" status="passed" time="0.020944"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @EncounterRate_increase
+  Scenario: Rate(Encounter) increase
+    Given a simulation with parameters ... passed in 0.013s
+      | parameter        | type  | distribution                 |
+      | MortalityProb    | float | truncnorm(0.01,0.005,0,1)    |
+      | Infected         | float | truncnorm(1000,100,500,1500) |
+      | MortalityTime    | float | truncnorm(1,0.5,1,5)         |
+      | TransmissionProb | float | truncnorm(0.1,0.05,0.01,1)   |
+      | IncubationTime   | float | truncnorm(3,1.5,1,5)         |
+      | RecoveryTime     | float | truncnorm(2.5,1.25,1,5)      |
+      | EncounterRate    | float | truncnorm(4,2,1,10)          |
+    And the following variables are recorded at the end of the simulation ... passed in 0.007s
+      | variable        | type  |
+      | deceased        | float |
+      | recovered       | float |
+      | cases           | float |
+      | peak            | int   |
+      | peak_infectious | float |
+    When we increase the EncounterRate ... passed in 0.001s
+    Then the cases should decrease ... passed in 0.000s
+    And the deceased should increase ... passed in 0.000s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase></testsuite>

@@ -1,0 +1,58 @@
+digraph "" {
+	graph [newrank=True,
+		rankdir=LR
+	];
+	subgraph cluster_outputs {
+		graph [label="Model outputs"];
+		deceased;
+		peak;
+		cases;
+		peak_infectious;
+		recovered;
+	}
+	subgraph cluster_inputs {
+		graph [label="Model inputs"];
+		RecoveryTime;
+		MortalityTime;
+		Infected;
+		TransmissionProb;
+		IncubationTime;
+		MortalityProb;
+		EncounterRate;
+	}
+	RecoveryTime -> deceased;
+	RecoveryTime -> peak;
+	RecoveryTime -> cases;
+	RecoveryTime -> peak_infectious;
+	RecoveryTime -> recovered;
+	MortalityTime -> deceased;
+	MortalityTime -> peak;
+	MortalityTime -> cases;
+	MortalityTime -> peak_infectious;
+	MortalityTime -> recovered;
+	Infected -> deceased;
+	Infected -> peak;
+	Infected -> cases;
+	Infected -> peak_infectious;
+	Infected -> recovered;
+	TransmissionProb -> deceased;
+	TransmissionProb -> peak;
+	TransmissionProb -> cases;
+	TransmissionProb -> peak_infectious;
+	TransmissionProb -> recovered;
+	IncubationTime -> deceased;
+	IncubationTime -> peak;
+	IncubationTime -> cases;
+	IncubationTime -> peak_infectious;
+	IncubationTime -> recovered;
+	MortalityProb -> deceased;
+	MortalityProb -> peak;
+	MortalityProb -> cases;
+	MortalityProb -> peak_infectious;
+	MortalityProb -> recovered;
+	EncounterRate -> deceased;
+	EncounterRate -> peak;
+	EncounterRate -> cases;
+	EncounterRate -> peak_infectious;
+	EncounterRate -> recovered;
+}

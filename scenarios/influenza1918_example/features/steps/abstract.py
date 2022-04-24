@@ -20,6 +20,7 @@ sys.path.append("../../")  # This one's for running `behave` in `compare-inverve
 import dag_steps
 from covasim_utils import avg_age, household_size
 
+
 def add_constraint(context, constraint):
     print("Adding constraint", constraint)
     context.scenario.modelling_scenario.constraints.add(constraint)
@@ -39,10 +40,6 @@ def step_impl(context, v1, set):
         False,
     )
     add_constraint(context, z3.simplify(folded))
-
-@given(u'pandemic_gets_going')
-def step_impl(context):
-    add_constraint(context, context.scenario.modelling_scenario.variables.get("pandemic_gets_going").z3)
 
 
 @given("{lower} <= {v} <= {upper}")
@@ -86,6 +83,7 @@ def step_impl(context, lower, v, upper):
         < context.scenario.modelling_scenario.variables.get(upper, upper),
     )
 
+
 @given("{lower} <= {v}")
 def step_impl(context, lower, v):
     add_constraint(
@@ -120,6 +118,7 @@ def step_impl(context, v1, v2):
         context.scenario.modelling_scenario.variables.get(v1, v1)
         >= context.scenario.modelling_scenario.variables.get(v2, v2),
     )
+
 
 mutations = {
     "increase": lambda x, x_prime: x_prime == (x*2),

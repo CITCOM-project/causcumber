@@ -107,7 +107,7 @@ def fit_distribution(data) -> stats.beta:
     return stats.beta(*params)
 
 
-def run_influenza_1918(runs, outputs):
+def run_influenza1918(runs, outputs):
     from OMPython import ModelicaSystem, OMCSessionZMQ
     from shutil import move
     stats = []
@@ -125,10 +125,9 @@ def run_influenza_1918(runs, outputs):
             for cmd in cmds:
                 answer = omc.sendExpression(cmd)
                 if not answer:
-                    raise ValueError("\\n{}:\\n{}".format(cmd, answer))
+                    raise ValueError("\n{}:\n{}".format(cmd, answer))
 
             df = pd.read_csv("influenza1918_res.csv")
-            # df.to_csv(f"results/influenza1918_abstract/influenza1918_res_{repeat}_{i}.csv")
             datum = run.to_dict()
             datum["deceased"]= df["Deceased"].iloc[-1]
             datum["recovered"]= df["Recovered"].iloc[-1]
@@ -139,7 +138,6 @@ def run_influenza_1918(runs, outputs):
 
     data = pd.DataFrame(stats)
     assert len(data) == repeats * len(runs)
-    # df.to_csv("results/influenza1918_abstract/influenza1918_res_summary.csv")
     return data
 
 def execute_test(scenario, causal_dag, causal_test_case, observational_data_csv_path):
@@ -190,7 +188,7 @@ def after_feature(context, feature):
             if os.path.exists(datapath):
                 data = pd.read_csv(datapath, index_col=0)
             else:
-                data = run_influenza_1918(runs, context.outputs)
+                data = run_influenza1918_example(runs, context.outputs)
                 data.to_csv(datapath)
             for test in concrete_tests:
                 print("  =====")
