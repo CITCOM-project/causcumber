@@ -1,6 +1,6 @@
 from kivy.config import Config
-Config.set('graphics', 'width', '1200')
-Config.set('graphics', 'height', '900')
+Config.set('graphics', 'width', '1100')
+Config.set('graphics', 'height', '800')
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 Config.write()
 
