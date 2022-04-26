@@ -1,0 +1,49 @@
+digraph "" {
+	graph [newrank=True,
+		rankdir=LR
+	];
+	subgraph cluster_inputs {
+		graph [label="Model inputs"];
+		asymp_prob;
+		asymp_quar_prob;
+		household_size;
+		trace_probs;
+		symp_prob;
+		symp_quar_prob;
+		quar_period;
+		location;
+		pop_infected;
+		average_age;
+		n_days;
+		pop_size;
+	}
+	subgraph cluster_outputs {
+		graph [label="Model outputs"];
+		cum_infections;
+		cum_deaths;
+		cum_quarantined;
+	}
+	asymp_prob -> cum_quarantined;
+	asymp_quar_prob -> cum_quarantined;
+	household_size -> cum_infections;
+	household_size -> cum_quarantined;
+	trace_probs -> cum_quarantined;
+	symp_prob -> cum_quarantined;
+	symp_quar_prob -> cum_quarantined;
+	quar_period -> cum_infections;
+	quar_period -> cum_quarantined;
+	location -> household_size;
+	location -> average_age;
+	pop_infected -> cum_infections;
+	pop_infected -> cum_quarantined;
+	average_age -> cum_infections;
+	average_age -> cum_deaths;
+	average_age -> cum_quarantined;
+	n_days -> cum_infections;
+	n_days -> cum_deaths;
+	n_days -> cum_quarantined;
+	pop_size -> cum_infections;
+	pop_size -> cum_quarantined;
+	cum_infections -> cum_deaths;
+	cum_quarantined -> cum_infections;
+}

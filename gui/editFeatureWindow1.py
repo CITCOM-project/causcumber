@@ -126,7 +126,7 @@ class EditFeatureWindow1(Screen):
             x = x.replace(';', '')
             final_parameterValue.append(x)
 
-        split_parameterType = self.column3Value.text.split()  #type
+        split_parameterType = self.column3Value.text.split("\n")  #type
         final_parameterType = []
         for x in split_parameterType:
             x = x.replace('\n', '')
@@ -178,7 +178,7 @@ class EditFeatureWindow1(Screen):
                 content += "      | " + final_variableName[x] + "  | " + final_variableType[x] + "  |\n"
             
             if len(self.extraCondition.text) != 0:
-                split_extraCondition = self.extraCondition.text.split()
+                split_extraCondition = self.extraCondition.text.split("\n")
                 final_extraCondition = []
                 for x in split_extraCondition:
                     x = x.replace('\n', '')

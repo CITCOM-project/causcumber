@@ -29,6 +29,40 @@ def add_constraint(context, constraint):
 #Examples below
 
 """
+@given("average_age = average_ages(location)")
+def step_impl(context):
+    context.supported_countries = sorted(
+        [
+            h
+            for h in covasim.data.country_age_data.data
+            if h in covasim.data.household_size_data.data
+        ],
+        key=lambda x: avg_age(x),
+    )
+    avg_ages = {x: avg_age(x) for x in context.supported_countries}
+
+    age = context.scenario.modelling_scenario.variables["average_age"].z3
+    loc = context.scenario.modelling_scenario.variables["location"].z3
+    folded = fold(
+        lambda acc, x: z3.If(loc == x[0], x[1], acc), list(avg_ages.items()), 0
+    )
+    add_constraint(context, age == folded)
+
+
+@given("household_size = household_sizes(location)")
+def step_impl(context):
+    size = context.scenario.modelling_scenario.variables["household_size"].z3
+    loc = context.scenario.modelling_scenario.variables["location"].z3
+    folded = fold(
+        lambda acc, x: z3.If(loc == x, household_size(x), acc),
+        context.supported_countries,
+        0,
+    )
+    add_constraint(context, size == folded)
+"""
+
+################################
+
 @given("{v1} in {set}")
 def step_impl(context, v1, set):
     set = eval(set)
@@ -43,13 +77,6 @@ def step_impl(context, v1, set):
         False,
     )
     add_constraint(context, z3.simplify(folded))
-
-@given(u'pandemic_gets_going')
-def step_impl(context):
-    add_constraint(context, context.scenario.modelling_scenario.variables.get("pandemic_gets_going").z3)
-"""
-
-################################
 
 @given("{lower} <= {v} <= {upper}")
 def step_impl(context, lower, v, upper):

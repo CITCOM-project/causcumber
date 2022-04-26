@@ -105,6 +105,9 @@ class EditFeatureWindow2(Screen):
             globals()[f"self.parameter_btn{x}"] = Button(text=self.output_parameter_list[x].strip(), size_hint_y=None, height=44)
             globals()[f"self.parameter_btn{x}"].bind(on_release=self.edit_relationship)
             self.dropdown.add_widget(globals()[f"self.parameter_btn{x}"])
+            self.all_btn = Button(text=".*", size_hint_y=None, height=44)
+            self.all_btn.bind(on_release=self.edit_relationship)
+            self.dropdown.add_widget(self.all_btn)
 
             globals()[f"self.output_parameter{x}"] = Label(text=self.output_parameter_list[x], size_hint=(1, 1)) 
             self.output_parameters.add_widget(globals()[f"self.output_parameter{x}"])
